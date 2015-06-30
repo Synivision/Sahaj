@@ -1,10 +1,8 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 
 [RequireComponent(typeof(MoveBehaviour))]
 public class PirateController : MonoBehaviour {
-
 	public MoveBehaviour moveBehaviour;
 	Vector3 startPos;
 	Vector3 endPos;
@@ -13,10 +11,7 @@ public class PirateController : MonoBehaviour {
 	void Start(){
 			
 		moveBehaviour = gameObject.GetComponent<MoveBehaviour>();
-
-
 	}
-
 	
 	void Update () {
 
@@ -36,4 +31,20 @@ public class PirateController : MonoBehaviour {
 		endPos = new Vector3(Random.Range(-50f, 20f), 2, Random.Range(-50f, 20f));
 	}
 
+    /* ALTERNATE
+    private MoveBehaviour _moveBehaviour;
+
+    void Start()
+    {
+        _moveBehaviour = GetComponent<MoveBehaviour>();
+
+        ResetLerp();
+        _moveBehaviour.OnLerpEndEvent += ResetLerp;
+    }
+
+    private void ResetLerp()
+    {
+        _moveBehaviour.LerpToTarget(new Vector3(Random.Range(-50f, 20f), 2, Random.Range(-50f, 20f)));
+    }
+     */
 }

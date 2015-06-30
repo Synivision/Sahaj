@@ -1,0 +1,32 @@
+{
+	Fonts
+	{
+	}
+	Materials
+	{
+		NavyGrid.mat
+		NavySmooth.mat
+		PinkGrid.mat
+		PinkSmooth.mat
+		SwatchNavyDarkAlbedo.mat
+		SwatchOrangeAlbedo.mat
+		SwatchPinkDAlbedo.mat
+		SwatchTealAlbedo.mat
+		SwatchTurquoiseAlbedo.mat
+		SwatchWhiteAlbedo.mat
+		SwatchYellowAlbedo.mat
+		YellowGrid.mat
+	}
+	Models
+	{
+	}
+	Prefabs
+	{
+	}
+	Sounds
+	{
+	}
+	Textures
+	{
+	}
+}
