@@ -3,22 +3,8 @@
 public delegate void OnLerpEndEventHandler();
 
 public class MoveBehaviour : MonoBehaviour {
-	void Start () {
-		
 
-	}
-	
-	void Update () {
-
-	}
-
-	public void move(Vector3 startPos, Vector3 endPos, float timer){
-
-		transform.position = Vector3.Lerp(startPos, endPos, (Time.time - timer)/2);
-
-	}
-
-    /* ALTERNATE
+    
     private const float LerpTime = 1f;
 
     public OnLerpEndEventHandler OnLerpEndEvent;
@@ -42,8 +28,8 @@ public class MoveBehaviour : MonoBehaviour {
     {
         _oldPosition = transform.position;
         _targetPosition = target;
-
         _lerpProgress = 0f;
     }
-     */
+	
+     
 }
