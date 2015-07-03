@@ -94,8 +94,8 @@ namespace Assets.Code.UnityBehaviours
             _resolver.Lock();
 
             /* BEGIN STATE */
-            //_currentState = new MenuState(_resolver);
-            //_currentState.Initialize();
+            _currentState = new PlayState(_resolver);
+            _currentState.Initialize();
 
             /* SUBSCRIBE FOR GAME END */
             _onExitGame = _messager.Subscribe<ExitGameMessage>(OnExitGame);
