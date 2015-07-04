@@ -53,8 +53,6 @@ public class CameraController : MonoBehaviour {
 					if (scrollVelocity <= 500)
 						scrollVelocity = 0;
 
-
-			
 			}
 			else if (touches[0].phase == TouchPhase.Ended)
 			{

@@ -1,7 +1,4 @@
 {
-	Fonts
-	{
-	}
 	Materials
 	{
 		NavyGrid.mat
@@ -21,12 +18,6 @@
 	{
 	}
 	Prefabs
-	{
-	}
-	Sounds
-	{
-	}
-	Textures
 	{
 	}
 }

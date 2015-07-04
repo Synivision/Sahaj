@@ -2,11 +2,15 @@
 using Assets.Code.Messaging;
 using Assets.Code.Ui;
 using UnityEngine;
+using Assets.Code.DataPipeline.Providers;
+using Assets.Code.Logic.Pooling;
 
 namespace Assets.Code.States
 {
+
     public class PlayState : BaseState
     {
+		public static  PrefabProvider _prefabProvider;
         /* REFERENCES */
         private readonly Messager _messager;
 
@@ -16,7 +20,18 @@ namespace Assets.Code.States
         public PlayState(IoCResolver resolver) : base(resolver)
         {
             _resolver.Resolve(out _messager);
+			_resolver.Resolve(out _prefabProvider);
         }
+
+		public  static PrefabProvider Prefabs {
+			get{
+				return _prefabProvider;
+			}
+			set{
+				_prefabProvider = value;
+
+			}
+		}
 
         public override void Initialize()
         {
@@ -24,6 +39,8 @@ namespace Assets.Code.States
             //_uiManager.RegisterUi( ... );
 
             Debug.Log("Play state initialized.");
+
+
         }
 
         public override void Update()

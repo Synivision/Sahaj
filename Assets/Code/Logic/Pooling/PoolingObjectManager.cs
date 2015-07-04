@@ -20,18 +20,30 @@ namespace Assets.Code.Logic.Pooling
             _prefabProvider = prefabProvider;
         }
 
+		public  Dictionary<string, ObjectPool> getpools(){
+
+			return _pools;
+
+		}
+
         public PoolingBehaviour Instantiate(string prefabName)
         {
             if(!_pools.ContainsKey(prefabName))
                 _pools.Add(prefabName, new ObjectPool(_prefabProvider.GetPrefab(prefabName)));
+
+
 
             return _pools[prefabName].Instantiate();
         }
 
         public void TearDown()
         {
-            foreach(var pool in _pools)
+            foreach(var pool in _pools){
                 pool.Value.TearDown();
+				UnityEngine.Debug.Log(pool.Value.ToString());		
+			}
+			UnityEngine.Debug.Log("teardown pooling object manager");
+
         }
     }
 }

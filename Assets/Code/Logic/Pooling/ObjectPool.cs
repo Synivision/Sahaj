@@ -2,6 +2,7 @@
 using Assets.Code.UnityBehaviours.Pooling;
 using UnityEngine;
 
+
 namespace Assets.Code.Logic.Pooling
 {
     public class ObjectPool
@@ -36,7 +37,6 @@ namespace Assets.Code.Logic.Pooling
             else
             {
                 subject = _inactiveObjects[0];
-
                 _inactiveObjects.RemoveAt(0);
                 _activeObjects.Add(subject);
 
@@ -49,11 +49,9 @@ namespace Assets.Code.Logic.Pooling
         private PoolingBehaviour CreateNewObject()
         {
             var fab = Object.Instantiate(_prefab);
-
-            var fabBehaviour = fab.GetComponent<PoolingBehaviour>();
+			var fabBehaviour = fab.GetComponent<PoolingBehaviour>();
             fabBehaviour.OnDeadEvent += () => DeactivateObject(fabBehaviour);
-
-            _objects.Add(fabBehaviour);
+			_objects.Add(fabBehaviour);
 
             return fabBehaviour;
         }
@@ -68,9 +66,13 @@ namespace Assets.Code.Logic.Pooling
 
         public void TearDown()
         {
-            foreach(var item in _objects)
+
+            foreach(var item in _objects){
                 Object.Destroy(item.gameObject);
 
+			}
+			UnityEngine.Debug.Log("Object Length : " + _objects.Count.ToString());
+			UnityEngine.Debug.Log("teardown objectpool");
             _objects.Clear();
             _inactiveObjects.Clear();
             _activeObjects.Clear();

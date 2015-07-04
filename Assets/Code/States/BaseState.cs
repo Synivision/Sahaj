@@ -1,8 +1,9 @@
 ﻿using Assets.Code.DataPipeline;
+using UnityEngine;
 
 namespace Assets.Code.States
 {
-    public abstract class BaseState
+    public abstract class BaseState 
     {
         protected IoCResolver _resolver;
 

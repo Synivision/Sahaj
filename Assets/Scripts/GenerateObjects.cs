@@ -6,13 +6,15 @@ public class GenerateObjects : MonoBehaviour {
 
 
 	public Button generateObjectButton;
-	public GameObject gameObjectPrefab;
+
+	public Button tearDownObjectButton;
+	LevelManager levelManager;
 
 	// Use this for initialization
 	void Start () {
-
+		levelManager = new LevelManager();
 		generateObjectButton.onClick.AddListener(generateRandomObjects);
-
+		tearDownObjectButton.onClick.AddListener(tearDownObjects);
 	//from visual studio
 	}
 	
@@ -24,11 +26,14 @@ public class GenerateObjects : MonoBehaviour {
 	void generateRandomObjects(){
 	
 
+		levelManager.CreatePirate();
+	}
 
-			Vector3 position = new Vector3(Random.Range(-50f, 20.0F), 10, Random.Range(-50f , 20.0f));
-			Instantiate(gameObjectPrefab, position, Quaternion.identity);
-
-
-
+	void tearDownObjects(){
+		System.Console.WriteLine("teardown object");
+		Debug.Log("teardown listener");
+		levelManager.TearDownPirates();
+		
+		
 	}
 }
