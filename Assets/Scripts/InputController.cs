@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Assets.Code.Ui.CanvasControllers;
 
 public class InputController : MonoBehaviour {
 	
@@ -7,7 +8,7 @@ public class InputController : MonoBehaviour {
 	private GameObject target;
 	public Vector3 screenSpace;
 	public Vector3 offset;
-	StatsBehaviour statsBehaviour = new StatsBehaviour();
+	private float _time=5;
 	private CameraController myCameraController;
 
 
@@ -24,10 +25,17 @@ public class InputController : MonoBehaviour {
 			
 			RaycastHit hitInfo;
 			target = GetClickedObject (out hitInfo);
-			if(target!=null && target.gameObject.tag == "Player")
-				//Send Message to statsBehaviour applyDamage Event
-				statsBehaviour.ApplyDamage();
+			if(target!=null && target.gameObject.tag == "Player"){
+				
+				StatsBehaviour playerStats = target.GetComponent<StatsBehaviour>();
+				playerStats.ApplyDamage();
+			}
+				
 			
+		}
+		_time+=Time.deltaTime;
+		if(_time > 3){
+			PirateInfoCanvasController.ToggleCanvas(false);
 		}
 		//used to move cube around 
 
@@ -45,12 +53,23 @@ public class InputController : MonoBehaviour {
 				myCameraController.enabled = false;
 
 				}
+
+			if(target!=null && target.gameObject.tag == "Player"){
+				
+
+				PirateController playerObject = target.GetComponent<PirateController>();
+				playerObject.UpdateUiPanel();
+				_time = 0;
+				
+				PirateInfoCanvasController.ToggleCanvas(true);
+			}
 			}
 
-               if (Input.GetMouseButtonUp (0)) {
+            if (Input.GetMouseButtonUp (0)) {
 			_mouseState = false;
 			myCameraController.enabled = true;
 		}
+
 		if (_mouseState) {
 			
 			var curScreenSpace = new Vector3 (Input.mousePosition.x, Input.mousePosition.y, screenSpace.z);

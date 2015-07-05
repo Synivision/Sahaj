@@ -28,10 +28,7 @@ public class LevelManager {
 
 	public void CreatePirate(){
 
-		 
 		poolingObjectManager.Instantiate("Sphere");
-
-
 
 	}
 

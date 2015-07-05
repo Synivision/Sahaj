@@ -10,9 +10,12 @@ public class StatsBehaviour : MonoBehaviour {
 	
 	void Start(){
 		
-		_currentHealth = stats.MaximumHealth;
-		_currentCourage = stats.MaximumCourage;
-		_currentDamage = 0;
+//		_currentHealth = stats.MaximumHealth;
+		//_currentCourage = stats.MaximumCourage;
+		//_currentDamage = 0;
+		_currentHealth = 100;
+		_currentDamage = 10;
+		_currentCourage = 1;
 		
 	}
 	
@@ -22,7 +25,7 @@ public class StatsBehaviour : MonoBehaviour {
 			Debug.Log ("Dead");
 		} else {
 			_currentHealth -= _currentDamage;
-			Debug.Log("Ouch");
+			Debug.Log("Current Health : "+ _currentHealth.ToString());
 		}
 	}
 	
