@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
 
@@ -32,7 +32,7 @@ public class GenerateObjects : MonoBehaviour {
 	void tearDownObjects(){
 		System.Console.WriteLine("teardown object");
 		Debug.Log("teardown listener");
-		levelManager.TearDownPirates();
+		levelManager.TearDownLevel();
 		
 		
 	}
