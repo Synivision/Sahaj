@@ -42,7 +42,6 @@ namespace Assets.Code.Logic.Pooling
                 pool.Value.TearDown();
 				UnityEngine.Debug.Log(pool.Value.ToString());		
 			}
-			UnityEngine.Debug.Log("teardown pooling object manager");
 
         }
     }

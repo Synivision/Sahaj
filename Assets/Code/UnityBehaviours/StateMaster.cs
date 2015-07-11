@@ -94,7 +94,7 @@ namespace Assets.Code.UnityBehaviours
             _resolver.Lock();
 
             /* BEGIN STATE */
-            _currentState = new PlayState(_resolver);
+            _currentState = new MenuState(_resolver);
             _currentState.Initialize();
 
             /* SUBSCRIBE FOR GAME END */
@@ -132,5 +132,15 @@ namespace Assets.Code.UnityBehaviours
             _currentState.Update ();
             _currentState.HandleInput();
         }
+
+		public IoCResolver Resolver{get{
+
+				return _resolver;
+			}set{
+
+				_resolver = value;
+			}}
     }
+
+
 }

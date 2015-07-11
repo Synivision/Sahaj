@@ -2,6 +2,10 @@
 using Assets.Code.Ui.CanvasControllers;
 using System.Collections.Generic;
 using System.Linq;
+using Assets.Code.Messaging;
+using Assets.Code.Messaging.Messages;
+using Assets.Code.DataPipeline;
+using Assets.Code.UnityBehaviours;
 
 
 [RequireComponent(typeof(MoveBehaviour))]
@@ -16,6 +20,8 @@ public class PirateController : MonoBehaviour {
 	private List<GameObject> _knownPirates;
 
 	private float time;
+
+	private  Messager _messager;
 
     void Start()
     {
@@ -33,6 +39,7 @@ public class PirateController : MonoBehaviour {
     
 		_knownPirates = LevelManager.GetKnownPirates();
 
+
 	}
 
 
@@ -47,25 +54,26 @@ public class PirateController : MonoBehaviour {
 				
 				Debug.Log("Nearest Pirate to "+ this._dataModel.Name+ " is " +nearestPlayer.GetComponent<PirateController>().DataModel.Name);
 
-			}
-
-		}
-}
-
-
-	public void Update(){
-
-	}
-
-
+				     }
+				
+				 }
+			 }
+	
+	
     private void ResetLerp()
     {
         _moveBehaviour.LerpToTarget(new Vector3(Random.Range(-50f, 20f), 2, Random.Range(-50f, 20f)));
     }
 
 	public void UpdateUiPanel(){
-		UnityEngine.Debug.Log(_dataModel.Health+" : "+_dataModel.Descipriton+" !");
-		PirateInfoCanvasController.setDisplayInfo(_dataModel);
+
+		IoCResolver resolver = GameObject.Find("state_master").GetComponent<StateMaster>().Resolver;
+		resolver.Resolve(out _messager);
+		_messager.Publish(new PirateMessage{
+
+			model = _dataModel
+		});
+		//PirateInfoCanvasController.setDisplayInfo(_dataModel);
 	}
 
 	public PirateModel DataModel{
