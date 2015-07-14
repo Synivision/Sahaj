@@ -4,7 +4,7 @@ namespace Assets.Code.UnityBehaviours.Pooling
 {
     public delegate void OnDeadEventHandler();
 
-    public class PoolingBehaviour : MonoBehaviour
+    public abstract class PoolingBehaviour : MonoBehaviour
     {
         private bool _isDead;
         public bool IsDead

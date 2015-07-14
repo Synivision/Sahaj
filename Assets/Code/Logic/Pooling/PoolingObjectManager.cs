@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Assets.Code.DataPipeline;
 using Assets.Code.DataPipeline.Providers;
+using UnityEngine;
 using Assets.Code.UnityBehaviours.Pooling;
 
 namespace Assets.Code.Logic.Pooling
@@ -36,6 +37,7 @@ namespace Assets.Code.Logic.Pooling
             return _pools[prefabName].Instantiate();
         }
 
+
         public void TearDown()
         {
             foreach(var pool in _pools){
@@ -44,5 +46,9 @@ namespace Assets.Code.Logic.Pooling
 			}
 
         }
+
+		//TearDownPirate
+		//pooling behaviour
+		//
     }
 }

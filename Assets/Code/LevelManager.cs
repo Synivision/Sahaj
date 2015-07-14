@@ -16,15 +16,9 @@ public class LevelManager
 	private readonly Messager _messager;
 	private readonly PoolingBehaviour _poolingbehviour;
 	PoolingObjectManager _poolingObjectManager;
-	private List<GameObject> _knownPirates;
 	
 	public LevelManager (IoCResolver resolver)
 	{
-
-		//pass iresolver in constructor
-		//_prefabProvider = PlayState.Prefabs;
-		//poolingObjectManager = new PoolingObjectManager(_prefabProvider);
-		
 		resolver.Resolve (out _messager);
 		resolver.Resolve (out _poolingObjectManager);
 		resolver.Resolve (out _prefabProvider);
@@ -33,32 +27,19 @@ public class LevelManager
 		_poolingObjectManager.Instantiate ("Plane");
 	}
 
-	public static List<GameObject> GetKnownPirates ()
-	{
-		List<GameObject> _knownPirates = GameObject.FindGameObjectsWithTag ("Player").
-			Select (pirate => pirate.gameObject).
-				Where (behaviour => behaviour != null).ToList ();
-		
-		return _knownPirates;
-	}
-
 	public void CreatePirate ()
 	{
-		_poolingObjectManager.Instantiate ("Sphere");
-	
-		_knownPirates = GetKnownPirates ();
-		Debug.Log ("known pirates  : " + _knownPirates.Count.ToString ());
+		var pirateObject = _poolingObjectManager.Instantiate ("Sphere");
+		pirateObject.transform.position = new Vector3(Random.Range(-100,100),10,Random.Range(-100,100)); 
+		_messager.Publish (new PirateListChangeMessage{
+		});
 	}
 
-	public void TearDownLevel()
+	public void TearDownLevel ()
 	{
 		UnityEngine.Debug.Log ("level manager");
-		_poolingObjectManager.TearDown();
-
-
+		_poolingObjectManager.TearDown ();
 	}
-
-
 }
 
 

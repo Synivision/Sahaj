@@ -15,46 +15,31 @@ public class InputController : MonoBehaviour
 	public Vector3 offset;
 	private float _time = 5;
 	private CameraController myCameraController;
-
 	private Messager _messager;
+
 	void Start ()
 	{
 		myCameraController = GetComponent<CameraController> ();
-		IoCResolver resolver = GameObject.Find("state_master").GetComponent<StateMaster>().Resolver;
-		resolver.Resolve(out _messager);
+		IoCResolver resolver = GameObject.Find ("state_master").GetComponent<StateMaster> ().Resolver;
+		resolver.Resolve (out _messager);
 
 	}
 
 	void Update ()
 	{
-		
-		if (Input.GetMouseButtonUp (1)) {
-			
-			RaycastHit hitInfo;
-			target = GetClickedObject (out hitInfo);
-			if (target != null && target.gameObject.tag == "Player") {
-				
-				StatsBehaviour playerStats = target.GetComponent<StatsBehaviour> ();
-				playerStats.ApplyDamage ();
-			}
-				
-			
-		}
 		_time += Time.deltaTime;
 		if (_time > 3) {
-			_messager.Publish(new PirateInfoCanvasMessage{
+			_messager.Publish (new PirateInfoCanvasMessage{
 				toggleValue = false
 			});
 		}
 		//used to move cube around 
-
 		if (Input.GetMouseButtonDown (0)) {
-
-				
+	
 			RaycastHit hitInfo;
 			target = GetClickedObject (out hitInfo);
 
-			if (target != null && target.gameObject.tag == "Cube") {
+			if (target != null && (target.gameObject.tag == "Cube" || target.gameObject.tag == "Player" )) {
 				_mouseState = true;
 				screenSpace = Camera.main.WorldToScreenPoint (target.transform.position);
 				offset = target.transform.position - Camera.main.ScreenToWorldPoint (new Vector3 (Input.mousePosition.x, Input.mousePosition.y, screenSpace.z));
@@ -66,13 +51,11 @@ public class InputController : MonoBehaviour
 			if (target != null && target.gameObject.tag == "Player") {
 				
 				//send message to pirate canvas controller to display pirate info
-
-			
 				PirateController playerObject = target.GetComponent<PirateController> ();
 				playerObject.UpdateUiPanel ();
 				_time = 0;
 				
-				_messager.Publish(new PirateInfoCanvasMessage{
+				_messager.Publish (new PirateInfoCanvasMessage{
 					toggleValue = true
 				});
 			}

@@ -1,32 +1,28 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class StatsBehaviour : MonoBehaviour {
+public class StatsBehaviour {
 	StatBlock stats;
 	
 	private float _currentDamage;
 	private float _currentHealth;
 	private float _currentCourage;
+
+	private PirateModel _pirateModel;
 	
-	void Start(){
-		
-//		_currentHealth = stats.MaximumHealth;
-		//_currentCourage = stats.MaximumCourage;
-		//_currentDamage = 0;
-		_currentHealth = 100;
-		_currentDamage = 10;
-		_currentCourage = 1;
+	public  StatsBehaviour(PirateModel pirateModel){
+
+		_pirateModel = pirateModel;
+		_currentHealth = _pirateModel.Health;
+		_currentDamage = _pirateModel.AttackDamage;
+		_currentCourage = _pirateModel.Courage;
 		
 	}
 	
-	public void ApplyDamage(){
-		
-		if (_currentDamage > _currentHealth) {
-			Debug.Log ("Dead");
-		} else {
-			_currentHealth -= _currentDamage;
-			Debug.Log("Current Health : "+ _currentHealth.ToString());
-		}
+	public void ApplyDamage(float damage){
+
+		_currentHealth -= damage;
+		Debug.Log("Current Health : "+ _currentHealth.ToString());
 	}
 	
 	public void Regenerate(){}
@@ -38,6 +34,11 @@ public class StatsBehaviour : MonoBehaviour {
 		stats.MaximumHealth = newHeallth;
 		
 	}
-	
-	
+
+	public float CurrentHealth{get{
+
+			return _currentHealth;
+		} set{
+			_currentHealth = value;
+		}}
 }

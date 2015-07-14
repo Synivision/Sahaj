@@ -23,25 +23,29 @@ namespace Assets.Code.Logic.Pooling
 
         public void Emit(string effectName, Vector3 position, Color tint, int amount)
         {
-            if(!_particleSystems.ContainsKey(effectName))
-                AddNewSytem(effectName);
 
-            var particleSystem = _particleSystems[effectName];
-            particleSystem.startColor = tint;
+			if(!_particleSystems.ContainsKey(effectName))
+				AddNewSytem(effectName	);
+
+			var particleSystem = _particleSystems[effectName];
+           
+				particleSystem.startColor = tint;
             particleSystem.transform.position = position;
-            particleSystem.Emit(amount);
+            
+			particleSystem.Emit(amount);
         }
 
         private void AddNewSytem(string name)
         {
             var fab = Object.Instantiate(_prefabProvider.GetPrefab(name));
-            fab.name = name;
+		//	var fab =new ObjectPool(_prefabProvider.GetPrefab(name));
+			fab.name = name;
 
             var fabBehaviour = fab.GetComponent<ParticleSystem>();
             if (fabBehaviour == null)
                 Debug.Log("WARNING! PoolingParticleManager particle type " + name + " is not a particle system!");
 
-            _particleSystems.Add(name, fabBehaviour);
+			_particleSystems.Add(name, fabBehaviour);
         }
 
         public void TearDown()

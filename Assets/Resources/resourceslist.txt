@@ -1,6 +1,8 @@
 {
 	Materials
 	{
+		Fairy Dust.mat
+		FlameA.mat
 		NavyGrid.mat
 		NavySmooth.mat
 		PinkGrid.mat
@@ -14,10 +16,39 @@
 		SwatchYellowAlbedo.mat
 		YellowGrid.mat
 	}
-	Models
+	Particles
 	{
+	}
+	ParticleSystems
+	{
+		Materials
+		{
+			ParticleAfterburner.mat
+			ParticleDuststorm.mat
+			ParticleFireball.mat
+			ParticleFirecloud.mat
+			ParticleFlames.mat
+			ParticleGlow.mat
+			ParticleSpray.mat
+			ParticleSteam.mat
+			ParticleSteamMobile.mat
+			ParticleWaterSpray.mat
+		}
 	}
 	Prefabs
 	{
+	}
+	Textures
+	{
+		GridEmissive.png
+		SwatchMauveAlbedo.png
+		SwatchNavyAlbedo.png
+		SwatchNavyDarkAlbedo.png
+		SwatchOrangeAlbedo.png
+		SwatchPinkDAlbedo.png
+		SwatchTealAlbedo.png
+		SwatchTurquoiseAlbedo.png
+		SwatchWhiteAlbedo.png
+		SwatchYellowAlbedo.png
 	}
 }
