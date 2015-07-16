@@ -22,7 +22,7 @@ public class StatsBehaviour {
 	public void ApplyDamage(float damage){
 
 		_currentHealth -= damage;
-		Debug.Log("Current Health : "+ _currentHealth.ToString());
+		Debug.Log("Current Health of Pirate : " + _currentHealth.ToString());
 	}
 	
 	public void Regenerate(){}

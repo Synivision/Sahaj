@@ -5,8 +5,9 @@ using Assets.Code.Messaging;
 using Assets.Code.DataPipeline;
 using Assets.Code.Messaging.Messages;
 using Assets.Code.UnityBehaviours;
+using Assets.Code.UnityBehaviours.Pooling;
 
-public class InputController : MonoBehaviour
+public class InputController : PoolingBehaviour
 {
 	
 	private bool _mouseState;
@@ -16,14 +17,24 @@ public class InputController : MonoBehaviour
 	private float _time = 5;
 	private CameraController myCameraController;
 	private Messager _messager;
+	private IoCResolver _resolver;
 
-	void Start ()
-	{
-		myCameraController = GetComponent<CameraController> ();
-		IoCResolver resolver = GameObject.Find ("state_master").GetComponent<StateMaster> ().Resolver;
+
+	public void Initialize(IoCResolver resolver){
+
+		myCameraController = GameObject.Find("Main Camera").GetComponent<CameraController>();
+		_resolver = resolver;
 		resolver.Resolve (out _messager);
-
 	}
+
+	/*
+	void Start(){
+		//myCameraController = GetComponent<CameraController> ();
+		myCameraController = this.gameObject.GetComponent<CameraController>();
+		//IoCResolver resolver = GameObject.Find("state_master").GetComponent<StateMaster>().Resolver;
+		//resolver.Resolve(out _messager);
+	}
+	*/
 
 	void Update ()
 	{

@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Assets.Code.UnityBehaviours.Pooling;
 
-public class CameraController : MonoBehaviour {
+public class CameraController : PoolingBehaviour {
 
 	// The rate of change of the field of view in perspective mode.
 	public float perspectiveZoomSpeed = 0.5f;        
@@ -19,7 +20,12 @@ public class CameraController : MonoBehaviour {
 	private Vector2 scrollDirection = Vector2.zero;
 
 	private float timeTouchPhaseEnded;
+	private Camera _camera;
 
+	void Start(){
+
+		_camera =GameObject.Find("Main Camera").GetComponent<Camera>();
+	}
 	
 	void Update()
 	{
@@ -43,7 +49,7 @@ public class CameraController : MonoBehaviour {
 					float positionY = delta.y * moveSensitivityY * Time.deltaTime;
 					positionY = invertMoveY ? positionY : positionY * -1;
 					
-					GetComponent<Camera>().transform.position += new Vector3 (positionX, 0, positionY);
+					_camera.transform.position += new Vector3 (positionX, 0, positionY);
 					
 					scrollDirection = touches[0].deltaPosition.normalized;
 					scrollVelocity = (touches[0].deltaPosition.magnitude / touches[0].deltaTime)*100f;
@@ -79,21 +85,21 @@ public class CameraController : MonoBehaviour {
 			float deltaMagnitudeDiff = prevTouchDeltaMag - touchDeltaMag;
 			
 			// If the camera is orthographic...
-			if (GetComponent<Camera>().orthographic)
+			if (_camera.orthographic)
 			{
 				// ... change the orthographic size based on the change in distance between the touches.
-				GetComponent<Camera>().orthographicSize += deltaMagnitudeDiff * orthoZoomSpeed;
+				_camera.orthographicSize += deltaMagnitudeDiff * orthoZoomSpeed;
 				
 				// Make sure the orthographic size never drops below zero.
-				GetComponent<Camera>().orthographicSize = Mathf.Max(GetComponent<Camera>().orthographicSize, 0.1f);
+				_camera.orthographicSize = Mathf.Max(_camera.orthographicSize, 0.1f);
 			}
 			else
 			{
 				// Otherwise change the field of view based on the change in distance between the touches.
-				GetComponent<Camera>().fieldOfView += deltaMagnitudeDiff * perspectiveZoomSpeed;
+				_camera.fieldOfView += deltaMagnitudeDiff * perspectiveZoomSpeed;
 				
 				// Clamp the field of view to make sure it's between 0 and 180.
-				GetComponent<Camera>().fieldOfView = Mathf.Clamp(GetComponent<Camera>().fieldOfView, 40f, 140f);
+				_camera.fieldOfView = Mathf.Clamp(_camera.fieldOfView, 40f, 140f);
 			}
 		}
 	}

@@ -2,7 +2,7 @@
 
 namespace Assets.Code.UnityBehaviours.Pooling
 {
-    public delegate void OnDeadEventHandler();
+	public delegate void OnDeadEventHandler();
 
     public abstract class PoolingBehaviour : MonoBehaviour
     {

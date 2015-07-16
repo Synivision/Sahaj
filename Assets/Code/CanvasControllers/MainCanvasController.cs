@@ -18,52 +18,48 @@ namespace Assets.Code.Ui.CanvasControllers
 
 		public MainCanvasController (IoCResolver resolver, Canvas canvasView) : base(canvasView)
 		{
-
-			resolver.Resolve(out _messager);
+			resolver.Resolve (out _messager);
 
 			ResolveElement (out _makePirateButton, "make_pirate_button");
 			ResolveElement (out _tearDownPirateButton, "teardown_pirate_button");
-			ResolveElement (out _quitButton,"quit_button");	
+			ResolveElement (out _quitButton, "quit_button");	
 
-
-			_makePirateButton.onClick.AddListener (generateRandomObjects);
-			_tearDownPirateButton.onClick.AddListener (tearDownObjects);
-			_quitButton.onClick.AddListener(quitGame);
+			_makePirateButton.onClick.AddListener (OnMakePirateButtonClicked);
+			_tearDownPirateButton.onClick.AddListener (OnTearDownPirateButtonClicked);
+			_quitButton.onClick.AddListener (OnQuitButtonClicked);
 		}
 
-		void quitGame(){
-			_messager.Publish(new QuitGameMessage{
+		void OnQuitButtonClicked ()
+		{
+			_messager.Publish (new QuitGameMessage{
 
 			});
 
 		}
 
-		void generateRandomObjects ()
+		void OnMakePirateButtonClicked ()
 		{
 			//send message to play state to make pirates
-			_messager.Publish(new CreatePirateMessage{
+			_messager.Publish (new CreatePirateMessage{
 
 			});
 
 		}
 				
-		void tearDownObjects ()
+		void OnTearDownPirateButtonClicked ()
 		{
-
-
 			//send message to play state to teardown level
-			_messager.Publish(new TearDownLevelMessage{});
+			_messager.Publish (new TearDownLevelMessage{});
 
 		}
 
-		public override void TearDown()
+		public override void TearDown ()
 		{	
-
 			//Remove Listeners
-			_makePirateButton.onClick.RemoveAllListeners();
-			_tearDownPirateButton.onClick.RemoveAllListeners();
-			_quitButton.onClick.RemoveAllListeners();
-			base.TearDown();
+			_makePirateButton.onClick.RemoveAllListeners ();
+			_tearDownPirateButton.onClick.RemoveAllListeners ();
+			_quitButton.onClick.RemoveAllListeners ();
+			base.TearDown ();
 		}
 
 

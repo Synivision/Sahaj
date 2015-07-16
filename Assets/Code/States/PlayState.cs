@@ -26,6 +26,7 @@ namespace Assets.Code.States
 		private MessagingToken _onQuitGame;
 		private MessagingToken _onCreatePirate;
 		private MessagingToken _onTearDownLevel;
+		private PoolingObjectManager _poolingObjectManager;
 		//level Manager
 
 		LevelManager levelManager;
@@ -35,26 +36,35 @@ namespace Assets.Code.States
 			_resolver.Resolve (out _messager);
 			_resolver.Resolve (out _prefabProvider);
 			_resolver.Resolve (out _canvasProvider);
+			_resolver.Resolve (out _poolingObjectManager);
 		}
 
 		public override void Initialize ()
 		{
 			_uiManager = new UiManager ();
-			//_uiManager.RegisterUi( ... );
 
 			_uiManager.RegisterUi (new MainCanvasController (_resolver, _canvasProvider.GetCanvas ("MainCanvas")));
 			_uiManager.RegisterUi (new PirateInfoCanvasController (_resolver, _canvasProvider.GetCanvas ("PirateInfoCanvas")));
 
 			Debug.Log ("Play state initialized.");
+			var controller = _poolingObjectManager.Instantiate("Controller");
+			controller.gameObject.GetComponent<InputController>().Initialize(_resolver);
 
 			//initialize level manager
 			levelManager = new LevelManager (_resolver);
 
 			//message tokens
-
 			_onQuitGame = _messager.Subscribe<QuitGameMessage> (OnQuitGame);
 			_onCreatePirate = _messager.Subscribe<CreatePirateMessage> (OnCreatePirate);
 			_onTearDownLevel = _messager.Subscribe<TearDownLevelMessage> (OnTearDownLevel);
+
+			//start Input controller
+
+
+			//InputController inputController = new InputController();
+			//inputController.Initialize(_resolver);
+
+
 		}
 
 		public void OnCreatePirate (CreatePirateMessage message)
@@ -86,6 +96,7 @@ namespace Assets.Code.States
 
 			levelManager.TearDownLevel ();
 
+
 		}
 
 		public override void TearDown ()
@@ -93,6 +104,7 @@ namespace Assets.Code.States
 			_messager.CancelSubscription (_onQuitGame, _onTearDownLevel, _onCreatePirate);
 			levelManager.TearDownLevel();
 			_uiManager.TearDown ();
+			_poolingObjectManager.TearDown();
 
 		}
 	}

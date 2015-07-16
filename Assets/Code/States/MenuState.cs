@@ -17,6 +17,7 @@ public class MenuState : BaseState{
 	private CanvasProvider _canvasProvider;
 	private UiManager _uiManager;
 	private MessagingToken _onStartGame;
+	private PoolingObjectManager _poolingObjectManager;
 
 	
 	/* PROPERTIES */
@@ -26,6 +27,7 @@ public class MenuState : BaseState{
 		_resolver.Resolve (out _messager);
 		_resolver.Resolve (out _prefabProvider);
 		_resolver.Resolve (out _canvasProvider);
+		_resolver.Resolve (out _poolingObjectManager);
 	}
 	public override void Initialize ()
 	{
@@ -33,13 +35,13 @@ public class MenuState : BaseState{
 		//message tokens
 		_onStartGame = _messager.Subscribe<StartGameMessage>(OnStartGame);
 
+		var controller = _poolingObjectManager.Instantiate("Controller");
+		controller.gameObject.GetComponent<InputController>().Initialize(_resolver);
 
 		_uiManager = new UiManager ();
-		//_uiManager.RegisterUi( ... );
 
 		_uiManager.RegisterUi(new MenuCanvasController(_resolver, _canvasProvider.GetCanvas("MenuCanvas")));
 
-		//menu canvas
 	}
 
 	private void OnStartGame(StartGameMessage message)
@@ -62,6 +64,7 @@ public class MenuState : BaseState{
 	{
 		_messager.CancelSubscription (_onStartGame);
 		_uiManager.TearDown ();
+		_poolingObjectManager.TearDown();
 
 	}
 
