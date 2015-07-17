@@ -55,13 +55,33 @@ public class LevelManager
 
 		pirateObject.Initialize(_resolver,GeneratePirateModel(),this);
 
-
-		pirateObject.transform.position = new Vector3(Random.Range(-100,100),10,Random.Range(-100,100)); 
+	
+		pirateObject.transform.position = new Vector3(Random.Range(-100,0),10,Random.Range(-100,0)); 
 
 		if(OnPirateGeneratedEvent!=null){
 			OnPirateGeneratedEvent();
 		}
 
+		Debug.Log ("Known Pirates : in create " + _knownPirates.Count.ToString ());
+
+	}
+
+	public void CreateEnemyPirate (){
+
+		pirateObject = (PirateController)_poolingObjectManager.Instantiate ("EnemySphere");
+		
+		_knownPirates.Add(pirateObject);
+		
+		
+		pirateObject.Initialize(_resolver,GeneratePirateModel(),this);
+		
+		
+		pirateObject.transform.position = new Vector3(Random.Range(0,100),10,Random.Range(0,100)); 
+		
+		if(OnPirateGeneratedEvent!=null){
+			OnPirateGeneratedEvent();
+		}
+		
 		Debug.Log ("Known Pirates : in create " + _knownPirates.Count.ToString ());
 
 	}

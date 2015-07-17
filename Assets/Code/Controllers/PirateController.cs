@@ -15,7 +15,6 @@ using Assets.Code.DataPipeline.Providers;
 
 public class PirateController : PoolingBehaviour
 {
-
 	private  MoveBehaviour _moveBehaviour;
 	private  StatsBehaviour _statsBehaviour;
 	private  GameObject target;
@@ -30,7 +29,7 @@ public class PirateController : PoolingBehaviour
 	private  PoolingObjectManager _poolingObjectManager;
 	private  PoolingParticleManager _poolingParticleManager;
 	private  float timeStay = 0;
-	private  float MinPirateDistance = 2;
+	private  float MinPirateDistance = 100;
 	private  MessagingToken _onPirateCreated;
 	private  PoolingAudioPlayer _poolingAudioPlayer;
 	private  SoundProvider _soundProvider;
@@ -43,12 +42,18 @@ public class PirateController : PoolingBehaviour
 	private  GameObject _spawnPoint;
 	private  PoolingBehaviour fabBullet;
 	private  List<PirateController> nearbyPlayers;
+	private  List<PirateController> nearbyEnemyPirates;
+
+	private string _pirateNature;
 
 	public void Initialize(IoCResolver resolver, PirateModel data,LevelManager levelManager){
 
 		_levelManager = levelManager;
 		_knownPirates = _levelManager.GetKnownPirates();
 		nearbyPlayers = new List<PirateController>();
+
+		_pirateNature = this.gameObject.tag;
+		print(_pirateNature);
 
 		UpdatePirateInfo();
 		_levelManager.OnPirateGeneratedEvent += UpdatePirateInfo;
@@ -89,35 +94,35 @@ public class PirateController : PoolingBehaviour
 		//hit target
 		if (5 > Random.Range(0, 10)){
 			Debug.Log("Hit");
-			fabBullet = _poolingObjectManager.Instantiate ("bullet2_prefab");
 
-			Vector3 randomPos = new Vector3(Random.Range(1,3),Random.Range(1,3),Random.Range(1,3));
-			fabBullet.gameObject.GetComponent<BulletController> ().Initialize (_resolver, _spawnPoint.transform.position+randomPos, true, Color.green, nearestPlayer);
-			
-			System.Action action = null;
-			
-			action += () => nearestPlayer.ApplyHit (Random.Range (10, 20));
-			//after some delay 
-			_unityReference.FireDelayed(action, 3f);
-
-
+			InstantiateBullet(true);
+			PerformHit();
 		} else {
 			Debug.Log("Miss");
 			//miss target 
-			fabBullet = _poolingObjectManager.Instantiate ("bullet2_prefab");
-
-			Vector3 randomPos = new Vector3(Random.Range(1,3),Random.Range(1,3),Random.Range(1,3));
-			fabBullet.gameObject.GetComponent<BulletController> ().Initialize (_resolver, _spawnPoint.transform.position+randomPos, false, Color.green, nearestPlayer);
-
+			InstantiateBullet(false);
 		}
+	}
 
+	void InstantiateBullet(bool hit){
+
+		fabBullet = _poolingObjectManager.Instantiate ("bullet2_prefab");
+		Vector3 randomPos = new Vector3(Random.Range(1,3),Random.Range(1,3),Random.Range(1,3));
+		fabBullet.gameObject.GetComponent<BulletController> ().Initialize (_resolver, _spawnPoint.transform.position+randomPos, hit, Color.green, nearestPlayer);
+
+	}
+
+	void PerformHit(){
+		System.Action action = null;
+		
+		action += () => nearestPlayer.ApplyHit (Random.Range (10, 20));
+		//after some delay 
+		_unityReference.FireDelayed(action, 3f);
 	}
 
 	public void ApplyHit (float damage)
 	{
-
 		_poolingParticleManager.Emit ("blood_prefab", this.transform.position, Color.red, 100);
-
 		if (_statsBehaviour.CurrentHealth > 0) {
 			_statsBehaviour.ApplyDamage (damage);
 		} 
@@ -127,9 +132,7 @@ public class PirateController : PoolingBehaviour
 	{
 		if (_knownPirates.Count > 1 && nearestPlayer != null) {
 		
-
-			//Debug.Log ("Distance : " + Vector3.Distance (nearestPlayer.transform.position, transform.position).ToString ());
-			if (Vector3.Distance (nearestPlayer.transform.position, transform.position) > 10) {
+			if (Vector3.Distance (nearestPlayer.transform.position, transform.position) < 100) {
 				minShootTime += Time.deltaTime;
 
 				if (minShootTime >= 3) {
@@ -154,15 +157,21 @@ public class PirateController : PoolingBehaviour
 	void UpdatePirateInfo ()
 	{
 
-		nearbyPlayers = _knownPirates.Where (pirate => Vector3.Distance (pirate.transform.position, transform.position) < MinPirateDistance).ToList ();
 
-		if (nearbyPlayers.Any ()) {
+		if(_pirateNature == "Player"){
+			//nearbyPlayers = _knownPirates.Where (pirate => (Vector3.Distance (pirate.transform.position, transform.position) < MinPirateDistance)).ToList();
+			_knownPirates = _knownPirates.Where (pirate => pirate.gameObject.tag == "Enemy").ToList();
 
+
+		}else if(_pirateNature == "Enemy"){
+
+			//nearbyPlayers = _knownPirates.Where (pirate => (Vector3.Distance (pirate.transform.position, transform.position) < MinPirateDistance)).ToList();
+			_knownPirates = _knownPirates.Where (pirate => pirate.gameObject.tag == "Player").ToList();
+		}
 
 			if (_knownPirates.Count > 1) {
 				nearestPlayer = _knownPirates.OrderBy (player => Vector3.Distance (player.transform.position, transform.position)).ToList () [1];
-
-			}
+	
 		}
 	}
 
@@ -172,26 +181,16 @@ public class PirateController : PoolingBehaviour
 
 			model = _pirateModel
 		});
-
 	}
 
 	public PirateModel DataModel {
-
 		get {
 			return _pirateModel;
 		}
-
 		set {
 			_pirateModel = value;
-
 		}
 	}
 
-	public LevelManager LevelManager{
-
-		get{return _levelManager;}
-		set{_levelManager = value;}
-
-	}
 }
 

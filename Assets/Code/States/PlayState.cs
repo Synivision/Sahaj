@@ -47,8 +47,8 @@ namespace Assets.Code.States
 			_uiManager.RegisterUi (new PirateInfoCanvasController (_resolver, _canvasProvider.GetCanvas ("PirateInfoCanvas")));
 
 			Debug.Log ("Play state initialized.");
-			var controller = _poolingObjectManager.Instantiate("Controller");
-			controller.gameObject.GetComponent<InputController>().Initialize(_resolver);
+			var controller = _poolingObjectManager.Instantiate ("Controller");
+			controller.gameObject.GetComponent<InputController> ().Initialize (_resolver);
 
 			//initialize level manager
 			levelManager = new LevelManager (_resolver);
@@ -69,8 +69,11 @@ namespace Assets.Code.States
 
 		public void OnCreatePirate (CreatePirateMessage message)
 		{
-
-			levelManager.CreatePirate ();
+			if (5 > Random.Range (0, 10)) {
+				levelManager.CreatePirate ();
+			} else {
+				levelManager.CreateEnemyPirate ();
+			}
 
 		}
 
@@ -91,20 +94,19 @@ namespace Assets.Code.States
 		{
 
 		}
+
 		private void OnTearDownLevel (TearDownLevelMessage message)
 		{
 
 			levelManager.TearDownLevel ();
-
-
 		}
 
 		public override void TearDown ()
 		{
 			_messager.CancelSubscription (_onQuitGame, _onTearDownLevel, _onCreatePirate);
-			levelManager.TearDownLevel();
+			levelManager.TearDownLevel ();
 			_uiManager.TearDown ();
-			_poolingObjectManager.TearDown();
+			_poolingObjectManager.TearDown ();
 
 		}
 	}
