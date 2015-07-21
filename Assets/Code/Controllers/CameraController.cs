@@ -22,13 +22,36 @@ public class CameraController : PoolingBehaviour {
 	private float timeTouchPhaseEnded;
 	private Camera _camera;
 
+	// How long the object should shake for.
+	public static float shake = 2f;
+	
+	// Amplitude of the shake. A larger value shakes the camera harder.
+	public float shakeAmount = 0.7f;
+	public float decreaseFactor = 1.0f;
+	
+	Vector3 originalPos;
+
 	void Start(){
 
 		_camera =GameObject.Find("Main Camera").GetComponent<Camera>();
+		originalPos = _camera.transform.localPosition;
 	}
 	
 	void Update()
 	{
+
+		if (shake > 0)
+		{
+			_camera.transform.localPosition = originalPos + Random.insideUnitSphere * shakeAmount;
+			
+			shake -= Time.deltaTime * decreaseFactor;
+		}
+		else
+		{
+			shake = 0f;
+			_camera.transform.localPosition = originalPos;
+		}
+
 		Touch[] touches = Input.touches;
 
 		if (touches.Length == 1)

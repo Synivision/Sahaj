@@ -38,6 +38,13 @@
 	Prefabs
 	{
 	}
+	Sounds
+	{
+		bgmusic.mp3
+		bonus.wav
+		gameover.mp3
+		hit.wav
+	}
 	Textures
 	{
 		GridEmissive.png

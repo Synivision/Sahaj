@@ -13,8 +13,19 @@ public class PirateModel {
 	private int _movementSpeed;
 	private int _trainingCost;
 	private float _trainingTime;
+	//(Player)nature = 0, (Enemy)nature = 1
+	private int _nature;
+	private Color _color;
 
+	public Color PirateColor{
+		get{return _color;}
+		set{_color=value;}
 
+	}
+	public int Nature{
+		get{return _nature;}
+		set{_nature = value;}
+	}
 	public int Health{
 		get{
 			return _health;

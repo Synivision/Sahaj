@@ -28,6 +28,8 @@ public class BulletController : PoolingBehaviour
 
 	public void Initialize (IoCResolver resolver, Vector3 startPos, bool hit, Color color, PirateController targetPirate)
 	{
+
+		CameraController.shake = 1;
 		_color = color;
 		_resolver = resolver;
 		_startPos = startPos;
@@ -49,24 +51,21 @@ public class BulletController : PoolingBehaviour
 
 		_resolver.Resolve (out _unityReference);
 
-		System.Action deleteBulletAction = null;
-		deleteBulletAction += Delete;
-		_unityReference.FireDelayed (deleteBulletAction, 3f);
+	
+		_unityReference.FireDelayed (()=>{
+			Delete();
+		}, 3f);
 
-		System.Action muzzleFlashAction = null;
-		muzzleFlashAction += DisableMuzzleFlash;
-		_unityReference.FireDelayed (muzzleFlashAction, muzzleFlashTime);
+
+		_unityReference.FireDelayed (() => {
+				muzzleFlash.enabled = false;
+				}, muzzleFlashTime);
 	}
-
-	void DisableMuzzleFlash ()
-	{
-		muzzleFlash.enabled = false;
-	}
-
+	
 	void Update ()
 	{
 		float distCovered = (Time.time - startTime) * speed;
-		float fracJourney = (distCovered / journeyLength) * 10;
+		float fracJourney = (distCovered / journeyLength) * 100;
 
 		if (_hit) {
 

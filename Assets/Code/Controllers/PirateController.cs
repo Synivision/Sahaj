@@ -44,19 +44,13 @@ public class PirateController : PoolingBehaviour
 	private  List<PirateController> nearbyPlayers;
 	private  List<PirateController> nearbyEnemyPirates;
 
-	private string _pirateNature;
 
+	private enum Nature{ Player=0, Enemy};
 	public void Initialize(IoCResolver resolver, PirateModel data,LevelManager levelManager){
 
 		_levelManager = levelManager;
 		_knownPirates = _levelManager.GetKnownPirates();
 		nearbyPlayers = new List<PirateController>();
-
-		_pirateNature = this.gameObject.tag;
-		print(_pirateNature);
-
-		UpdatePirateInfo();
-		_levelManager.OnPirateGeneratedEvent += UpdatePirateInfo;
 
 		_spawnPoint = transform.FindChild("BulletSpawnPoint").gameObject;
 		_moveBehaviour = GetComponent<MoveBehaviour> ();
@@ -68,7 +62,8 @@ public class PirateController : PoolingBehaviour
 		_moveBehaviour.OnLerpEndEvent += ResetLerp;
 		
 		_pirateModel = data;
-		
+		gameObject.GetComponent<Renderer>().material.color = _pirateModel.PirateColor;
+		 
 		//Initialize stats behaviour
 		_statsBehaviour = new StatsBehaviour (_pirateModel);
 		
@@ -80,6 +75,9 @@ public class PirateController : PoolingBehaviour
 		_resolver.Resolve (out _poolingAudioPlayer);
 		_resolver.Resolve (out _soundProvider);
 		_resolver.Resolve (out _unityReference);
+
+		UpdatePirateInfo();
+		_levelManager.OnPirateGeneratedEvent += UpdatePirateInfo;
 	
 	}
 
@@ -91,8 +89,8 @@ public class PirateController : PoolingBehaviour
 
 	public void Shoot ()
 	{
-		//hit target
-		if (5 > Random.Range(0, 10)){
+		//hit target		
+		if (8 > Random.Range(0, 10)){
 			Debug.Log("Hit");
 
 			InstantiateBullet(true);
@@ -114,10 +112,9 @@ public class PirateController : PoolingBehaviour
 
 	void PerformHit(){
 		System.Action action = null;
-		
-		action += () => nearestPlayer.ApplyHit (Random.Range (10, 20));
-		//after some delay 
-		_unityReference.FireDelayed(action, 3f);
+		_unityReference.FireDelayed(() =>{
+			nearestPlayer.ApplyHit (Random.Range (10, 20));
+			}, .1f);
 	}
 
 	public void ApplyHit (float damage)
@@ -130,12 +127,13 @@ public class PirateController : PoolingBehaviour
 
 	void Update ()
 	{
-		if (_knownPirates.Count > 1 && nearestPlayer != null) {
+
+		if (_knownPirates.Count >= 1 && nearestPlayer != null) {
 		
 			if (Vector3.Distance (nearestPlayer.transform.position, transform.position) < 100) {
 				minShootTime += Time.deltaTime;
 
-				if (minShootTime >= 3) {
+				if (minShootTime >= 1.5f) {
 
 					Shoot ();
 					minShootTime = 0;
@@ -157,21 +155,39 @@ public class PirateController : PoolingBehaviour
 	void UpdatePirateInfo ()
 	{
 
+		_knownPirates = _levelManager.GetKnownPirates();
+		if(_pirateModel.Nature == (int)Nature.Player){
+			_knownPirates = _knownPirates.Where (pirate => pirate._pirateModel.Nature==(int)Nature.Enemy).ToList();
 
-		if(_pirateNature == "Player"){
-			//nearbyPlayers = _knownPirates.Where (pirate => (Vector3.Distance (pirate.transform.position, transform.position) < MinPirateDistance)).ToList();
-			_knownPirates = _knownPirates.Where (pirate => pirate.gameObject.tag == "Enemy").ToList();
 
+		}else if(_pirateModel.Nature == (int)Nature.Enemy){
 
-		}else if(_pirateNature == "Enemy"){
-
-			//nearbyPlayers = _knownPirates.Where (pirate => (Vector3.Distance (pirate.transform.position, transform.position) < MinPirateDistance)).ToList();
-			_knownPirates = _knownPirates.Where (pirate => pirate.gameObject.tag == "Player").ToList();
+			_knownPirates = _knownPirates.Where (pirate => pirate._pirateModel.Nature==(int)Nature.Player).ToList();
 		}
 
-			if (_knownPirates.Count > 1) {
-				nearestPlayer = _knownPirates.OrderBy (player => Vector3.Distance (player.transform.position, transform.position)).ToList () [1];
-	
+		if (_knownPirates.Count >= 1) {
+
+			nearestPlayer = _knownPirates[0];
+
+			foreach(PirateController pirate in _knownPirates){
+
+				if(Vector3.Distance (pirate.transform.position, transform.position) < Vector3.Distance (nearestPlayer.transform.position, transform.position)){
+
+					nearestPlayer = pirate;
+
+				}
+								
+			}
+
+			if(nearestPlayer != null){
+
+				_unityReference.FireDelayed(()=>{
+					UpdatePirateInfo();
+				},2f);
+				Debug.Log("Nearest pirate to : " + DataModel.Name + " is : " + nearestPlayer.DataModel.Name);
+			}
+				
+
 		}
 	}
 

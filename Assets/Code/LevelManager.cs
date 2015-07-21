@@ -94,6 +94,15 @@ public class LevelManager
 		pirateModel.AttackDamage = Random.Range (10, 20);
 		pirateModel.Name = "Pirate No." + Random.Range (0, 100).ToString ();
 		pirateModel.Courage = Random.Range (1, 5);
+
+		if(5 > Random.Range(0,10)){
+			pirateModel.Nature=0;
+			pirateModel.PirateColor = Color.red;
+		}
+		else{
+			pirateModel.Nature=1;
+			pirateModel.PirateColor = Color.yellow;
+		}
 		return pirateModel;
 
 	}
