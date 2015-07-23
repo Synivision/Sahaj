@@ -71,7 +71,33 @@ namespace Assets.Code.States
 
 		public void OnCreatePirate (CreatePirateMessage message)
 		{
-				levelManager.CreatePirate ();
+			switch(message.PirateName){
+			
+			case "Pirate1":
+				levelManager.CreatePirate(message.PirateName);
+				break;
+
+			case "Pirate2":
+				levelManager.CreatePirate(message.PirateName);
+				break;
+
+			case "Pirate3":
+				levelManager.CreatePirate(message.PirateName);
+				break;
+
+			case "EnemyPirate1":
+				levelManager.CreatePirate(message.PirateName);
+				break;
+
+			case "EnemyPirate2":
+				levelManager.CreatePirate(message.PirateName);
+				break;
+
+			case "EnemyPirate3":
+				levelManager.CreatePirate(message.PirateName);
+				break;
+
+			}
 		}
 
 		public override void Update ()

@@ -2,7 +2,7 @@
 using Assets.Code.Ui.CanvasControllers;
 using System.Collections.Generic;
 using System.Linq;
-
+using UnityEngine.UI;
 using Assets.Code.Messaging;
 using Assets.Code.Messaging.Messages;
 using Assets.Code.DataPipeline;
@@ -27,6 +27,7 @@ public class PirateController : PoolingBehaviour
 	private  IoCResolver _resolver;
 	private  Messager _messager;
 	private  PoolingObjectManager _poolingObjectManager;
+	private  PrefabProvider _prefabProvider;
 	private  PoolingParticleManager _poolingParticleManager;
 	private  float timeStay = 0;
 	private  float MinPirateDistance = 100;
@@ -44,9 +45,16 @@ public class PirateController : PoolingBehaviour
 	private  List<PirateController> nearbyPlayers;
 	private  List<PirateController> nearbyEnemyPirates;
 
+	public Slider _healthBar;
+	public Text _stateText;
+	public RectTransform panel;
+	enum PirateState{Shooting,Chasing,Idle,Fleeing};
 
-	private enum Nature{ Player=0, Enemy};
+	private PirateState _pirateState;
+
 	public void Initialize(IoCResolver resolver, PirateModel data,LevelManager levelManager){
+
+
 
 		_levelManager = levelManager;
 		_knownPirates = _levelManager.GetKnownPirates();
@@ -54,6 +62,7 @@ public class PirateController : PoolingBehaviour
 
 		_spawnPoint = transform.FindChild("BulletSpawnPoint").gameObject;
 		_moveBehaviour = GetComponent<MoveBehaviour> ();
+		//_healthBar = transform.FindChild("Canvas").transform.FindChild("Slider").gameObject.GetComponent<Slider>();
 
 		OnDeadEvent += () => _levelManager.OnPirateDead(this);
 
@@ -75,10 +84,16 @@ public class PirateController : PoolingBehaviour
 		_resolver.Resolve (out _poolingAudioPlayer);
 		_resolver.Resolve (out _soundProvider);
 		_resolver.Resolve (out _unityReference);
+		_resolver.Resolve (out _prefabProvider);
 
 		UpdatePirateInfo();
 		_levelManager.OnPirateGeneratedEvent += UpdatePirateInfo;
-	
+		_healthBar.maxValue = _pirateModel.Health;
+
+		ChangeState(PirateState.Idle);
+
+		panel.sizeDelta = new Vector2(_pirateModel.PirateRange, _pirateModel.PirateRange);
+
 	}
 
 	private void ResetLerp ()
@@ -95,10 +110,13 @@ public class PirateController : PoolingBehaviour
 
 			InstantiateBullet(true);
 			PerformHit();
+			var soundPoolManager = new PoolingAudioPlayer(_prefabProvider.GetPrefab("ShootSoundHit"));
+
 		} else {
 			Debug.Log("Miss");
 			//miss target 
 			InstantiateBullet(false);
+			var soundPoolManager = new PoolingAudioPlayer(_prefabProvider.GetPrefab("ShootSoundMiss"));
 		}
 	}
 
@@ -127,19 +145,33 @@ public class PirateController : PoolingBehaviour
 
 	void Update ()
 	{
-
+		/*
+		if (!_knownPirates.Any()) {
+			ChangeState(PirateState.Idle);
+			return;
+		}
+        */
+	
 		if (_knownPirates.Count >= 1 && nearestPlayer != null) {
 		
-			if (Vector3.Distance (nearestPlayer.transform.position, transform.position) < 100) {
+			if (Vector3.Distance (nearestPlayer.transform.position, transform.position) < _pirateModel.PirateRange) {
+
+				ChangeState(PirateState.Shooting);
+				Debug.Log("In pirate shoot range detection");
 				minShootTime += Time.deltaTime;
 
 				if (minShootTime >= 1.5f) {
 
 					Shoot ();
 					minShootTime = 0;
-
+					Debug.Log(Vector3.Distance (nearestPlayer.transform.position, transform.position).ToString());
 				}
 			}
+			else{
+				ChangeState(PirateState.Idle);
+			}
+
+
 		}
 
 		if(_statsBehaviour.CurrentHealth < 0){
@@ -150,19 +182,22 @@ public class PirateController : PoolingBehaviour
 			}
 		}
 
+
+		_healthBar.value = _statsBehaviour.CurrentHealth;
+
 	}
 
 	void UpdatePirateInfo ()
 	{
 
 		_knownPirates = _levelManager.GetKnownPirates();
-		if(_pirateModel.Nature == (int)Nature.Player){
-			_knownPirates = _knownPirates.Where (pirate => pirate._pirateModel.Nature==(int)Nature.Enemy).ToList();
+		if(_pirateModel.PirateNature == (int)PirateModel.Nature.Player){
+			_knownPirates = _knownPirates.Where (pirate => pirate._pirateModel.PirateNature == (int)PirateModel.Nature.Enemy).ToList();
 
 
-		}else if(_pirateModel.Nature == (int)Nature.Enemy){
+		}else if( _pirateModel.PirateNature == (int)PirateModel.Nature.Enemy ){
 
-			_knownPirates = _knownPirates.Where (pirate => pirate._pirateModel.Nature==(int)Nature.Player).ToList();
+			_knownPirates = _knownPirates.Where (pirate => pirate._pirateModel.PirateNature == (int)PirateModel.Nature.Player).ToList();
 		}
 
 		if (_knownPirates.Count >= 1) {
@@ -180,15 +215,23 @@ public class PirateController : PoolingBehaviour
 			}
 
 			if(nearestPlayer != null){
+			
+					
+				
 
 				_unityReference.FireDelayed(()=>{
 					UpdatePirateInfo();
 				},2f);
-				Debug.Log("Nearest pirate to : " + DataModel.Name + " is : " + nearestPlayer.DataModel.Name);
+			//	Debug.Log("Nearest pirate to : " + DataModel.Name + " is : " + nearestPlayer.DataModel.Name);
 			}
 				
 
-		}
+		}else {
+			
+			ChangeState(PirateState.Idle);
+			
+		} 
+
 	}
 
 	public void UpdateUiPanel ()
@@ -207,6 +250,14 @@ public class PirateController : PoolingBehaviour
 			_pirateModel = value;
 		}
 	}
+
+
+	private void ChangeState(PirateState newState)
+	{
+		_pirateState = newState;
+		_stateText.text = newState.ToString();
+	}
+
 
 }
 

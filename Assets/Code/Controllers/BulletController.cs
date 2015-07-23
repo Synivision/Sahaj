@@ -20,10 +20,11 @@ public class BulletController : PoolingBehaviour
 	private float journeyLength;
 	private float speed = 5.0F;
 	private Light muzzleFlash;
-	private float muzzleFlashTime = 0.3f;
+	private float muzzleFlashTime = 0.1f;
 	private PirateController _targetPirate;
 	private bool _hit;
 	private  UnityReferenceMaster _unityReference;
+	private LineRenderer _lineRenderer;
 	Vector3 randomPosition;
 
 	public void Initialize (IoCResolver resolver, Vector3 startPos, bool hit, Color color, PirateController targetPirate)
@@ -54,12 +55,16 @@ public class BulletController : PoolingBehaviour
 	
 		_unityReference.FireDelayed (()=>{
 			Delete();
-		}, 3f);
+		}, .15f);
 
 
 		_unityReference.FireDelayed (() => {
 				muzzleFlash.enabled = false;
 				}, muzzleFlashTime);
+
+		_lineRenderer = GetComponent<LineRenderer>();
+		_lineRenderer.SetWidth(.45f,.45f);
+		_lineRenderer.SetPosition(0,startPos);
 	}
 	
 	void Update ()
@@ -73,6 +78,9 @@ public class BulletController : PoolingBehaviour
 		} else {  
 			transform.position = Vector3.Lerp (_startPos, _targetPirate.transform.position + randomPosition, fracJourney);
 		}
+
+
+		_lineRenderer.SetPosition(1,this.transform.position);
 	}
 
 
