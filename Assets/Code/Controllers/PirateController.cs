@@ -11,8 +11,8 @@ using Assets.Code.UnityBehaviours;
 using Assets.Code.Logic.Pooling;
 using Assets.Code.DataPipeline.Providers;
 
+[RequireComponent(typeof(MoveBehaviour))]
 
-public delegate void OnPirateDeadEventHandler();
 public class PirateController : AIPath
 {
 	private  MoveBehaviour _moveBehaviour;
@@ -53,7 +53,7 @@ public class PirateController : AIPath
 	private PirateState _pirateState;
 	private bool isChase=true;
 
-	private OnPirateDeadEventHandler OnPirateDeadEvent;
+
 
 	public void Initialize(IoCResolver resolver, PirateModel data,LevelManager levelManager){
 
@@ -65,9 +65,11 @@ public class PirateController : AIPath
 
 		_spawnPoint = transform.FindChild("BulletSpawnPoint").gameObject;
 		_moveBehaviour = GetComponent<MoveBehaviour> ();
+		//_healthBar = transform.FindChild("Canvas").transform.FindChild("Slider").gameObject.GetComponent<Slider>();
 
-		OnPirateDeadEvent += () => _levelManager.OnPirateDead(this);
-	
+		OnDeadEvent += () => _levelManager.OnPirateDead(this);
+
+		
 		ResetLerp ();
 		_moveBehaviour.OnLerpEndEvent += ResetLerp;
 		
@@ -90,13 +92,13 @@ public class PirateController : AIPath
 		UpdatePirateInfo();
 		_levelManager.OnPirateGeneratedEvent += UpdatePirateInfo;
 		_healthBar.maxValue = _pirateModel.Health;
+;
 
 		ChangeState(PirateState.Idle);
-
 		panel.sizeDelta = new Vector2(_pirateModel.PirateRange, _pirateModel.PirateRange);
 		isChase = true;
 		this.name = _pirateModel.Name;
-		base.Start();
+
 
 	}
 
@@ -113,9 +115,9 @@ public class PirateController : AIPath
 			InstantiateBullet(true);
 			PerformHit();
 			_poolingAudioPlayer.PlaySound(transform.position,_soundProvider.GetSound("lazer_shoot1"),50);
-
+			
 		} else {
-
+			
 			InstantiateBullet(false);
 			_poolingAudioPlayer.PlaySound(transform.position,_soundProvider.GetSound("lazer_shoot_miss"),50);
 		}
@@ -152,7 +154,8 @@ public class PirateController : AIPath
 		switch(_pirateState){
 		case PirateState.Chasing:
 				
-				target = nearestPlayer.transform;
+	
+		  		target = nearestPlayer.transform;
 				HandleChase();
 				_stateText.text = "Chasing";
 				
@@ -174,12 +177,28 @@ public class PirateController : AIPath
 			break;
 
 		}
+	
+		if(nearestPlayer!=null){
 
+			//if(isChase == true){
+				
+
+		}
 		if (_knownPirates.Count >= 1 && nearestPlayer != null) {
 		
 			if (Vector3.Distance (nearestPlayer.transform.position, transform.position) < _pirateModel.PirateRange) {
 
+
+//				Debug.Log("In pirate shoot range detection");
+
+
+				//if(minShootTime >= 3f){
 					ChangeState(PirateState.Shooting);
+				//	minShootTime = 0f;
+				//}
+					
+				//	Debug.Log(Vector3.Distance (nearestPlayer.transform.position, transform.position).ToString());
+
 			}
 			else{
 				ChangeState(PirateState.Chasing);
@@ -190,14 +209,10 @@ public class PirateController : AIPath
 
 		if(_statsBehaviour.CurrentHealth < 0){
 
-			if(OnPirateDeadEvent!=null){
-				OnPirateDeadEvent();
-			}
-			//To Do delete object from list, Destroy Object 
+			Delete();
 			if(_levelManager.OnPirateGeneratedEvent!=null){
 				_levelManager.OnPirateGeneratedEvent();
 			}
-			DestroyObject(this.gameObject);
 		}
 
 
