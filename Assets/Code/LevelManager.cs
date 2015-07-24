@@ -36,7 +36,7 @@ public class LevelManager
 		_resolver.Resolve (out _prefabProvider);
 
 		_poolingObjectManager.Instantiate ("Cube");
-		_poolingObjectManager.Instantiate ("Plane");
+		_poolingObjectManager.Instantiate ("AStarPlane");
 		_knownPirates = new List<PirateController> ();
 	}
 
@@ -62,7 +62,7 @@ public class LevelManager
 			OnPirateGeneratedEvent();
 		}
 
-		Debug.Log ("Known Pirates : in create " + _knownPirates.Count.ToString ());
+		//Debug.Log ("Known Pirates : in create " + _knownPirates.Count.ToString ());
 
 	}
 

@@ -13,11 +13,11 @@ using Assets.Code.DataPipeline.Providers;
 
 [RequireComponent(typeof(MoveBehaviour))]
 
-public class PirateController : PoolingBehaviour
+public class PirateController : AIPath
 {
 	private  MoveBehaviour _moveBehaviour;
 	private  StatsBehaviour _statsBehaviour;
-	private  GameObject target;
+
 	private  PirateModel _pirateModel;
 	private  List<PirateController> _knownPirates;
 	private  PirateController nearestPlayer;
@@ -51,6 +51,12 @@ public class PirateController : PoolingBehaviour
 	enum PirateState{Shooting,Chasing,Idle,Fleeing};
 
 	private PirateState _pirateState;
+<<<<<<< HEAD
+=======
+	private bool isChase=true;
+
+
+>>>>>>> pirate-shooting
 
 	public void Initialize(IoCResolver resolver, PirateModel data,LevelManager levelManager){
 
@@ -89,10 +95,20 @@ public class PirateController : PoolingBehaviour
 		UpdatePirateInfo();
 		_levelManager.OnPirateGeneratedEvent += UpdatePirateInfo;
 		_healthBar.maxValue = _pirateModel.Health;
+<<<<<<< HEAD
 
 		ChangeState(PirateState.Idle);
 
 		panel.sizeDelta = new Vector2(_pirateModel.PirateRange, _pirateModel.PirateRange);
+=======
+;
+
+		ChangeState(PirateState.Idle);
+		panel.sizeDelta = new Vector2(_pirateModel.PirateRange, _pirateModel.PirateRange);
+		isChase = true;
+		this.name = _pirateModel.Name;
+
+>>>>>>> pirate-shooting
 
 	}
 
@@ -106,17 +122,23 @@ public class PirateController : PoolingBehaviour
 	{
 		//hit target		
 		if (8 > Random.Range(0, 10)){
-			Debug.Log("Hit");
-
 			InstantiateBullet(true);
 			PerformHit();
+<<<<<<< HEAD
 			var soundPoolManager = new PoolingAudioPlayer(_prefabProvider.GetPrefab("ShootSoundHit"));
 
+=======
+			_poolingAudioPlayer.PlaySound(transform.position,_soundProvider.GetSound("lazer_shoot1"),50);
+			
+>>>>>>> pirate-shooting
 		} else {
-			Debug.Log("Miss");
-			//miss target 
+			
 			InstantiateBullet(false);
+<<<<<<< HEAD
 			var soundPoolManager = new PoolingAudioPlayer(_prefabProvider.GetPrefab("ShootSoundMiss"));
+=======
+			_poolingAudioPlayer.PlaySound(transform.position,_soundProvider.GetSound("lazer_shoot_miss"),50);
+>>>>>>> pirate-shooting
 		}
 	}
 
@@ -145,6 +167,7 @@ public class PirateController : PoolingBehaviour
 
 	void Update ()
 	{
+<<<<<<< HEAD
 		/*
 		if (!_knownPirates.Any()) {
 			ChangeState(PirateState.Idle);
@@ -159,9 +182,50 @@ public class PirateController : PoolingBehaviour
 				ChangeState(PirateState.Shooting);
 				Debug.Log("In pirate shoot range detection");
 				minShootTime += Time.deltaTime;
+=======
+		minShootTime += Time.deltaTime;
+		UpdateStateInfo();
+	
+		switch(_pirateState){
+		case PirateState.Chasing:
+				
+	
+		  		target = nearestPlayer.transform;
+				HandleChase();
+				_stateText.text = "Chasing";
+				
+			break;
 
-				if (minShootTime >= 1.5f) {
+		case PirateState.Fleeing:
+			break;
+		case PirateState.Shooting:
+			
+			if(minShootTime >= 1f){
+				Shoot ();
+				minShootTime = 0f;
+			}
+				
+			//ChangeState(PirateState.Chasing);
 
+			break;
+		case PirateState.Idle:
+			break;
+
+		}
+	
+		if(nearestPlayer!=null){
+
+			//if(isChase == true){
+				
+
+		}
+		if (_knownPirates.Count >= 1 && nearestPlayer != null) {
+		
+			if (Vector3.Distance (nearestPlayer.transform.position, transform.position) < _pirateModel.PirateRange) {
+>>>>>>> pirate-shooting
+
+
+<<<<<<< HEAD
 					Shoot ();
 					minShootTime = 0;
 					Debug.Log(Vector3.Distance (nearestPlayer.transform.position, transform.position).ToString());
@@ -169,6 +233,21 @@ public class PirateController : PoolingBehaviour
 			}
 			else{
 				ChangeState(PirateState.Idle);
+=======
+//				Debug.Log("In pirate shoot range detection");
+
+
+				//if(minShootTime >= 3f){
+					ChangeState(PirateState.Shooting);
+				//	minShootTime = 0f;
+				//}
+					
+				//	Debug.Log(Vector3.Distance (nearestPlayer.transform.position, transform.position).ToString());
+
+			}
+			else{
+				ChangeState(PirateState.Chasing);
+>>>>>>> pirate-shooting
 			}
 
 
@@ -185,6 +264,18 @@ public class PirateController : PoolingBehaviour
 
 		_healthBar.value = _statsBehaviour.CurrentHealth;
 
+<<<<<<< HEAD
+=======
+	}
+
+	void UpdateStateInfo(){
+
+		if (!_knownPirates.Any()) {
+			ChangeState(PirateState.Idle);
+			return;
+		}
+
+>>>>>>> pirate-shooting
 	}
 
 	void UpdatePirateInfo ()
@@ -209,7 +300,16 @@ public class PirateController : PoolingBehaviour
 				if(Vector3.Distance (pirate.transform.position, transform.position) < Vector3.Distance (nearestPlayer.transform.position, transform.position)){
 
 					nearestPlayer = pirate;
-
+					/*if(isChase == true){
+						target = nearestPlayer.transform;
+						isChase = false;
+					}
+					HandleChase(nearestPlayer.transform.position);
+					*/
+					Debug.Log ("In UpdatePirate Info");
+						
+					
+			
 				}
 								
 			}
@@ -232,7 +332,25 @@ public class PirateController : PoolingBehaviour
 			
 		} 
 
+<<<<<<< HEAD
+=======
 	}
+
+	public void HandleChase()
+	{
+		Debug.Log("Handle Chase");
+		//Calculate desired velocity
+		var dir = CalculateVelocity(tr.transform.position);
+		
+		
+		//Rotate towards targetDirection (filled in by CalculateVelocity)
+		RotateTowards(targetDirection);
+		dir.y = 0;
+		
+		controller.SimpleMove(dir);
+>>>>>>> pirate-shooting
+	}
+
 
 	public void UpdateUiPanel ()
 	{
