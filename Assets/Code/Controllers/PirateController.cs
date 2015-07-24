@@ -51,12 +51,9 @@ public class PirateController : AIPath
 	enum PirateState{Shooting,Chasing,Idle,Fleeing};
 
 	private PirateState _pirateState;
-<<<<<<< HEAD
-=======
 	private bool isChase=true;
 
 
->>>>>>> pirate-shooting
 
 	public void Initialize(IoCResolver resolver, PirateModel data,LevelManager levelManager){
 
@@ -95,12 +92,6 @@ public class PirateController : AIPath
 		UpdatePirateInfo();
 		_levelManager.OnPirateGeneratedEvent += UpdatePirateInfo;
 		_healthBar.maxValue = _pirateModel.Health;
-<<<<<<< HEAD
-
-		ChangeState(PirateState.Idle);
-
-		panel.sizeDelta = new Vector2(_pirateModel.PirateRange, _pirateModel.PirateRange);
-=======
 ;
 
 		ChangeState(PirateState.Idle);
@@ -108,7 +99,6 @@ public class PirateController : AIPath
 		isChase = true;
 		this.name = _pirateModel.Name;
 
->>>>>>> pirate-shooting
 
 	}
 
@@ -124,21 +114,12 @@ public class PirateController : AIPath
 		if (8 > Random.Range(0, 10)){
 			InstantiateBullet(true);
 			PerformHit();
-<<<<<<< HEAD
-			var soundPoolManager = new PoolingAudioPlayer(_prefabProvider.GetPrefab("ShootSoundHit"));
-
-=======
 			_poolingAudioPlayer.PlaySound(transform.position,_soundProvider.GetSound("lazer_shoot1"),50);
 			
->>>>>>> pirate-shooting
 		} else {
 			
 			InstantiateBullet(false);
-<<<<<<< HEAD
-			var soundPoolManager = new PoolingAudioPlayer(_prefabProvider.GetPrefab("ShootSoundMiss"));
-=======
 			_poolingAudioPlayer.PlaySound(transform.position,_soundProvider.GetSound("lazer_shoot_miss"),50);
->>>>>>> pirate-shooting
 		}
 	}
 
@@ -167,22 +148,6 @@ public class PirateController : AIPath
 
 	void Update ()
 	{
-<<<<<<< HEAD
-		/*
-		if (!_knownPirates.Any()) {
-			ChangeState(PirateState.Idle);
-			return;
-		}
-        */
-	
-		if (_knownPirates.Count >= 1 && nearestPlayer != null) {
-		
-			if (Vector3.Distance (nearestPlayer.transform.position, transform.position) < _pirateModel.PirateRange) {
-
-				ChangeState(PirateState.Shooting);
-				Debug.Log("In pirate shoot range detection");
-				minShootTime += Time.deltaTime;
-=======
 		minShootTime += Time.deltaTime;
 		UpdateStateInfo();
 	
@@ -222,18 +187,8 @@ public class PirateController : AIPath
 		if (_knownPirates.Count >= 1 && nearestPlayer != null) {
 		
 			if (Vector3.Distance (nearestPlayer.transform.position, transform.position) < _pirateModel.PirateRange) {
->>>>>>> pirate-shooting
 
 
-<<<<<<< HEAD
-					Shoot ();
-					minShootTime = 0;
-					Debug.Log(Vector3.Distance (nearestPlayer.transform.position, transform.position).ToString());
-				}
-			}
-			else{
-				ChangeState(PirateState.Idle);
-=======
 //				Debug.Log("In pirate shoot range detection");
 
 
@@ -247,7 +202,6 @@ public class PirateController : AIPath
 			}
 			else{
 				ChangeState(PirateState.Chasing);
->>>>>>> pirate-shooting
 			}
 
 
@@ -264,8 +218,6 @@ public class PirateController : AIPath
 
 		_healthBar.value = _statsBehaviour.CurrentHealth;
 
-<<<<<<< HEAD
-=======
 	}
 
 	void UpdateStateInfo(){
@@ -275,7 +227,6 @@ public class PirateController : AIPath
 			return;
 		}
 
->>>>>>> pirate-shooting
 	}
 
 	void UpdatePirateInfo ()
@@ -332,8 +283,6 @@ public class PirateController : AIPath
 			
 		} 
 
-<<<<<<< HEAD
-=======
 	}
 
 	public void HandleChase()
@@ -348,7 +297,6 @@ public class PirateController : AIPath
 		dir.y = 0;
 		
 		controller.SimpleMove(dir);
->>>>>>> pirate-shooting
 	}
 
 
