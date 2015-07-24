@@ -13,16 +13,33 @@ public class PirateModel {
 	private int _movementSpeed;
 	private int _trainingCost;
 	private float _trainingTime;
-	//(Player)nature = 0, (Enemy)nature = 1
-	private int _nature;
 	private Color _color;
+
+
+	private int _nature;
+	public enum Nature{ Player=0, Enemy=1};
+
+	private int _pirateRange;
+	
+	public enum Range{
+
+		Milee=20,
+		Gunner1=30,
+		Gunner2=40,
+		Gunner3=50
+	};
+	
+	public int PirateRange{
+		get{return _pirateRange;}
+		set{_pirateRange = value;}
+	}
 
 	public Color PirateColor{
 		get{return _color;}
 		set{_color=value;}
 
 	}
-	public int Nature{
+	public int PirateNature{
 		get{return _nature;}
 		set{_nature = value;}
 	}

@@ -2,6 +2,7 @@
 {
 	public class CreatePirateMessage : IMessage
 	{
+		public string PirateName;
 	}
 
 }

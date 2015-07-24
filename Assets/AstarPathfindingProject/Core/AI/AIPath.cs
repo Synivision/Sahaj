@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using Pathfinding;
+using Assets.Code.UnityBehaviours.Pooling;
 using Pathfinding.RVO;
 
 /** AI for following paths.
@@ -35,7 +36,7 @@ using Pathfinding.RVO;
  */
 [RequireComponent(typeof(Seeker))]
 [AddComponentMenu("Pathfinding/AI/AIPath (generic)")]
-public class AIPath : MonoBehaviour {
+public class AIPath : PoolingBehaviour {
 	
 	/** Determines how often it will search for new paths. 
 	 * If you have fast moving targets or AIs, you might want to set it to a lower value.

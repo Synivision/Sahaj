@@ -37,6 +37,7 @@
 	}
 	Prefabs
 	{
+		border.png
 	}
 	Sounds
 	{
@@ -44,6 +45,8 @@
 		bonus.wav
 		gameover.mp3
 		hit.wav
+		lazer_shoot1.wav
+		lazer_shoot_miss.wav
 	}
 	Textures
 	{
