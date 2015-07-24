@@ -24,8 +24,8 @@ public class LevelManager
 	PoolingObjectManager _poolingObjectManager;
 	private List<PirateController> _knownPirates;
 	private readonly IoCResolver _resolver;
-
 	PirateController pirateObject;
+	private int count = 0; 
 	
 	public LevelManager (IoCResolver resolver)
 	{
@@ -48,14 +48,24 @@ public class LevelManager
 
 	public void CreatePirate (string pirateName)
 	{
-	    pirateObject = (PirateController)_poolingObjectManager.Instantiate ("Sphere");
+
+		if(count==0){
+			var prefab = Resources.Load<GameObject>("Prefabs/Sphere");
+			var gameObject = Object.Instantiate(prefab) as GameObject;
+			pirateObject = gameObject.GetComponent<PirateController>();
+			count++;
+		}
+		else if(count==1){
+			var prefab = Resources.Load<GameObject>("Prefabs/Sphere2");
+			var gameObject = Object.Instantiate(prefab) as GameObject;
+			pirateObject = gameObject.GetComponent<PirateController>();
+			count++;
+		}
 
 		_knownPirates.Add(pirateObject);
-
-
 		pirateObject.Initialize(_resolver,GeneratePirateModel(pirateName),this);
 
-	
+
 		pirateObject.transform.position = new Vector3(Random.Range(-100,0),10,Random.Range(-100,0)); 
 
 		if(OnPirateGeneratedEvent!=null){
