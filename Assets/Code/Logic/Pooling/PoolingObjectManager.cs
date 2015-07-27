@@ -42,7 +42,7 @@ namespace Assets.Code.Logic.Pooling
         {
             foreach(var pool in _pools){
                 pool.Value.TearDown();
-				UnityEngine.Debug.Log(pool.Value.ToString());		
+				//UnityEngine.Debug.Log(pool.Value.ToString());		
 			}
 
         }

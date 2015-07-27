@@ -71,8 +71,8 @@ namespace Assets.Code.Logic.Pooling
                 Object.Destroy(item.gameObject);
 
 			}
-			UnityEngine.Debug.Log("Object Length : " + _objects.Count.ToString());
-			UnityEngine.Debug.Log("teardown objectpool");
+			//UnityEngine.Debug.Log("Object Length : " + _objects.Count.ToString());
+			//UnityEngine.Debug.Log("teardown objectpool");
             _objects.Clear();
             _inactiveObjects.Clear();
             _activeObjects.Clear();

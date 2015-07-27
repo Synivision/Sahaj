@@ -16,9 +16,6 @@
 		SwatchYellowAlbedo.mat
 		YellowGrid.mat
 	}
-	Particles
-	{
-	}
 	ParticleSystems
 	{
 		Materials
@@ -51,6 +48,7 @@
 	Textures
 	{
 		GridEmissive.png
+		icon.jpg
 		SwatchMauveAlbedo.png
 		SwatchNavyAlbedo.png
 		SwatchNavyDarkAlbedo.png

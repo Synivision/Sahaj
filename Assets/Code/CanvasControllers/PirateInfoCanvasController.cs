@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using Assets.Code.DataPipeline.Providers;
 using Assets.Code.DataPipeline;
@@ -56,7 +56,7 @@ namespace Assets.Code.Ui.CanvasControllers
 
 			_healthText.text = "Health : " + message.model.Health.ToString ();
 			_attackDamageText.text = "Attack Damage : " + message.model.AttackDamage.ToString ();
-			_nameText.text = "Name : " + message.model.Name;
+			_nameText.text = "Name : " + message.model.PirateName;
 			_descriptionText.text = message.model.Descipriton;
 
 		}

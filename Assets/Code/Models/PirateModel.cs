@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
-
-public class PirateModel {
+using Assets.Code.Models;
+public class PirateModel : IGameDataModel{
 
 	private int _health;
 	private int _attackDamage;
@@ -14,7 +14,6 @@ public class PirateModel {
 	private int _trainingCost;
 	private float _trainingTime;
 	private Color _color;
-
 
 	private int _nature;
 	public enum Nature{ Player=0, Enemy=1};
@@ -62,7 +61,7 @@ public class PirateModel {
 		}
 	}
 
-	public string Name{
+	public string PirateName{
 		get{
 			return _name;
 		}
@@ -123,6 +122,11 @@ public class PirateModel {
 		get{return _trainingTime;}
 		set{_trainingTime = value;}
 		
+	}
+
+	public string Name {
+
+		get;set;
 	}
 
 

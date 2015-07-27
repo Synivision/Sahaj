@@ -18,6 +18,7 @@ public class InputController : PoolingBehaviour
 	private CameraController myCameraController;
 	private Messager _messager;
 	private IoCResolver _resolver;
+	public static string PirateName ="Pirate1";
 
 
 	public void Initialize(IoCResolver resolver){
@@ -26,15 +27,6 @@ public class InputController : PoolingBehaviour
 		_resolver = resolver;
 		resolver.Resolve (out _messager);
 	}
-
-	/*
-	void Start(){
-		//myCameraController = GetComponent<CameraController> ();
-		myCameraController = this.gameObject.GetComponent<CameraController>();
-		//IoCResolver resolver = GameObject.Find("state_master").GetComponent<StateMaster>().Resolver;
-		//resolver.Resolve(out _messager);
-	}
-	*/
 
 	void Update ()
 	{
@@ -50,7 +42,7 @@ public class InputController : PoolingBehaviour
 			RaycastHit hitInfo;
 			target = GetClickedObject (out hitInfo);
 
-			if (target != null && (target.gameObject.tag == "Cube" || target.gameObject.tag == "Player" )) {
+			if (target != null && (target.gameObject.tag == "Cube" )) {
 				_mouseState = true;
 				screenSpace = Camera.main.WorldToScreenPoint (target.transform.position);
 				offset = target.transform.position - Camera.main.ScreenToWorldPoint (new Vector3 (Input.mousePosition.x, Input.mousePosition.y, screenSpace.z));
@@ -70,6 +62,27 @@ public class InputController : PoolingBehaviour
 					toggleValue = true
 				});
 			}
+
+			Ray ray;
+		
+			
+			ray=Camera.main.ScreenPointToRay(Input.mousePosition);
+			if(UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject(-1)== false){
+
+				if(Physics.Raycast(ray,out hitInfo) && target.gameObject.tag=="Plane")
+				{
+					
+					Vector3 spawnPosition = new Vector3(hitInfo.point.x,5.2f,hitInfo.point.z);
+					//Debug.Log ("Spawn Point from Input Controller = " + spawnPosition.ToString());
+					_messager.Publish (new CreatePirateMessage{
+						PirateName = PirateName,
+						SpawnPosition = spawnPosition
+					});
+				}
+
+			}
+
+
 		}
 
 		if (Input.GetMouseButtonUp (0)) {
