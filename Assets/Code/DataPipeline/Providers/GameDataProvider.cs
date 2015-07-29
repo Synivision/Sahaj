@@ -31,7 +31,6 @@ namespace Assets.Code.DataPipeline.Providers
 
             if(_data[targetType].ContainsKey(data.Name))
                 Debug.Log("WARNING! duplicate name (" + data.Name + ") of type " + targetType + " added to GameDataProvider!");
-			Debug.Log(data.Name);
 			_data[targetType].Add(data.Name, data);
         }
 

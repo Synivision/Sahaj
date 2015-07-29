@@ -11,6 +11,7 @@ using Assets.Code.States;
 using Assets.Code.Utilities;
 using UnityEngine;
 
+
 namespace Assets.Code.UnityBehaviours
 {
     [RequireComponent(typeof(UnityReferenceMaster))]
@@ -18,7 +19,7 @@ namespace Assets.Code.UnityBehaviours
     {
         /* REFERENCES */
         private UnityReferenceMaster _unityReference;
-
+		private GameDataProvider _gameDataProvider;
         /* PROPERTIES */
         private Messager _messager;
         private IoCResolver _resolver;
@@ -92,6 +93,7 @@ namespace Assets.Code.UnityBehaviours
 
             // lock the resolver (stop any new items being registered)
             _resolver.Lock();
+			_resolver.Resolve (out _gameDataProvider);
 
             /* BEGIN STATE */
             _currentState = new MenuState(_resolver);
@@ -99,6 +101,17 @@ namespace Assets.Code.UnityBehaviours
 
             /* SUBSCRIBE FOR GAME END */
             _onExitGame = _messager.Subscribe<ExitGameMessage>(OnExitGame);
+
+
+			//add data to dame data provider
+
+			_gameDataProvider.AddData<PirateModel>(GeneratePirate1());
+			_gameDataProvider.AddData<PirateModel>(GeneratePirate2());
+			_gameDataProvider.AddData<PirateModel>(GeneratePirate3());
+			_gameDataProvider.AddData<PirateModel>(GenerateEnemy1());
+			_gameDataProvider.AddData<PirateModel>(GenerateEnemy2());
+			_gameDataProvider.AddData<PirateModel>(GenerateEnemy3());
+
         }
 
         private void OnExitGame(ExitGameMessage message)
@@ -140,7 +153,104 @@ namespace Assets.Code.UnityBehaviours
 
 				_resolver = value;
 			}}
-    }
 
+		public PirateModel GeneratePirate1(){
+			
+			PirateModel pirateModel=new PirateModel();
+			pirateModel.Name = "Pirate1";
+			pirateModel.Health = 200;
+			pirateModel.Descipriton = "Control the crew and gives orders";
+			pirateModel.AttackDamage = 25;
+			pirateModel.PirateName = "Captain" + UnityEngine.Random.Range (0, 100).ToString ();
+			pirateModel.Courage = 5;
+			pirateModel.PirateNature = (int)PirateModel.Nature.Player ;
+			pirateModel.PirateRange = (int)PirateModel.Range.Gunner3;
+			pirateModel.PirateColor = Color.blue;
+			
+			return pirateModel;
+		}
+		public PirateModel GeneratePirate2(){
+			
+			//Quarter Master
+			PirateModel pirateModel=new PirateModel();
+			pirateModel.Name = "Pirate2";
+			pirateModel.Health = 150;
+			pirateModel.Descipriton = "Second in command : swords man";
+			pirateModel.AttackDamage = 20;
+			pirateModel.PirateName = "Quarter Master" + UnityEngine.Random.Range (0, 100).ToString();
+			pirateModel.Courage = 4;
+			pirateModel.PirateNature = (int)PirateModel.Nature.Player ;
+			pirateModel.PirateRange = (int)PirateModel.Range.Gunner3;
+			pirateModel.PirateColor = Color.green;
+			
+			return pirateModel;
+		}
+		
+		public PirateModel GeneratePirate3(){
+			
+			//Gunner
+			PirateModel pirateModel=new PirateModel();
+			pirateModel.Name = "Pirate3";
+			pirateModel.Health = 100;
+			pirateModel.Descipriton = "Attacks and defends the ship from the gun port on deck";
+			pirateModel.AttackDamage = 15;
+			pirateModel.PirateName = "Gunner" + UnityEngine.Random.Range (0, 100).ToString ();
+			pirateModel.Courage = 3;
+			pirateModel.PirateRange = (int)PirateModel.Range.Gunner2;
+			pirateModel.PirateNature = (int)PirateModel.Nature.Player ;
+			pirateModel.PirateColor = Color.yellow;
+			
+			return pirateModel;
+		}
+		
+		private PirateModel GenerateEnemy1(){
+			
+			PirateModel pirateModel=new PirateModel();
+			pirateModel.Name = "EnemyPirate1";
+			pirateModel.Health = 120;
+			pirateModel.Descipriton = "Milee Enemy Pirate";
+			pirateModel.AttackDamage = 10;
+			pirateModel.PirateName = "Enemy " + UnityEngine.Random.Range (0, 100).ToString ();
+			pirateModel.Courage = 3;
+			pirateModel.PirateRange = (int)PirateModel.Range.Milee;
+			pirateModel.PirateNature = (int)PirateModel.Nature.Enemy ;
+			pirateModel.PirateColor = Color.red;
+			
+			return pirateModel;
+		}
+		
+		private PirateModel GenerateEnemy2(){
+			
+			PirateModel pirateModel=new PirateModel();
+			pirateModel.Name = "EnemyPirate2";
+			pirateModel.Health = 150;
+			pirateModel.Descipriton = "Gunner1 Enemy Pirate";
+			pirateModel.AttackDamage = 8;
+			pirateModel.PirateName = "Enemy " + UnityEngine.Random.Range (0, 100).ToString ();
+			pirateModel.Courage = 4;
+			pirateModel.PirateRange = (int)PirateModel.Range.Gunner1;
+			pirateModel.PirateNature = (int)PirateModel.Nature.Enemy ;
+			pirateModel.PirateColor = Color.grey;
+			
+			return pirateModel;
+		}
+		
+		private PirateModel GenerateEnemy3(){
+			
+			PirateModel pirateModel=new PirateModel();
+			pirateModel.Name = "EnemyPirate3";
+			pirateModel.Health = 100;
+			pirateModel.Descipriton = "Gunner2 Enemy Pirate";
+			pirateModel.AttackDamage = 10;
+			pirateModel.PirateName = "Enemy " + UnityEngine.Random.Range (0, 100).ToString ();
+			pirateModel.Courage = 3;
+			pirateModel.PirateRange = (int)PirateModel.Range.Gunner2;
+			pirateModel.PirateNature = (int)PirateModel.Nature.Enemy ;
+			pirateModel.PirateColor = Color.black;
+			
+			return pirateModel;
+		}
+
+    }
 
 }

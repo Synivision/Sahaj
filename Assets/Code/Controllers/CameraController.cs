@@ -42,6 +42,7 @@ public class CameraController : PoolingBehaviour {
 
 		if (shake > 0)
 		{
+
 			_camera.transform.localPosition = originalPos + Random.insideUnitSphere * shakeAmount;
 			
 			shake -= Time.deltaTime * decreaseFactor;
@@ -49,7 +50,7 @@ public class CameraController : PoolingBehaviour {
 		else
 		{
 			shake = 0f;
-			_camera.transform.localPosition = originalPos;
+			//_camera.transform.localPosition = originalPos;
 		}
 
 		Touch[] touches = Input.touches;
@@ -62,8 +63,7 @@ public class CameraController : PoolingBehaviour {
 			}
 			else if (touches[0].phase == TouchPhase.Moved)
 			{
-
-
+				    shake = 0f;
 					Vector2 delta = touches[0].deltaPosition;
 					
 					float positionX = delta.x * moveSensitivityX * Time.deltaTime;

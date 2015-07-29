@@ -31,7 +31,7 @@ public class MenuState : BaseState{
 	}
 	public override void Initialize ()
 	{
-		Debug.Log ("Menu state initialized.");
+		//Debug.Log ("Menu state initialized.");
 		//message tokens
 		_onStartGame = _messager.Subscribe<StartGameMessage>(OnStartGame);
 

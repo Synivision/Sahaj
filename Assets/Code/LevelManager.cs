@@ -98,13 +98,12 @@ public class LevelManager
 	public void OnPirateDead(PirateController pirate){
 
 		_knownPirates.Remove(pirate);
-		Debug.Log ("Known Pirates : after remove " + _knownPirates.Count.ToString ());
+	//	Debug.Log ("Known Pirates : after remove " + _knownPirates.Count.ToString ());
 
 	}
 
 	public void TearDownLevel ()
 	{
-		UnityEngine.Debug.Log ("level manager");
 		_poolingObjectManager.TearDown ();
 	}
 

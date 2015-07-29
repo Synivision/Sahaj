@@ -1,4 +1,13 @@
 {
+	Fonts
+	{
+	}
+	GUI
+	{
+		goldcoin.png
+		icon.jpg
+		star.png
+	}
 	Materials
 	{
 		Fairy Dust.mat
@@ -48,7 +57,6 @@
 	Textures
 	{
 		GridEmissive.png
-		icon.jpg
 		SwatchMauveAlbedo.png
 		SwatchNavyAlbedo.png
 		SwatchNavyDarkAlbedo.png
