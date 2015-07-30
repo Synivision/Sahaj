@@ -19,15 +19,15 @@ public class InputController : PoolingBehaviour
 	private Messager _messager;
 	private IoCResolver _resolver;
 	public static string PirateName ="Pirate1";
-
-
+	
+	int pointerId = -1;
 	public void Initialize(IoCResolver resolver){
-
+		
 		myCameraController = GameObject.Find("Main Camera").GetComponent<CameraController>();
 		_resolver = resolver;
 		resolver.Resolve (out _messager);
 	}
-
+	
 	void Update ()
 	{
 		_time += Time.deltaTime;
@@ -36,40 +36,47 @@ public class InputController : PoolingBehaviour
 				toggleValue = false
 			});
 		}
+		
+		
+		Touch[] touch = Input.touches;
+		if (Application.platform == RuntimePlatform.Android)
+			pointerId = touch[0].fingerId;
+		
 		//used to move cube around 
 		if (Input.GetMouseButtonDown (0)) {
-	
+			
 			RaycastHit hitInfo;
 			target = GetClickedObject (out hitInfo);
-
+			
 			if (target != null && (target.gameObject.tag == "Cube" )) {
 				_mouseState = true;
 				screenSpace = Camera.main.WorldToScreenPoint (target.transform.position);
 				offset = target.transform.position - Camera.main.ScreenToWorldPoint (new Vector3 (Input.mousePosition.x, Input.mousePosition.y, screenSpace.z));
 				
 				myCameraController.enabled = false;
-
+				
 			}
-
-			if (target != null && target.gameObject.tag == "Player") {
+			//&& target.gameObject.tag == "Player"
+			if (target != null) {
 				
 				//send message to pirate canvas controller to display pirate info
-				PirateController playerObject = target.GetComponent<PirateController> ();
+				/*PirateController playerObject = target.GetComponent<PirateController> ();
 				playerObject.UpdateUiPanel ();
 				_time = 0;
 				
 				_messager.Publish (new PirateInfoCanvasMessage{
 					toggleValue = true
 				});
+				*/
 			}
-
-			Ray ray;
-		
 			
-			ray=Camera.main.ScreenPointToRay(Input.mousePosition);
-			if(UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject(-1)== false){
-
-				if(Physics.Raycast(ray,out hitInfo) && target.gameObject.tag=="Plane")
+			Ray ray;
+			
+			
+			ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+			if(UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject(pointerId)== false){
+				//&& target.gameObject.tag=="Plane"
+				if(Physics.Raycast(ray,out hitInfo)&& target.gameObject.tag!="Cube" )
 				{
 					
 					Vector3 spawnPosition = new Vector3(hitInfo.point.x,5.2f,hitInfo.point.z);
@@ -79,17 +86,17 @@ public class InputController : PoolingBehaviour
 						SpawnPosition = spawnPosition
 					});
 				}
-
+				
 			}
-
-
+			
+			
 		}
-
+		
 		if (Input.GetMouseButtonUp (0)) {
 			_mouseState = false;
 			myCameraController.enabled = true;
 		}
-
+		
 		if (_mouseState) {
 			
 			var curScreenSpace = new Vector3 (Input.mousePosition.x, Input.mousePosition.y, screenSpace.z);

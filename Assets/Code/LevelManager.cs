@@ -27,7 +27,8 @@ public class LevelManager
 	GameDataProvider _gameDataProvider;
 
 	PirateController pirateObject;
-	
+	PoolingBehaviour allPiratesObject;
+	private BuildingModel model,model2;
 	public LevelManager (IoCResolver resolver)
 	{
 		_resolver = resolver;
@@ -37,9 +38,38 @@ public class LevelManager
 		_resolver.Resolve (out _prefabProvider);
 		_resolver.Resolve (out _gameDataProvider);
 
-		_poolingObjectManager.Instantiate ("Cube");
-		_poolingObjectManager.Instantiate ("AStarPlane");
+
+		allPiratesObject = (PoolingBehaviour)_poolingObjectManager.Instantiate ("AllPirates");
+
 		_knownPirates = new List<PirateController> ();
+
+		GenerateLevelMap();
+	}
+
+	public void GenerateLevelMap(){
+		_poolingObjectManager.Instantiate ("AStarPlane");
+
+
+		var building1 = _poolingObjectManager.Instantiate ("Building") as BuildingController;
+		model = new BuildingModel();
+
+		model.Name = "Building1";
+		model.BuildingColor = Color.gray;
+		model.Range = 50;
+
+		building1.Initialize(_resolver, model,this);
+		building1.transform.position = new Vector3(50,building1.transform.position.y,-20);
+
+		var building2 = _poolingObjectManager.Instantiate ("Building") as BuildingController;
+		model2 = new BuildingModel();
+		model2.Name = "Building2";
+		model2.BuildingColor = Color.red;
+		model2.Range = 50;
+
+		building2.Initialize(_resolver, model2,this);
+		building2.transform.position = new Vector3(-85,building1.transform.position.y,-85);
+
+
 	}
 
 	public List<PirateController> GetKnownPirates(){
@@ -54,10 +84,11 @@ public class LevelManager
 
 		_knownPirates.Add(pirateObject);
 
+
 		pirateObject.Initialize(_resolver,GeneratePirateModel(pirateName),this);
 			
 		pirateObject.transform.position = spawnposition;
-
+		pirateObject.transform.SetParent(allPiratesObject.transform);
 		if(OnPirateGeneratedEvent!=null){
 			OnPirateGeneratedEvent();
 		}

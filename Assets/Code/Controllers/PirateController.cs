@@ -59,7 +59,6 @@ public class PirateController : AIPath
 		_levelManager = levelManager;
 		_knownPirates = _levelManager.GetKnownPirates ();
 		nearbyPlayers = new List<PirateController> ();
-
 		_spawnPoint = transform.FindChild ("BulletSpawnPoint").gameObject;
 		_moveBehaviour = GetComponent<MoveBehaviour> ();
 
@@ -210,12 +209,12 @@ public class PirateController : AIPath
 
 		_knownPirates = _levelManager.GetKnownPirates ();
 		if (_pirateModel.PirateNature == (int)PirateModel.Nature.Player) {
-			_knownPirates = _knownPirates.Where (pirate => pirate._pirateModel.PirateNature == (int)PirateModel.Nature.Enemy).ToList ();
+			_knownPirates = _knownPirates.Where (pirate => pirate.DataModel.PirateNature == (int)PirateModel.Nature.Enemy).ToList ();
 
 
 		} else if (_pirateModel.PirateNature == (int)PirateModel.Nature.Enemy) {
 
-			_knownPirates = _knownPirates.Where (pirate => pirate._pirateModel.PirateNature == (int)PirateModel.Nature.Player).ToList ();
+			_knownPirates = _knownPirates.Where (pirate => pirate.DataModel.PirateNature == (int)PirateModel.Nature.Player).ToList ();
 		}
 
 		if (_knownPirates.Count >= 1) {
