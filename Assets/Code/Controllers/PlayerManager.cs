@@ -18,14 +18,14 @@ public class PlayerManager  : IResolvableItem {
 	private  Messager _messager;
 	private  MessagingToken _onPirateCreated;
 	
-	private PlayerModel _playerModel;
+	public PlayerModel Model{ get; set;}
 	
 	public void Initialize (IoCResolver resolver, PlayerModel data, LevelManager levelManager)
 	{
 		//Get Resolver
 		_resolver = resolver;
 		_resolver.Resolve (out _messager);
-		_playerModel = data;
+		Model = data;
 
 		//Debug.Log("Player Manager Created");
 	}

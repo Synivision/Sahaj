@@ -1,7 +1,4 @@
 {
-	Fonts
-	{
-	}
 	GUI
 	{
 		goldcoin.png
