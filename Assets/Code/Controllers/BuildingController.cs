@@ -46,10 +46,12 @@ public class BuildingController : PoolingBehaviour {
 		gameObject.GetComponent<Renderer> ().material.color = _buildingModel.BuildingColor;
 		this.name = _buildingModel.Name;
 
+		_statsBehaviour = new StatsBehaviour (_buildingModel);
 		_knownPirates = _levelManager.GetKnownPirates();
 		_spawnPoint = transform.FindChild ("BulletSpawnPoint").gameObject;
 		UpdatePirateInfo ();
 		_levelManager.OnPirateGeneratedEvent += UpdatePirateInfo;
+		OnDeadEvent += () => _levelManager.OnPirateDead (this);
 	}
 
 	void Update ()
@@ -76,7 +78,7 @@ public class BuildingController : PoolingBehaviour {
 			}
 			
 		}
-		/*
+
 		if (_statsBehaviour.CurrentHealth < 0) {
 			
 			Delete ();
@@ -84,7 +86,7 @@ public class BuildingController : PoolingBehaviour {
 				_levelManager.OnPirateGeneratedEvent ();
 			}
 		}
-		
+		/*
 		*/
 		//_healthBar.value = _statsBehaviour.CurrentHealth;
 		
@@ -135,7 +137,7 @@ public class BuildingController : PoolingBehaviour {
 
 		_knownPirates = _levelManager.GetKnownPirates ();
 			
-		_knownPirates = _knownPirates.Where (pirate => pirate.DataModel.PirateNature == (int)PirateModel.Nature.Player).ToList ();
+		//_knownPirates = _knownPirates.Where (pirate => pirate.DataModel.PirateNature == (int)PirateModel.Nature.Player).ToList ();
 
 
 		if (_knownPirates.Count >= 1) {

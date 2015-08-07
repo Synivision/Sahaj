@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+using Assets.Code.Models;
 public class StatsBehaviour {
 	StatBlock stats;
 	
@@ -8,7 +9,7 @@ public class StatsBehaviour {
 	private float _currentCourage;
 	
 	private PirateModel _pirateModel;
-	
+	private BuildingModel _buildingModel;
 	public  StatsBehaviour(PirateModel pirateModel){
 		
 		_pirateModel = pirateModel;
@@ -18,6 +19,14 @@ public class StatsBehaviour {
 		
 	}
 	
+	public  StatsBehaviour(BuildingModel buildingModel){
+		
+		_buildingModel = buildingModel;
+		CurrentHealth = _buildingModel.Health;
+
+
+		
+	}
 	public void ApplyDamage(float damage){
 		
 		CurrentHealth -= damage;

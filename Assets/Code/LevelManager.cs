@@ -23,10 +23,11 @@ public class LevelManager
 	private readonly PoolingBehaviour _poolingbehviour;
 	PoolingObjectManager _poolingObjectManager;
 	private List<PirateController> _knownPirates;
+	private List<PoolingBehaviour> _allEnemyObjects;
 	private readonly IoCResolver _resolver;
 	GameDataProvider _gameDataProvider;
 
-	PirateController pirateObject;
+	PoolingBehaviour pirateObject;
 	PoolingBehaviour allPiratesObject;
 	private BuildingModel model,model2;
 	public LevelManager (IoCResolver resolver)
@@ -42,7 +43,7 @@ public class LevelManager
 		allPiratesObject = (PoolingBehaviour)_poolingObjectManager.Instantiate ("AllPirates");
 
 		_knownPirates = new List<PirateController> ();
-
+		_allEnemyObjects = new List<PoolingBehaviour>();
 		GenerateLevelMap();
 	}
 
@@ -56,6 +57,7 @@ public class LevelManager
 		model.Name = "Building1";
 		model.BuildingColor = Color.gray;
 		model.Range = 50;
+		model.Health = 100;
 
 		building1.Initialize(_resolver, model,this);
 		building1.transform.position = new Vector3(50,building1.transform.position.y,-20);
@@ -65,11 +67,13 @@ public class LevelManager
 		model2.Name = "Building2";
 		model2.BuildingColor = Color.red;
 		model2.Range = 50;
+		model2.Health = 100;
 
 		building2.Initialize(_resolver, model2,this);
 		building2.transform.position = new Vector3(-85,building1.transform.position.y,-85);
 
-
+		_allEnemyObjects.Add(building1);
+		_allEnemyObjects.Add(building2);
 	}
 
 	public List<PirateController> GetKnownPirates(){
@@ -78,15 +82,27 @@ public class LevelManager
 
 	}
 
+	public List<PoolingBehaviour> GetAllEnemyObjects(){
+
+		return _allEnemyObjects;
+
+	}
+
 	public void CreatePirate (string pirateName, Vector3 spawnposition)
 	{
-	    pirateObject = (PirateController)_poolingObjectManager.Instantiate ("Sphere");
+	    pirateObject = _poolingObjectManager.Instantiate ("Sphere");
+		PirateModel model = GeneratePirateModel(pirateName);
 
-		_knownPirates.Add(pirateObject);
-
-
-		pirateObject.Initialize(_resolver,GeneratePirateModel(pirateName),this);
+		if(model.PirateNature == (int)PirateModel.Nature.Enemy){
 			
+			_allEnemyObjects.Add(pirateObject);
+			
+		}else{
+			//only player pirates in the lists
+			_knownPirates.Add((PirateController)pirateObject);
+		}
+
+		((PirateController)pirateObject).Initialize(_resolver, model, this);
 		pirateObject.transform.position = spawnposition;
 		pirateObject.transform.SetParent(allPiratesObject.transform);
 		if(OnPirateGeneratedEvent!=null){
@@ -123,12 +139,15 @@ public class LevelManager
 
 	}
 
+	
+	public void OnPirateDead(PoolingBehaviour poolingObject){
 
-
-
-	public void OnPirateDead(PirateController pirate){
-
-		_knownPirates.Remove(pirate);
+		if(poolingObject.gameObject.GetComponent<PirateController>()!=null){
+			_knownPirates.Remove((PirateController)poolingObject);
+		}
+		else{
+			_allEnemyObjects.Remove(poolingObject);
+		}
 	//	Debug.Log ("Known Pirates : after remove " + _knownPirates.Count.ToString ());
 
 	}

@@ -4,9 +4,9 @@ using Assets.Code.Models;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
-public class UserModel : MonoBehaviour {
-
-	public string UserName{get;set;}
+public class PlayerModel : IGameDataModel {
+	
+	public string Name{get;set;}
 	public string Email{get;set;}
 	public int Gold{get;set;}
 	public Image UserIcon{get;set;}
@@ -17,6 +17,6 @@ public class UserModel : MonoBehaviour {
 	public int LevelUnLocked{get;set;}
 	public int Wins{get;set;}
 	public int Gems{get;set;}
-
-
+	
+	
 }

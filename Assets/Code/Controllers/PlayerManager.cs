@@ -11,22 +11,24 @@ using Assets.Code.UnityBehaviours;
 using Assets.Code.Logic.Pooling;
 using Assets.Code.DataPipeline.Providers;
 
-public class UserController : PoolingBehaviour {
-
+public class PlayerManager  : IResolvableItem {
+	
 	//Refences
 	private  IoCResolver _resolver;
 	private  Messager _messager;
 	private  MessagingToken _onPirateCreated;
-
-	private UserModel _userModel;
-
-	public void Initialize (IoCResolver resolver, UserModel data, LevelManager levelManager)
+	
+	private PlayerModel _playerModel;
+	
+	public void Initialize (IoCResolver resolver, PlayerModel data, LevelManager levelManager)
 	{
 		//Get Resolver
 		_resolver = resolver;
 		_resolver.Resolve (out _messager);
-		
+		_playerModel = data;
+
+		//Debug.Log("Player Manager Created");
 	}
-
-
+	
+	
 }

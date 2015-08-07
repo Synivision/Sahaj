@@ -89,6 +89,11 @@ namespace Assets.Code.UnityBehaviours
             var canvasProvider = new CanvasProvider();
             _unityReference.LoadCanvases(canvasProvider);
             _resolver.RegisterItem(canvasProvider);
+
+
+			//Player manager
+			var playerManager = new PlayerManager();
+			_resolver.RegisterItem(playerManager);
             #endregion
 
             // lock the resolver (stop any new items being registered)

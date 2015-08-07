@@ -21,13 +21,13 @@ public class BulletController : PoolingBehaviour
 	private float speed = 5.0F;
 	private Light muzzleFlash;
 	private float muzzleFlashTime = 0.1f;
-	private PirateController _targetPirate;
+	private PoolingBehaviour _targetPirate;
 	private bool _hit;
 	private  UnityReferenceMaster _unityReference;
 	private LineRenderer _lineRenderer;
 	Vector3 randomPosition;
 
-	public void Initialize (IoCResolver resolver, Vector3 startPos, bool hit, Color color, PirateController targetPirate)
+	public void Initialize (IoCResolver resolver, Vector3 startPos, bool hit, Color color, PoolingBehaviour targetPirate)
 	{
 
 		CameraController.shake = 1;

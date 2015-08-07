@@ -17,7 +17,9 @@ public class PirateController : AIPath
 	private  StatsBehaviour _statsBehaviour;
 	private  PirateModel _pirateModel;
 	private  List<PirateController> _knownPirates;
+	private  List<PoolingBehaviour> _allEnemyObjects;
 	private  PirateController nearestPlayer;
+	private  PoolingBehaviour nearestEnemyObject;
 	private  float time;
 
 	//Refences
@@ -38,6 +40,7 @@ public class PirateController : AIPath
 	private  GameObject _spawnPoint;
 	private  PoolingBehaviour fabBullet;
 	private  List<PirateController> nearbyPlayers;
+	private  List<PoolingBehaviour> nearByEnemyObjects;
 	private  List<PirateController> nearbyEnemyPirates;
 	public Slider _healthBar;
 	public Text _stateText;
@@ -57,14 +60,23 @@ public class PirateController : AIPath
 	{
 
 		_levelManager = levelManager;
-		_knownPirates = _levelManager.GetKnownPirates ();
-		nearbyPlayers = new List<PirateController> ();
+
+
 		_spawnPoint = transform.FindChild ("BulletSpawnPoint").gameObject;
 		_moveBehaviour = GetComponent<MoveBehaviour> ();
 
 		OnDeadEvent += () => _levelManager.OnPirateDead (this);
 	
 		_pirateModel = data;
+
+		if(_pirateModel.PirateNature==(int)PirateModel.Nature.Enemy){
+			_knownPirates = _levelManager.GetKnownPirates ();
+			nearbyPlayers = new List<PirateController> ();
+		}else{
+			_allEnemyObjects = _levelManager.GetAllEnemyObjects();
+			nearByEnemyObjects = new List<PoolingBehaviour> ();
+			
+		}
 		gameObject.GetComponent<Renderer> ().material.color = _pirateModel.PirateColor;
 		 
 		//Initialize stats behaviour
@@ -93,6 +105,7 @@ public class PirateController : AIPath
 
 	public void Shoot ()
 	{
+
 		//hit target		
 		if (8 > Random.Range (0, 10)) {
 			InstantiateBullet (true);
@@ -111,7 +124,14 @@ public class PirateController : AIPath
 
 		fabBullet = _poolingObjectManager.Instantiate ("bullet2_prefab");
 		Vector3 randomPos = new Vector3 (Random.Range (1, 3), Random.Range (1, 3), Random.Range (1, 3));
-		fabBullet.gameObject.GetComponent<BulletController> ().Initialize (_resolver, _spawnPoint.transform.position + randomPos, hit, Color.green, nearestPlayer);
+		if(_pirateModel.PirateNature == (int)PirateModel.Nature.Enemy){
+
+			fabBullet.gameObject.GetComponent<BulletController> ().Initialize (_resolver, _spawnPoint.transform.position + randomPos, hit, Color.green,(PoolingBehaviour) nearestPlayer);
+		}else{
+
+			fabBullet.gameObject.GetComponent<BulletController> ().Initialize (_resolver, _spawnPoint.transform.position + randomPos, hit, Color.green, nearestEnemyObject);
+		}
+
 
 	}
 
@@ -119,7 +139,21 @@ public class PirateController : AIPath
 	{
 		System.Action action = null;
 		_unityReference.FireDelayed (() => {
-			nearestPlayer.ApplyHit (Random.Range (10, 20));
+			if(_pirateModel.PirateNature == (int)PirateModel.Nature.Enemy){
+				nearestPlayer.ApplyHit (Random.Range (10, 20));
+			}else {
+			
+				if(nearestEnemyObject.gameObject.GetComponent<PirateController>() != null){
+
+					((PirateController)nearestEnemyObject).ApplyHit(Random.Range (10, 20));
+				}
+				else{
+
+					((BuildingController)nearestEnemyObject).ApplyHit(Random.Range (10, 20));
+				}
+			}
+
+
 		}, .1f);
 	}
 
@@ -139,8 +173,12 @@ public class PirateController : AIPath
 		switch (_pirateState) {
 		case PirateState.Chasing:
 				
-	
-			target = nearestPlayer.transform;
+			if(_pirateModel.PirateNature == (int)PirateModel.Nature.Enemy){
+				target = nearestPlayer.transform;
+			}
+			else{
+				target = nearestEnemyObject.transform;
+			}
 			HandleChase ();
 			_stateText.text = "Chasing";
 				
@@ -162,24 +200,36 @@ public class PirateController : AIPath
 			break;
 
 		}
-	
-		if (nearestPlayer != null) {
+		if(_pirateModel.PirateNature == (int)PirateModel.Nature.Enemy){
 
-			//if(isChase == true){
+			if (_knownPirates.Count >= 1 && nearestPlayer != null) {
 				
+				if (Vector3.Distance (nearestPlayer.transform.position, transform.position) < _pirateModel.PirateRange) {
+					
+					ChangeState (PirateState.Shooting);
+					//Debug.Log(Vector3.Distance (nearestPlayer.transform.position, transform.position).ToString());
+				} else {
+					ChangeState (PirateState.Chasing);
+				}
+				
+			}
 
-		}
-		if (_knownPirates.Count >= 1 && nearestPlayer != null) {
-		
-			if (Vector3.Distance (nearestPlayer.transform.position, transform.position) < _pirateModel.PirateRange) {
+		}else{
 
-				ChangeState (PirateState.Shooting);
-				//Debug.Log(Vector3.Distance (nearestPlayer.transform.position, transform.position).ToString());
-			} else {
-				ChangeState (PirateState.Chasing);
+			if (_allEnemyObjects.Count >= 1 && nearestEnemyObject != null) {
+				
+				if (Vector3.Distance (nearestEnemyObject.transform.position, transform.position) < _pirateModel.PirateRange) {
+					
+					ChangeState (PirateState.Shooting);
+					//Debug.Log(Vector3.Distance (nearestPlayer.transform.position, transform.position).ToString());
+				} else {
+					ChangeState (PirateState.Chasing);
+				}
+				
 			}
 
 		}
+
 
 		if (_statsBehaviour.CurrentHealth < 0) {
 
@@ -196,54 +246,96 @@ public class PirateController : AIPath
 
 	void UpdateStateInfo ()
 	{
-
-		if (!_knownPirates.Any ()) {
-			ChangeState (PirateState.Idle);
-			return;
+		if(_pirateModel.PirateNature == (int) PirateModel.Nature.Enemy){
+			if (!_knownPirates.Any ()) {
+				ChangeState (PirateState.Idle);
+				return;
+			}
 		}
+		else{
+			if (!_allEnemyObjects.Any()) {
+				ChangeState (PirateState.Idle);
+				return;
+			}
+
+		}
+
 
 	}
 
 	void UpdatePirateInfo ()
 	{
+		if(_pirateModel.PirateNature == (int) PirateModel.Nature.Enemy){
 
-		_knownPirates = _levelManager.GetKnownPirates ();
+			_knownPirates = _levelManager.GetKnownPirates ();
+		}else{
+
+			_allEnemyObjects = _levelManager.GetAllEnemyObjects();
+		}
 		if (_pirateModel.PirateNature == (int)PirateModel.Nature.Player) {
-			_knownPirates = _knownPirates.Where (pirate => pirate.DataModel.PirateNature == (int)PirateModel.Nature.Enemy).ToList ();
-
+			//_knownPirates = _knownPirates.Where (pirate => pirate.DataModel.PirateNature == (int)PirateModel.Nature.Enemy).ToList ();
+			if (_allEnemyObjects.Count >= 1) {
+				
+				nearestEnemyObject  = _allEnemyObjects [0];
+				
+				foreach (PoolingBehaviour enemyObject in _allEnemyObjects) {
+					
+					if (Vector3.Distance (enemyObject.transform.position, transform.position) < Vector3.Distance (nearestEnemyObject.transform.position, transform.position)) {
+						
+						nearestEnemyObject = enemyObject;
+						
+					}
+					
+				}
+				
+				if (nearestEnemyObject != null) {
+					
+					_unityReference.FireDelayed (() => {
+						UpdatePirateInfo ();
+					}, 2f);
+				}
+				
+				
+			} else {
+				
+				ChangeState (PirateState.Idle);
+				
+			} 
 
 		} else if (_pirateModel.PirateNature == (int)PirateModel.Nature.Enemy) {
 
-			_knownPirates = _knownPirates.Where (pirate => pirate.DataModel.PirateNature == (int)PirateModel.Nature.Player).ToList ();
+			//_knownPirates = _knownPirates.Where (pirate => pirate.DataModel.PirateNature == (int)PirateModel.Nature.Player).ToList ();
+			if (_knownPirates.Count >= 1) {
+				
+				nearestPlayer = _knownPirates [0];
+				
+				foreach (PirateController pirate in _knownPirates) {
+					
+					if (Vector3.Distance (pirate.transform.position, transform.position) < Vector3.Distance (nearestPlayer.transform.position, transform.position)) {
+						
+						nearestPlayer = pirate;
+						
+					}
+					
+				}
+				
+				if (nearestPlayer != null) {
+					
+					_unityReference.FireDelayed (() => {
+						UpdatePirateInfo ();
+					}, 2f);
+				}
+				
+				
+			} else {
+				
+				ChangeState (PirateState.Idle);
+				
+			} 
+
 		}
 
-		if (_knownPirates.Count >= 1) {
 
-			nearestPlayer = _knownPirates [0];
-
-			foreach (PirateController pirate in _knownPirates) {
-
-				if (Vector3.Distance (pirate.transform.position, transform.position) < Vector3.Distance (nearestPlayer.transform.position, transform.position)) {
-
-					nearestPlayer = pirate;
-				
-				}
-								
-			}
-
-			if (nearestPlayer != null) {
-			
-				_unityReference.FireDelayed (() => {
-					UpdatePirateInfo ();
-				}, 2f);
-			}
-				
-
-		} else {
-			
-			ChangeState (PirateState.Idle);
-			
-		} 
 
 	}
 

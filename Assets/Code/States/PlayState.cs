@@ -2,11 +2,12 @@
 using Assets.Code.Messaging;
 using Assets.Code.Ui;
 using UnityEngine;
+using System.Collections.Generic;
 using Assets.Code.DataPipeline.Providers;
 using Assets.Code.Logic.Pooling;
 using Assets.Code.Ui.CanvasControllers;
 using Assets.Code.Messaging.Messages;
-
+using System.Collections;
 namespace Assets.Code.States
 {
 	public class PlayState : BaseState
@@ -29,14 +30,17 @@ namespace Assets.Code.States
 		private PoolingObjectManager _poolingObjectManager;
 		//level Manager
 
-		LevelManager levelManager;
+		private Dictionary<string,bool> _unlockedPirates;
 
+		LevelManager levelManager;
+		PlayerManager _playerManager;
 		public PlayState (IoCResolver resolver) : base(resolver)
 		{
 			_resolver.Resolve (out _messager);
 			_resolver.Resolve (out _prefabProvider);
 			_resolver.Resolve (out _canvasProvider);
 			_resolver.Resolve (out _poolingObjectManager);
+			_resolver.Resolve (out _playerManager);
 
 		}
 
@@ -47,8 +51,16 @@ namespace Assets.Code.States
 			//_uiManager.RegisterUi (new MainCanvasController (_resolver, _canvasProvider.GetCanvas ("MainCanvas")));
 			_uiManager.RegisterUi (new PirateInfoCanvasController (_resolver, _canvasProvider.GetCanvas ("PirateInfoCanvas")));
 
-			_uiManager.RegisterUi (new GamePlayCanvasController (_resolver, _canvasProvider.GetCanvas ("GamePlayCanvas")));
-			//Debug.Log ("Play state initialized.");
+			_unlockedPirates = new Dictionary<string, bool>();
+			_unlockedPirates.Add("Pirate1",true);
+			_unlockedPirates.Add("Pirate2",true);
+			_unlockedPirates.Add("Pirate3",true);
+			_unlockedPirates.Add("EnemyPirate1",true);
+			_unlockedPirates.Add("EnemyPirate2",true);
+			_unlockedPirates.Add("EnemyPirate3",true);
+			_unlockedPirates.Add ("EnemyPirate4",false);
+			_unlockedPirates.Add ("Pirate4",false);
+			_unlockedPirates.Add ("EnemyPirate5",false);
 
 			//Instantiate CameraController and InputController
 			var controller = _poolingObjectManager.Instantiate ("Controller");
@@ -57,10 +69,31 @@ namespace Assets.Code.States
 			//Initialize level manager
 			levelManager = new LevelManager (_resolver);
 
+
+			PlayerModel playerModel = new PlayerModel();
+			playerModel.Name = "User";
+			playerModel.Email = "user@gmail.com";
+			playerModel.Gold = 350;
+			playerModel.ExperiencePoints = 50;
+			playerModel.UserLevel =  34;
+			playerModel.UserRank = 89;
+			playerModel.Wins = 84;
+			playerModel.Gems = 895;
+			playerModel.UnlockedPirates = _unlockedPirates;
+
+
+
+			_playerManager.Initialize(_resolver,playerModel,levelManager);
+
+			_uiManager.RegisterUi (new GamePlayCanvasController (_resolver, _canvasProvider.GetCanvas ("GamePlayCanvas"), _playerManager));
+			//Debug.Log ("Play state initialized.");
+
 			//Message tokens
 			_onQuitGame = _messager.Subscribe<QuitGameMessage> (OnQuitGame);
 			_onCreatePirate = _messager.Subscribe<CreatePirateMessage> (OnCreatePirate);
 			_onTearDownLevel = _messager.Subscribe<TearDownLevelMessage> (OnTearDownLevel);
+
+
 		
 		}
 

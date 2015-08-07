@@ -14,6 +14,9 @@ namespace Assets.Code.Ui.CanvasControllers
 	public class GamePlayCanvasController : BaseCanvasController {
 
 		private readonly Messager _messager;
+		private GameObject _parentButtonObject;
+		private Button _previouslyClickedTileButton;
+
 		private readonly Button _makePirate1Button;
 		private readonly Button _makePirate2Button;
 		private readonly Button _makePirate3Button;
@@ -21,7 +24,9 @@ namespace Assets.Code.Ui.CanvasControllers
 		private readonly Button _makeEnemyPirate1Button;
 		private readonly Button _makeEnemyPirate2Button;
 		private readonly Button _makeEnemyPirate3Button;
-		
+
+		private readonly PrefabProvider _prefabProvider;
+
 		private readonly Text _fpsText;
 		private Canvas _canvas;
 		private readonly Button _quitButton;
@@ -29,25 +34,32 @@ namespace Assets.Code.Ui.CanvasControllers
 		private UnityReferenceMaster _unityReference;
 
 		private List<Button> _buttonList;
+		private PlayerManager _playerManager;
 
-		public GamePlayCanvasController (IoCResolver resolver, Canvas canvasView) : base(canvasView)
+		public GamePlayCanvasController (IoCResolver resolver, Canvas canvasView, PlayerManager playerManager) : base(canvasView)
 		{
 			_canvas = canvasView;
+			resolver.Resolve (out _prefabProvider);
+
 			resolver.Resolve (out _messager);
 			resolver.Resolve (out _unityReference);
 
 			ResolveElement (out _fpsText,"FpsText");
 			ResolveElement(out _quitButton,"QuitButton");
 
-			var panel = GetElement("SelectPiratePanel");
+			var panel = GetElement("Scroll");
 			var contentpanel = panel.transform.GetChild(0);
+
+			_parentButtonObject = contentpanel.gameObject;
+
+
+			/*
 			_makePirate1Button = contentpanel.GetChild(0).GetComponent<Button>();
 			_makePirate2Button = contentpanel.GetChild(1).GetComponent<Button>();
 			_makePirate3Button = contentpanel.GetChild(2).GetComponent<Button>();
 			_makeEnemyPirate1Button = contentpanel.GetChild(3).GetComponent<Button>();
 			_makeEnemyPirate2Button = contentpanel.GetChild(4).GetComponent<Button>();
 			_makeEnemyPirate3Button = contentpanel.GetChild(5).GetComponent<Button>();
-
 
 			_makePirate1Button.onClick.AddListener (OnMakePirate1ButtonClicked);
 			_makePirate2Button.onClick.AddListener (OnMakePirate2ButtonClicked);
@@ -56,13 +68,35 @@ namespace Assets.Code.Ui.CanvasControllers
 			_makeEnemyPirate1Button.onClick.AddListener(OnMakeEnemyPirate1ButtonClicked);
 			_makeEnemyPirate2Button.onClick.AddListener(OnMakeEnemyPirate2ButtonClicked);
 			_makeEnemyPirate3Button.onClick.AddListener(OnMakeEnemyPirate3ButtonClicked);
-
-
-
+*/
 			_quitButton.onClick.AddListener (OnQuitButtonClicked);
+			_playerManager = playerManager;
 
 			InitializeButtonList();
 
+		}
+
+		public void CreatePirateButton()
+		{
+			var fab = Object.Instantiate(_prefabProvider.GetPrefab("PirateButton")).gameObject.GetComponent<Button>();
+			
+			fab.gameObject.name = "PirateButton";
+			fab.onClick.AddListener(() => OnPirateButtonClicked(fab));
+			
+			fab.transform.SetParent(_parentButtonObject.transform);
+			fab.transform.localScale = Vector3.one;
+		}
+		
+		private void OnPirateButtonClicked(Button button)
+		{
+			if (_previouslyClickedTileButton == button) return;
+			
+			if (_previouslyClickedTileButton != null)
+				_previouslyClickedTileButton.interactable = true;
+			
+			button.interactable = false;
+			_previouslyClickedTileButton = button;
+			
 		}
 
 		void OnQuitButtonClicked ()
@@ -91,6 +125,7 @@ namespace Assets.Code.Ui.CanvasControllers
 
 			if(_buttonList.Contains(button)){
 				button.interactable = state;
+				_previouslyClickedTileButton = button;
 			}
 
 			_buttonList.Remove(button);
@@ -163,6 +198,12 @@ namespace Assets.Code.Ui.CanvasControllers
 			
 			var frameRate = (int)(1.0 / Time.deltaTime);
 			_fpsText.text = frameRate.ToString()+" fps";
+			if (Input.GetKeyDown (KeyCode.A)) {
+				
+				CreatePirateButton();
+				
+			}
+
 		}
 
 }
