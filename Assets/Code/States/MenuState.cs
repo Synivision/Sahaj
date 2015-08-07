@@ -34,10 +34,6 @@ public class MenuState : BaseState{
 		//Debug.Log ("Menu state initialized.");
 		//message tokens
 		_onStartGame = _messager.Subscribe<StartGameMessage>(OnStartGame);
-
-		var controller = _poolingObjectManager.Instantiate("Controller");
-		controller.gameObject.GetComponent<InputController>().Initialize(_resolver);
-
 		_uiManager = new UiManager ();
 
 		_uiManager.RegisterUi(new MenuCanvasController(_resolver, _canvasProvider.GetCanvas("MenuCanvas")));

@@ -8,7 +8,7 @@ using Assets.Code.DataPipeline.Providers;
 using Assets.Code.Messaging;
 using Assets.Code.Messaging.Messages;
 using Assets.Code.UnityBehaviours;
-
+using Assets.Code.States;
 
 namespace Assets.Code.Ui.CanvasControllers
 {
@@ -37,6 +37,8 @@ namespace Assets.Code.Ui.CanvasControllers
 		private List<Button> _buttonList;
 		private PlayerManager _playerManager;
 
+		private InputSession _inputSession;
+
 		public GamePlayCanvasController (IoCResolver resolver, Canvas canvasView, PlayerManager playerManager) : base(canvasView)
 		{
 			_canvas = canvasView;
@@ -44,6 +46,7 @@ namespace Assets.Code.Ui.CanvasControllers
 
 			resolver.Resolve (out _messager);
 			resolver.Resolve (out _unityReference);
+			resolver.Resolve (out _inputSession);
 
 			ResolveElement (out _fpsText,"FpsText");
 			ResolveElement(out _quitButton,"QuitButton");
@@ -64,9 +67,7 @@ namespace Assets.Code.Ui.CanvasControllers
 				if(item.Value == true){
 					_buttonList.Add(CreatePirateButton(item.Key));
 				}
-
 			}
-
 		}
 
 		public Button CreatePirateButton(string name)
@@ -83,7 +84,7 @@ namespace Assets.Code.Ui.CanvasControllers
 		
 		private void OnPirateButtonClicked(Button button,string name)
 		{
-			InputController.PirateName = name;
+			_inputSession.CurrentlySelectedPirateName = name;
 			Debug.Log (name);
 			if (_previouslyClickedTileButton == button) return;
 			

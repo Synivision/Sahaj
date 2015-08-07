@@ -3,14 +3,16 @@ using System.Collections;
 using Assets.Code.Models;
 using UnityEngine.UI;
 using System.Collections.Generic;
-
-public class InputSession  {
+using Assets.Code.UnityBehaviours.Pooling;
+using Assets.Code.DataPipeline;
+public class InputSession : IResolvableItem  {
 	private InputSessionData _data;
 
-	public InputSession(InputSessionData data){
+	public void Initialize (InputSessionData data){
 
 		_data = data;
 	}
+
 
 	public string CurrentlySelectedPirateName{
 		get{return _data.Name;}

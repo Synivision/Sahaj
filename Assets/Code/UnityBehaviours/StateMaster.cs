@@ -94,6 +94,10 @@ namespace Assets.Code.UnityBehaviours
 			//Player manager
 			var playerManager = new PlayerManager();
 			_resolver.RegisterItem(playerManager);
+
+
+			var inputSession  =  new InputSession();
+			_resolver.RegisterItem(inputSession);
             #endregion
 
             // lock the resolver (stop any new items being registered)
