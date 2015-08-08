@@ -98,12 +98,12 @@ public class BuildingController : PoolingBehaviour {
 			InstantiateBullet (true);
 			PerformHit ();
 
-			_poolingAudioPlayer.PlaySound (transform.position, _soundProvider.GetSound ("lazer_shoot1"), 50);
+			_poolingAudioPlayer.PlaySound (transform.position, _soundProvider.GetSound ("lazer_shoot1"), 0.3f);
 			
 		} else {
 
 			InstantiateBullet (false);
-			_poolingAudioPlayer.PlaySound (transform.position, _soundProvider.GetSound ("lazer_shoot_miss"), 50);
+			_poolingAudioPlayer.PlaySound (transform.position, _soundProvider.GetSound ("lazer_shoot_miss"), 0.3f);
 		}
 	}
 	
