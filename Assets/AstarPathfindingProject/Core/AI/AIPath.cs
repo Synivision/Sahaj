@@ -36,7 +36,7 @@ using Pathfinding.RVO;
  */
 [RequireComponent(typeof(Seeker))]
 [AddComponentMenu("Pathfinding/AI/AIPath (generic)")]
-public class AIPath : PoolingBehaviour {
+public class AIPath : MonoBehaviour {
 	
 	/** Determines how often it will search for new paths. 
 	 * If you have fast moving targets or AIs, you might want to set it to a lower value.

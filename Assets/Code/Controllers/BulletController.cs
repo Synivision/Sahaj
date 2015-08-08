@@ -1,15 +1,7 @@
 ﻿using UnityEngine;
-using Assets.Code.Ui.CanvasControllers;
-using System.Collections.Generic;
-using System.Linq;
-
-using Assets.Code.Messaging;
-using Assets.Code.Messaging.Messages;
 using Assets.Code.DataPipeline;
 using Assets.Code.UnityBehaviours.Pooling;
 using Assets.Code.UnityBehaviours;
-using Assets.Code.Logic.Pooling;
-using Assets.Code.DataPipeline.Providers;
 
 public class BulletController : PoolingBehaviour
 {
@@ -21,41 +13,38 @@ public class BulletController : PoolingBehaviour
 	private float speed = 5.0F;
 	private Light muzzleFlash;
 	private float muzzleFlashTime = 0.1f;
-	private PoolingBehaviour _targetPirate;
+	private Vector3 _target;
 	private bool _hit;
 	private  UnityReferenceMaster _unityReference;
 	private LineRenderer _lineRenderer;
 	Vector3 randomPosition;
 
-	public void Initialize (IoCResolver resolver, Vector3 startPos, bool hit, Color color, PoolingBehaviour targetPirate)
+	public void Initialize (IoCResolver resolver, Vector3 startPos, bool hit, Color color, Vector3 target)
 	{
-
 		CameraController.shake = 1;
 		_color = color;
 		_resolver = resolver;
 		_startPos = startPos;
 		_hit = hit;
-		_targetPirate = targetPirate;
+		_target = target;
 
 		muzzleFlash = this.gameObject.GetComponent<Light> ();
 		muzzleFlash.enabled = true;
 		
 		startTime = Time.time;
 		if (_hit) {
-			journeyLength = Vector3.Distance (_startPos, _targetPirate.transform.position);
+			journeyLength = Vector3.Distance (_startPos, _target);
 
 		} else {
 			//TODO change journey length
 			randomPosition = new Vector3 (Random.Range (1, 30), Random.Range (1, 30), Random.Range (1, 30));
-			journeyLength = Vector3.Distance (_startPos, _targetPirate.transform.position + randomPosition);
+			journeyLength = Vector3.Distance (_startPos, _target + randomPosition);
 		}
 
 		_resolver.Resolve (out _unityReference);
 
 	
-		_unityReference.FireDelayed (()=>{
-			Delete();
-		}, .15f);
+		_unityReference.FireDelayed (() =>{ Delete(); }, .15f);
 
 
 		_unityReference.FireDelayed (() => {
@@ -74,13 +63,13 @@ public class BulletController : PoolingBehaviour
 
 		if (_hit) {
 
-			transform.position = Vector3.Lerp (_startPos, _targetPirate.transform.position, fracJourney);
+			transform.position = Vector3.Lerp (_startPos, _target, fracJourney);
 		} else {  
-			transform.position = Vector3.Lerp (_startPos, _targetPirate.transform.position + randomPosition, fracJourney);
+			transform.position = Vector3.Lerp (_startPos, _target + randomPosition, fracJourney);
 		}
 
 
-		_lineRenderer.SetPosition(1,this.transform.position);
+		_lineRenderer.SetPosition(1, transform.position);
 	}
 
 

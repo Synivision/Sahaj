@@ -7,8 +7,10 @@ using Assets.Code.Extensions;
 using Assets.Code.Logic.Pooling;
 using Assets.Code.Messaging;
 using Assets.Code.Messaging.Messages;
+using Assets.Code.Models;
 using Assets.Code.States;
 using Assets.Code.Utilities;
+using UnityEditor;
 using UnityEngine;
 
 
@@ -111,16 +113,127 @@ namespace Assets.Code.UnityBehaviours
             /* SUBSCRIBE FOR GAME END */
             _onExitGame = _messager.Subscribe<ExitGameMessage>(OnExitGame);
 
+            #region DATA DEFINITIONS (eventually to be moved to data)
+            _gameDataProvider.AddData (new BuildingModel
+            {
+                Name = "building_a",
+                BuildingColor = Color.gray,
+                Range = 50,
+                Stats = new StatBlock
+                {
+                    MaximumHealth = 100,
+                    MaximumDamage = 1,
+                    MaximumCourage = -1
+                }
+            });
 
-			//add data to dame data provider
+            _gameDataProvider.AddData (new BuildingModel
+            {
+                Name = "building_b",
+                BuildingColor = Color.red,
+                Range = 50,
+                Stats = new StatBlock
+                {
+                    MaximumHealth = 100,
+                    MaximumDamage = 1,
+                    MaximumCourage = -1
+                }
+            });
 
-			_gameDataProvider.AddData<PirateModel>(GeneratePirate1());
-			_gameDataProvider.AddData<PirateModel>(GeneratePirate2());
-			_gameDataProvider.AddData<PirateModel>(GeneratePirate3());
-			_gameDataProvider.AddData<PirateModel>(GenerateEnemy1());
-			_gameDataProvider.AddData<PirateModel>(GenerateEnemy2());
-			_gameDataProvider.AddData<PirateModel>(GenerateEnemy3());
+            /* PLAYER PIRATES */
+            _gameDataProvider.AddData( new PirateModel {
+                Name = "Pirate1",
+                Stats = new StatBlock
+                {
+                    MaximumHealth = 200,
+                    MaximumDamage = 25,
+                    MaximumCourage = 5
+                },
+                Descipriton = "Control the crew and gives orders",
+                PirateName = "Captain" + UnityEngine.Random.Range (0, 100),
+                PirateNature = PirateNature.Player,
+                PirateRange = (int)PirateModel.Range.Gunner3,
+                PirateColor = Color.blue
+            });
 
+            _gameDataProvider.AddData(new PirateModel
+            {
+                Name = "Pirate2",
+                Stats = new StatBlock
+                {
+                    MaximumHealth = 150,
+                    MaximumDamage = 20,
+                    MaximumCourage = 4
+                },
+                Descipriton = "Second in command : swords man",
+                PirateName = "Quarter Master" + UnityEngine.Random.Range (0, 100),
+                PirateNature = (int)PirateNature.Player ,
+                PirateRange = (int)PirateModel.Range.Gunner3,
+                PirateColor = Color.green
+            });
+            _gameDataProvider.AddData(new PirateModel
+            {
+                Name = "Pirate3",
+                Stats = new StatBlock
+                {
+                    MaximumHealth = 100,
+                    MaximumDamage = 15,
+                    MaximumCourage = 3
+                },
+                Descipriton = "Attacks and defends the ship from the gun port on deck",
+                PirateName = "Gunner" + UnityEngine.Random.Range (0, 100),
+                PirateRange = (int)PirateModel.Range.Gunner2,
+                PirateNature = PirateNature.Player,
+                PirateColor = Color.yellow
+            });
+
+            /* ENEMY PIRATES */
+            _gameDataProvider.AddData(new PirateModel
+            {
+                Name = "EnemyPirate1",
+                Stats = new StatBlock
+                {
+                    MaximumHealth = 120,
+                    MaximumDamage = 10,
+                    MaximumCourage = 3
+                },
+                Descipriton = "Milee Enemy Pirate",
+                PirateName = "Enemy " + UnityEngine.Random.Range (0, 100),
+                PirateRange = (int)PirateModel.Range.Milee,
+                PirateNature = PirateNature.Enemy,
+                PirateColor = Color.red,
+            });
+            _gameDataProvider.AddData(new PirateModel
+            {
+                Name = "EnemyPirate2",
+                Stats = new StatBlock
+                {
+                    MaximumHealth = 150,
+                    MaximumDamage = 8,
+                    MaximumCourage = 4
+                },
+                Descipriton = "Gunner1 Enemy Pirate",
+                PirateName = "Enemy " + UnityEngine.Random.Range (0, 100),
+                PirateRange = (int)PirateModel.Range.Gunner1,
+                PirateNature = PirateNature.Enemy,
+                PirateColor = Color.grey
+            });
+            _gameDataProvider.AddData(new PirateModel
+            {
+                Name = "EnemyPirate3",
+                Stats = new StatBlock
+                {
+                    MaximumHealth = 100,
+                    MaximumDamage = 10,
+                    MaximumCourage = 3
+                },
+                Descipriton = "Gunner2 Enemy Pirate",
+                PirateName = "Enemy " + UnityEngine.Random.Range (0, 100),
+                PirateRange = (int)PirateModel.Range.Gunner2,
+                PirateNature = PirateNature.Enemy,
+                PirateColor = Color.black
+            });
+            #endregion
         }
 
         private void OnExitGame(ExitGameMessage message)
@@ -154,112 +267,5 @@ namespace Assets.Code.UnityBehaviours
             _currentState.Update ();
             _currentState.HandleInput();
         }
-
-		public IoCResolver Resolver{get{
-
-				return _resolver;
-			}set{
-
-				_resolver = value;
-			}}
-
-		public PirateModel GeneratePirate1(){
-			
-			PirateModel pirateModel=new PirateModel();
-			pirateModel.Name = "Pirate1";
-			pirateModel.Health = 200;
-			pirateModel.Descipriton = "Control the crew and gives orders";
-			pirateModel.AttackDamage = 25;
-			pirateModel.PirateName = "Captain" + UnityEngine.Random.Range (0, 100).ToString ();
-			pirateModel.Courage = 5;
-			pirateModel.PirateNature = (int)PirateModel.Nature.Player ;
-			pirateModel.PirateRange = (int)PirateModel.Range.Gunner3;
-			pirateModel.PirateColor = Color.blue;
-			
-			return pirateModel;
-		}
-		public PirateModel GeneratePirate2(){
-			
-			//Quarter Master
-			PirateModel pirateModel=new PirateModel();
-			pirateModel.Name = "Pirate2";
-			pirateModel.Health = 150;
-			pirateModel.Descipriton = "Second in command : swords man";
-			pirateModel.AttackDamage = 20;
-			pirateModel.PirateName = "Quarter Master" + UnityEngine.Random.Range (0, 100).ToString();
-			pirateModel.Courage = 4;
-			pirateModel.PirateNature = (int)PirateModel.Nature.Player ;
-			pirateModel.PirateRange = (int)PirateModel.Range.Gunner3;
-			pirateModel.PirateColor = Color.green;
-			
-			return pirateModel;
-		}
-		
-		public PirateModel GeneratePirate3(){
-			
-			//Gunner
-			PirateModel pirateModel=new PirateModel();
-			pirateModel.Name = "Pirate3";
-			pirateModel.Health = 100;
-			pirateModel.Descipriton = "Attacks and defends the ship from the gun port on deck";
-			pirateModel.AttackDamage = 15;
-			pirateModel.PirateName = "Gunner" + UnityEngine.Random.Range (0, 100).ToString ();
-			pirateModel.Courage = 3;
-			pirateModel.PirateRange = (int)PirateModel.Range.Gunner2;
-			pirateModel.PirateNature = (int)PirateModel.Nature.Player ;
-			pirateModel.PirateColor = Color.yellow;
-			
-			return pirateModel;
-		}
-		
-		private PirateModel GenerateEnemy1(){
-			
-			PirateModel pirateModel=new PirateModel();
-			pirateModel.Name = "EnemyPirate1";
-			pirateModel.Health = 120;
-			pirateModel.Descipriton = "Milee Enemy Pirate";
-			pirateModel.AttackDamage = 10;
-			pirateModel.PirateName = "Enemy " + UnityEngine.Random.Range (0, 100).ToString ();
-			pirateModel.Courage = 3;
-			pirateModel.PirateRange = (int)PirateModel.Range.Milee;
-			pirateModel.PirateNature = (int)PirateModel.Nature.Enemy ;
-			pirateModel.PirateColor = Color.red;
-			
-			return pirateModel;
-		}
-		
-		private PirateModel GenerateEnemy2(){
-			
-			PirateModel pirateModel=new PirateModel();
-			pirateModel.Name = "EnemyPirate2";
-			pirateModel.Health = 150;
-			pirateModel.Descipriton = "Gunner1 Enemy Pirate";
-			pirateModel.AttackDamage = 8;
-			pirateModel.PirateName = "Enemy " + UnityEngine.Random.Range (0, 100).ToString ();
-			pirateModel.Courage = 4;
-			pirateModel.PirateRange = (int)PirateModel.Range.Gunner1;
-			pirateModel.PirateNature = (int)PirateModel.Nature.Enemy ;
-			pirateModel.PirateColor = Color.grey;
-			
-			return pirateModel;
-		}
-		
-		private PirateModel GenerateEnemy3(){
-			
-			PirateModel pirateModel=new PirateModel();
-			pirateModel.Name = "EnemyPirate3";
-			pirateModel.Health = 100;
-			pirateModel.Descipriton = "Gunner2 Enemy Pirate";
-			pirateModel.AttackDamage = 10;
-			pirateModel.PirateName = "Enemy " + UnityEngine.Random.Range (0, 100).ToString ();
-			pirateModel.Courage = 3;
-			pirateModel.PirateRange = (int)PirateModel.Range.Gunner2;
-			pirateModel.PirateNature = (int)PirateModel.Nature.Enemy ;
-			pirateModel.PirateColor = Color.black;
-			
-			return pirateModel;
-		}
-
     }
-
 }

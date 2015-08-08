@@ -1,160 +1,146 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using Assets.Code.Models;
+using UnityEngine;
 using System.Collections.Generic;
 using Assets.Code.DataPipeline;
 using Assets.Code.DataPipeline.Providers;
-using Assets.Code.Logic.Pooling;
-using Assets.Code.Messaging;
-using Assets.Code.UnityBehaviours.Pooling;
-using Assets.Code.States;
-using System.Linq;
-using Assets.Code.Messaging.Messages;
-using Assets.Code.DataPipeline;
 
-public delegate void OnPirateGeneratedEventHandler();
-
+public delegate void OnPirateCreatedEventHandler(PirateController newPirate);
+public delegate void OnPirateKilledEventHandler(PirateController killedPirate);
+public delegate void OnBuildingCreatedEventHandler(BuildingController newBuilding);
+public delegate void OnBuildingDestroyedEventHandler(BuildingController destroyedBuilding);
 
 public class LevelManager 
 {
-	public OnPirateGeneratedEventHandler OnPirateGeneratedEvent;
-
-
+    /* REFENCES */
+    readonly GameDataProvider _gameDataProvider;
 	private readonly PrefabProvider _prefabProvider;
-	private readonly Messager _messager;
-	private readonly PoolingBehaviour _poolingbehviour;
-	PoolingObjectManager _poolingObjectManager;
-	private List<PirateController> _knownPirates;
-	private List<PoolingBehaviour> _allEnemyObjects;
-	private readonly IoCResolver _resolver;
-	GameDataProvider _gameDataProvider;
 
-	PoolingBehaviour pirateObject;
-	PoolingBehaviour allPiratesObject;
-	private BuildingModel model,model2;
+    /* PROPERTIES */
+    private readonly List<PirateController> _knownPirates;
+    private readonly List<BuildingController> _knownBuildings;
+	private readonly IoCResolver _resolver;
+
+	private readonly GameObject _piratesParent;
+    private readonly GameObject _buildingsParent;
+
+    public OnPirateCreatedEventHandler OnPirateCreatedEvent;
+    public OnPirateKilledEventHandler OnPirateKilledEvent;
+    public OnBuildingCreatedEventHandler OnBuildingCreatedEvent;
+    public OnBuildingDestroyedEventHandler OnBuildingDestroyedEvent;
+
 	public LevelManager (IoCResolver resolver)
 	{
 		_resolver = resolver;
 
-		_resolver.Resolve (out _messager);
-		_resolver.Resolve (out _poolingObjectManager);
 		_resolver.Resolve (out _prefabProvider);
 		_resolver.Resolve (out _gameDataProvider);
 
-
-		allPiratesObject = (PoolingBehaviour)_poolingObjectManager.Instantiate ("AllPirates");
+		_piratesParent = Object.Instantiate(_prefabProvider.GetPrefab("empty_prefab"));
+        _buildingsParent = Object.Instantiate(_prefabProvider.GetPrefab("empty_prefab"));
 
 		_knownPirates = new List<PirateController> ();
-		_allEnemyObjects = new List<PoolingBehaviour>();
+        _knownBuildings = new List<BuildingController>();
 		GenerateLevelMap();
 	}
 
 	public void GenerateLevelMap(){
-		_poolingObjectManager.Instantiate ("AStarPlane");
+		Object.Instantiate (_prefabProvider.GetPrefab("AStarPlane"));
 
-
-		var building1 = _poolingObjectManager.Instantiate ("Building") as BuildingController;
-		model = new BuildingModel();
-
-		model.Name = "Building1";
-		model.BuildingColor = Color.gray;
-		model.Range = 50;
-		model.Health = 100;
-
-		building1.Initialize(_resolver, model,this);
-		building1.transform.position = new Vector3(50,building1.transform.position.y,-20);
-
-		var building2 = _poolingObjectManager.Instantiate ("Building") as BuildingController;
-		model2 = new BuildingModel();
-		model2.Name = "Building2";
-		model2.BuildingColor = Color.red;
-		model2.Range = 50;
-		model2.Health = 100;
-
-		building2.Initialize(_resolver, model2,this);
-		building2.transform.position = new Vector3(-85,building1.transform.position.y,-85);
-
-		_allEnemyObjects.Add(building1);
-		_allEnemyObjects.Add(building2);
+	    CreateBuilding("building_a", new Vector3(50, 15, -20));
+        CreateBuilding("building_b", new Vector3(-85, 15, -85));
 	}
 
-	public List<PirateController> GetKnownPirates(){
+    public List<StatsBehaviour> GetOpposition(PirateNature context)
+    {
+        var opposition = _knownPirates.Where(pirate => pirate.Model.PirateNature != context)
+                                      .Select(pirate => pirate.Stats)
+                                      .ToList();
+        
+        // TODO: add nature to buildings?
+        if(context == PirateNature.Player)
+            opposition.AddRange(_knownBuildings.Select(building => building.Stats));
 
-		return _knownPirates;	
+        return opposition;
+    } 
 
+	public List<PirateController> GetOpposingPirates(PirateNature context){
+		return _knownPirates.Where(pirate => pirate.Model.PirateNature != context).ToList();
 	}
 
-	public List<PoolingBehaviour> GetAllEnemyObjects(){
+    public List<BuildingController> GetOpposingBuildings(PirateNature context)
+    {
+        return context == PirateNature.Player ? _knownBuildings : new List<BuildingController>();
+    } 
 
-		return _allEnemyObjects;
+    public void CreateBuilding(string buildingName, Vector3 spawnPosition)
+    {
+        var model = _gameDataProvider.GetData<BuildingModel>(buildingName);
 
-	}
+        var fab = Object.Instantiate(_prefabProvider.GetPrefab("Building"));
+        var buildingController = fab.GetComponent<BuildingController>();
+
+        buildingController.Initialize(_resolver, model, this);
+
+        fab.name = buildingName;
+        fab.transform.position = spawnPosition;
+
+        if (OnBuildingCreatedEvent != null)
+            OnBuildingCreatedEvent(buildingController);
+
+        buildingController.Stats.OnKilledEvent += () => OnBuildingKilled(buildingController);
+
+        _knownBuildings.Add(buildingController);
+    }
+
+    private void OnBuildingKilled(BuildingController building)
+    {
+        _knownBuildings.Remove(building);
+        if (OnBuildingDestroyedEvent != null)
+            OnBuildingDestroyedEvent(building);
+
+        if (building != null)
+            building.Delete();
+    }
 
 	public void CreatePirate (string pirateName, Vector3 spawnposition)
 	{
-	    pirateObject = _poolingObjectManager.Instantiate ("Sphere");
-		PirateModel model = GeneratePirateModel(pirateName);
+        // NOTE: we might also use this model to define the pirate's prefab
+        // this way we could have special pirates with scripts alternate to the default
+        // (same applies to buildings above)
+	    var model = _gameDataProvider.GetData<PirateModel>(pirateName);
 
-		if(model.PirateNature == (int)PirateModel.Nature.Enemy){
-			
-			_allEnemyObjects.Add(pirateObject);
-			
-		}else{
-			//only player pirates in the lists
-			_knownPirates.Add((PirateController)pirateObject);
-		}
+	    var fab = Object.Instantiate(_prefabProvider.GetPrefab("Sphere"));
+	    var pirateController = fab.GetComponent<PirateController>();
 
-		((PirateController)pirateObject).Initialize(_resolver, model, this);
-		pirateObject.transform.position = spawnposition;
-		pirateObject.transform.SetParent(allPiratesObject.transform);
-		if(OnPirateGeneratedEvent!=null){
-			OnPirateGeneratedEvent();
-		}
+        pirateController.Initialize(_resolver, model, this);
 
+	    fab.name = pirateName;
+		fab.transform.position = spawnposition;
+		fab.transform.SetParent(_piratesParent.transform);
+
+		if(OnPirateCreatedEvent != null)
+			OnPirateCreatedEvent(pirateController);
+        
+        pirateController.Stats.OnKilledEvent += () => OnPirateKilled(pirateController);
+
+        _knownPirates.Add(pirateController);
 	}
 
-	public PirateModel GeneratePirateModel(string pirateName){
+    private void OnPirateKilled(PirateController pirate)
+    {
+        _knownPirates.Remove(pirate);
+        if (OnPirateKilledEvent != null)
+            OnPirateKilledEvent(pirate);
 
-		PirateModel pirateModel = new PirateModel ();
-		switch (pirateName){
-			case"Pirate1":
-				pirateModel = _gameDataProvider.GetData<PirateModel>("Pirate1");
-				break;
-			case"Pirate2":
-				pirateModel = _gameDataProvider.GetData<PirateModel>("Pirate2");
-				break;
-			case"Pirate3":
-				pirateModel = _gameDataProvider.GetData<PirateModel>("Pirate3");
-				break;
-			case"EnemyPirate1":
-				pirateModel = _gameDataProvider.GetData<PirateModel>("EnemyPirate1");
-				break;
-			case"EnemyPirate2":
-				pirateModel = _gameDataProvider.GetData<PirateModel>("EnemyPirate2");
-				break;
-			case"EnemyPirate3":
-				pirateModel = _gameDataProvider.GetData<PirateModel>("EnemyPirate3");
-				break;
-
-		}
-		return pirateModel;
-
-	}
-
-	
-	public void OnPirateDead(PoolingBehaviour poolingObject){
-
-		if(poolingObject.gameObject.GetComponent<PirateController>()!=null){
-			_knownPirates.Remove((PirateController)poolingObject);
-		}
-		else{
-			_allEnemyObjects.Remove(poolingObject);
-		}
-	//	Debug.Log ("Known Pirates : after remove " + _knownPirates.Count.ToString ());
-
-	}
+        if (pirate != null)
+            pirate.Delete();
+    }
 
 	public void TearDownLevel ()
 	{
-		_poolingObjectManager.TearDown ();
+        Object.Destroy(_piratesParent);
+        Object.Destroy(_buildingsParent);
 	}
 
 }

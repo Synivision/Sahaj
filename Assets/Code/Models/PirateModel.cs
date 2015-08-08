@@ -1,9 +1,8 @@
 ﻿using UnityEngine;
-using System.Collections;
 using Assets.Code.Models;
+
 public class PirateModel : IGameDataModel{
 	
-	public enum Nature{ Player=0, Enemy=1};
 	public enum Range{
 		
 		Milee=20,
@@ -14,11 +13,9 @@ public class PirateModel : IGameDataModel{
 	
 	public int PirateRange{ get; set;}
 	public Color PirateColor{ get; set;}
-	public int PirateNature{ get; set;}
-	public int Health{ get; set;}
-	public int AttackDamage{ get; set;}
+	public PirateNature PirateNature{ get; set;}
+    public StatBlock Stats { get; set; }
 	public string PirateName{ get; set;}
-	public int Courage{ get; set;}
 	public string Descipriton{ get; set;}
 	public string Weapon{ get; set;}
 	public int Level{get; set;}

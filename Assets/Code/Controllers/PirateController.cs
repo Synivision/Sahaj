@@ -1,381 +1,291 @@
+using Assets.Code.Models;
 using UnityEngine;
-using Assets.Code.Ui.CanvasControllers;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine.UI;
 using Assets.Code.Messaging;
 using Assets.Code.Messaging.Messages;
 using Assets.Code.DataPipeline;
-using Assets.Code.UnityBehaviours.Pooling;
 using Assets.Code.UnityBehaviours;
 using Assets.Code.Logic.Pooling;
 using Assets.Code.DataPipeline.Providers;
 
+enum PirateState
+{
+    Shooting,
+    Chasing,
+    Idle,
+    Scanning,
+    Fleeing
+}
+
+[RequireComponent(typeof(StatsBehaviour))]
 public class PirateController : AIPath
 {
-	private  MoveBehaviour _moveBehaviour;
-	private  StatsBehaviour _statsBehaviour;
-	private  PirateModel _pirateModel;
-	private  List<PirateController> _knownPirates;
-	private  List<PoolingBehaviour> _allEnemyObjects;
-	private  PirateController nearestPlayer;
-	private  PoolingBehaviour nearestEnemyObject;
-	private  float time;
+    /* REFERENCES */
+    // ioc
+    private IoCResolver _resolver;
+    private Messager _messager;
+    private PrefabProvider _prefabProvider;
+    private SoundProvider _soundProvider;
+    private PoolingAudioPlayer _poolingAudioPlayer;
+    private PoolingObjectManager _poolingObjectManager;
+    private PoolingParticleManager _poolingParticleManager;
 
-	//Refences
-	private  IoCResolver _resolver;
-	private  Messager _messager;
-	private  PoolingObjectManager _poolingObjectManager;
-	private  PrefabProvider _prefabProvider;
-	private  PoolingParticleManager _poolingParticleManager;
-	private  float timeStay = 0;
-	private  float MinPirateDistance = 100;
-	private  MessagingToken _onPirateCreated;
-	private  PoolingAudioPlayer _poolingAudioPlayer;
-	private  SoundProvider _soundProvider;
-	private  float projectileVelocity = 0;
-	private  float minShootTime = 0;
-	private  LevelManager _levelManager;
+    private LevelManager _levelManager;
+
+    // other components
+    public MoveBehaviour MoveBehaviour;
+    public StatsBehaviour Stats;
+
+    private GameObject _bulletOrigin;
+    public Slider _healthBar;
+    public Text _stateText;
+    public RectTransform Panel;
+
+    // data
+    public PirateModel Model { get; private set; }
+
+    /* PROPERTIES */
+    private StatsBehaviour _currentTarget;
+
 	private  UnityReferenceMaster _unityReference;
-	private  GameObject _spawnPoint;
-	private  PoolingBehaviour fabBullet;
-	private  List<PirateController> nearbyPlayers;
-	private  List<PoolingBehaviour> nearByEnemyObjects;
-	private  List<PirateController> nearbyEnemyPirates;
-	public Slider _healthBar;
-	public Text _stateText;
-	public RectTransform panel;
-	enum PirateState
+
+    private float _timeTillNextShot;
+    private float _timeTillNextSearch;
+
+	private PirateState _currentState;
+
+	public void Initialize (IoCResolver resolver, PirateModel model, LevelManager levelManager)
 	{
-		Shooting,
-		Chasing,
-		Idle,
-		Fleeing}
-	;
+        // resolve references
+        _levelManager = levelManager;
+        Model = model;
 
-	private PirateState _pirateState;
-	private bool isChase = true;
+        _resolver = resolver;
+        _resolver.Resolve(out _messager);
+        _resolver.Resolve(out _poolingParticleManager);
+        _resolver.Resolve(out _poolingObjectManager);
+        _resolver.Resolve(out _poolingAudioPlayer);
+        _resolver.Resolve(out _soundProvider);
+        _resolver.Resolve(out _unityReference);
+        _resolver.Resolve(out _prefabProvider);
 
-	public void Initialize (IoCResolver resolver, PirateModel data, LevelManager levelManager)
-	{
+        MoveBehaviour = GetComponent<MoveBehaviour>();
+        Stats = GetComponent<StatsBehaviour>();
+        _bulletOrigin = transform.FindChild("BulletSpawnPoint").gameObject;
 
-		_levelManager = levelManager;
+        // initialize properties
+	    _levelManager.OnPirateCreatedEvent += OnPirateCreated;
+	    _levelManager.OnBuildingCreatedEvent += OnBuildingCreated;
 
+        Stats.Initialize(Model.Stats);
+	    Stats.OnCurrentHealthChangedEvent += OnCurrentHealthChanged;
 
-		_spawnPoint = transform.FindChild ("BulletSpawnPoint").gameObject;
-		_moveBehaviour = GetComponent<MoveBehaviour> ();
+        gameObject.GetComponent<Renderer>().material.color = Model.PirateColor;
+        Panel.sizeDelta = new Vector2(Model.PirateRange, Model.PirateRange);
 
-		OnDeadEvent += () => _levelManager.OnPirateDead (this);
-	
-		_pirateModel = data;
+        ChangeState(PirateState.Scanning);
+		_healthBar.maxValue = Stats.Block.MaximumHealth;
+	    _healthBar.value = Stats.CurrentHealth;
 
-		if(_pirateModel.PirateNature==(int)PirateModel.Nature.Enemy){
-			_knownPirates = _levelManager.GetKnownPirates ();
-			nearbyPlayers = new List<PirateController> ();
-		}else{
-			_allEnemyObjects = _levelManager.GetAllEnemyObjects();
-			nearByEnemyObjects = new List<PoolingBehaviour> ();
-			
-		}
-		gameObject.GetComponent<Renderer> ().material.color = _pirateModel.PirateColor;
-		 
-		//Initialize stats behaviour
-		_statsBehaviour = new StatsBehaviour (_pirateModel);
-		
-		//Get Resolver
-		_resolver = resolver;
-		_resolver.Resolve (out _messager);
-		_resolver.Resolve (out _poolingParticleManager);
-		_resolver.Resolve (out _poolingObjectManager);
-		_resolver.Resolve (out _poolingAudioPlayer);
-		_resolver.Resolve (out _soundProvider);
-		_resolver.Resolve (out _unityReference);
-		_resolver.Resolve (out _prefabProvider);
-
-		UpdatePirateInfo ();
-		_levelManager.OnPirateGeneratedEvent += UpdatePirateInfo;
-		_healthBar.maxValue = _pirateModel.Health;
-
-		ChangeState (PirateState.Idle);
-		panel.sizeDelta = new Vector2 (_pirateModel.PirateRange, _pirateModel.PirateRange);
-		isChase = true;
-		this.name = _pirateModel.PirateName;
-
+        // NOTE: this should be replaced with an attack speed value from the model
+	    _timeTillNextShot = 1f;
+	    _timeTillNextSearch = 2f;
 	}
 
-	public void Shoot ()
+	private void OnCurrentHealthChanged (float oldHealth, float newHealth, float delta)
 	{
+		_healthBar.value = Stats.CurrentHealth;
 
-		//hit target		
-		if (8 > Random.Range (0, 10)) {
-			InstantiateBullet (true);
-			PerformHit ();
-			_poolingAudioPlayer.PlaySound (transform.position, _soundProvider.GetSound ("lazer_shoot1"), 0.3f);
-			
-		} else {
-			
-			InstantiateBullet (false);
-			_poolingAudioPlayer.PlaySound (transform.position, _soundProvider.GetSound ("lazer_shoot_miss"), 0.3f);
-		}
+        // you might here want to implement a tiered system, or a gradial one
+        // where the amount of damage is related to the amount of blood/horrible screaming (Y)
+		if (delta < 0)
+		    _poolingParticleManager.Emit ("blood_prefab", transform.position, Color.red, 100);
 	}
 
-	void InstantiateBullet (bool hit)
-	{
+    private void OnPirateCreated(PirateController newPirate)
+    {
+        if (Model.PirateNature != newPirate.Model.PirateNature)
+        {
+            if (_currentTarget == null)
+                _currentTarget = newPirate.Stats;
+        }
+    }
 
-		fabBullet = _poolingObjectManager.Instantiate ("bullet2_prefab");
-		Vector3 randomPos = new Vector3 (Random.Range (1, 3), Random.Range (1, 3), Random.Range (1, 3));
-		if(_pirateModel.PirateNature == (int)PirateModel.Nature.Enemy){
-
-			fabBullet.gameObject.GetComponent<BulletController> ().Initialize (_resolver, _spawnPoint.transform.position + randomPos, hit, Color.green,(PoolingBehaviour) nearestPlayer);
-		}else{
-
-			fabBullet.gameObject.GetComponent<BulletController> ().Initialize (_resolver, _spawnPoint.transform.position + randomPos, hit, Color.green, nearestEnemyObject);
-		}
-
-
-	}
-
-	void PerformHit ()
-	{
-		System.Action action = null;
-		_unityReference.FireDelayed (() => {
-			if(_pirateModel.PirateNature == (int)PirateModel.Nature.Enemy){
-				nearestPlayer.ApplyHit (Random.Range (10, 20));
-			}else {
-			
-				if(nearestEnemyObject.gameObject.GetComponent<PirateController>() != null){
-
-					((PirateController)nearestEnemyObject).ApplyHit(Random.Range (10, 20));
-				}
-				else{
-
-					((BuildingController)nearestEnemyObject).ApplyHit(Random.Range (10, 20));
-				}
-			}
-
-
-		}, .1f);
-	}
-
-	public void ApplyHit (float damage)
-	{
-		_poolingParticleManager.Emit ("blood_prefab", this.transform.position, Color.red, 100);
-		if (_statsBehaviour.CurrentHealth > 0) {
-			_statsBehaviour.ApplyDamage (damage);
-		} 
-	}
+    private void OnBuildingCreated(BuildingController newBuilding)
+    {
+        // TODO: natures for buildings?
+        if (Model.PirateNature == PirateNature.Player)
+        {
+            if (_currentTarget == null)
+                _currentTarget = newBuilding.Stats;
+        }
+    }
 
 	void Update ()
 	{
-		minShootTime += Time.deltaTime;
-		UpdateStateInfo ();
-	
-		switch (_pirateState) {
-		case PirateState.Chasing:
-				
-			if(_pirateModel.PirateNature == (int)PirateModel.Nature.Enemy){
-				target = nearestPlayer.transform;
-			}
-			else{
-				target = nearestEnemyObject.transform;
-			}
-			HandleChase ();
-			_stateText.text = "Chasing";
-				
-			break;
+        HandleScanning();
 
-		case PirateState.Fleeing:
-			break;
-		case PirateState.Shooting:
-			
-			if (minShootTime >= 1f) {
-				Shoot ();
-				minShootTime = 0f;
-			}
-				
-			//ChangeState(PirateState.Chasing);
-
-			break;
-		case PirateState.Idle:
-			break;
-
-		}
-		if(_pirateModel.PirateNature == (int)PirateModel.Nature.Enemy){
-
-			if (_knownPirates.Count >= 1 && nearestPlayer != null) {
-				
-				if (Vector3.Distance (nearestPlayer.transform.position, transform.position) < _pirateModel.PirateRange) {
-					
-					ChangeState (PirateState.Shooting);
-					//Debug.Log(Vector3.Distance (nearestPlayer.transform.position, transform.position).ToString());
-				} else {
-					ChangeState (PirateState.Chasing);
-				}
-				
-			}
-
-		}else{
-
-			if (_allEnemyObjects.Count >= 1 && nearestEnemyObject != null) {
-				
-				if (Vector3.Distance (nearestEnemyObject.transform.position, transform.position) < _pirateModel.PirateRange) {
-					
-					ChangeState (PirateState.Shooting);
-					//Debug.Log(Vector3.Distance (nearestPlayer.transform.position, transform.position).ToString());
-				} else {
-					ChangeState (PirateState.Chasing);
-				}
-				
-			}
-
-		}
-
-
-		if (_statsBehaviour.CurrentHealth < 0) {
-
-			Delete ();
-			if (_levelManager.OnPirateGeneratedEvent != null) {
-				_levelManager.OnPirateGeneratedEvent ();
-			}
-		}
-
-
-		_healthBar.value = _statsBehaviour.CurrentHealth;
-
+        switch (_currentState)
+        {
+            case PirateState.Chasing:
+                HandleChase();
+                break;
+            case PirateState.Fleeing:
+                break;
+            case PirateState.Shooting:
+                HandleShooting();
+                break;
+            case PirateState.Scanning:
+                HandleScanning();
+                break;
+            case PirateState.Idle:
+                break;
+        }
 	}
 
-	void UpdateStateInfo ()
-	{
-		if(_pirateModel.PirateNature == (int) PirateModel.Nature.Enemy){
-			if (!_knownPirates.Any ()) {
-				ChangeState (PirateState.Idle);
-				return;
-			}
-		}
-		else{
-			if (!_allEnemyObjects.Any()) {
-				ChangeState (PirateState.Idle);
-				return;
-			}
+    #region STATE HANDLING
+    private void HandleChase()
+    {
+        if (_currentTarget != null)
+        {
+            //Calculate desired velocity
+            var dir = CalculateVelocity(tr.transform.position);
 
-		}
+            //Rotate towards targetDirection (filled in by CalculateVelocity)
+            RotateTowards(targetDirection);
+            dir.y = 0;
 
+            controller.SimpleMove(dir);
 
-	}
+            // start shooting if we're in range
+            if (Vector3.Distance(transform.position, target.position) <= Model.PirateRange)
+                ChangeState(PirateState.Shooting);
+        }
+        else
+            ChangeState(PirateState.Scanning);
+    }
 
-	void UpdatePirateInfo ()
-	{
-		if(_pirateModel.PirateNature == (int) PirateModel.Nature.Enemy){
+    private void HandleShooting()
+    {
+        _timeTillNextShot -= Time.deltaTime;
 
-			_knownPirates = _levelManager.GetKnownPirates ();
-		}else{
+        if (_currentTarget != null)
+        {
+            if (_timeTillNextShot <= 0f)
+            {
+                Shoot(_currentTarget);
+                _timeTillNextShot = 1f;
+            }
+        }
+        else
+            ChangeState(PirateState.Scanning);
+    }
 
-			_allEnemyObjects = _levelManager.GetAllEnemyObjects();
-		}
-		if (_pirateModel.PirateNature == (int)PirateModel.Nature.Player) {
-			//_knownPirates = _knownPirates.Where (pirate => pirate.DataModel.PirateNature == (int)PirateModel.Nature.Enemy).ToList ();
-			if (_allEnemyObjects.Count >= 1) {
-				
-				nearestEnemyObject  = _allEnemyObjects [0];
-				
-				foreach (PoolingBehaviour enemyObject in _allEnemyObjects) {
-					
-					if (Vector3.Distance (enemyObject.transform.position, transform.position) < Vector3.Distance (nearestEnemyObject.transform.position, transform.position)) {
-						
-						nearestEnemyObject = enemyObject;
-						
-					}
-					
-				}
-				
-				if (nearestEnemyObject != null) {
-					
-					_unityReference.FireDelayed (() => {
-						UpdatePirateInfo ();
-					}, 2f);
-				}
-				
-				
-			} else {
-				
-				ChangeState (PirateState.Idle);
-				
-			} 
+    private void HandleScanning()
+    {
+        _timeTillNextSearch -= Time.deltaTime;
 
-		} else if (_pirateModel.PirateNature == (int)PirateModel.Nature.Enemy) {
+        if (_timeTillNextSearch <= 0f)
+        {
+            _currentTarget = EvaluateTargets();
+            
+            // if we found a target, do we chase or shoot?
+            if (_currentTarget != null)
+            {
+                if (Vector3.Distance(transform.position, _currentTarget.transform.position) <= Model.PirateRange)
+                    ChangeState(PirateState.Shooting);
+                else
+                {
+                    target = _currentTarget.transform;
+                    ChangeState(PirateState.Chasing);
+                }
+            }
 
-			//_knownPirates = _knownPirates.Where (pirate => pirate.DataModel.PirateNature == (int)PirateModel.Nature.Player).ToList ();
-			if (_knownPirates.Count >= 1) {
-				
-				nearestPlayer = _knownPirates [0];
-				
-				foreach (PirateController pirate in _knownPirates) {
-					
-					if (Vector3.Distance (pirate.transform.position, transform.position) < Vector3.Distance (nearestPlayer.transform.position, transform.position)) {
-						
-						nearestPlayer = pirate;
-						
-					}
-					
-				}
-				
-				if (nearestPlayer != null) {
-					
-					_unityReference.FireDelayed (() => {
-						UpdatePirateInfo ();
-					}, 2f);
-				}
-				
-				
-			} else {
-				
-				ChangeState (PirateState.Idle);
-				
-			} 
+            _timeTillNextSearch = 2f;
+        }
+    }
+    #endregion
 
-		}
+    private void Shoot(StatsBehaviour shootingTarget)
+    {
+        // hit target		
+        if (8 > Random.Range(0, 10))
+        {
+            _unityReference.FireDelayed(() =>
+            {
+                shootingTarget.CurrentHealth -= Model.Stats.MaximumDamage;
+            }, 0.1f);
 
+            CreateBullet(shootingTarget.transform.position, true);
+            _poolingAudioPlayer.PlaySound(transform.position, _soundProvider.GetSound("lazer_shoot1"), 0.3f);
+        }
+        // miss
+        else
+        {
+            CreateBullet(shootingTarget.transform.position, false);
+            _poolingAudioPlayer.PlaySound(transform.position, _soundProvider.GetSound("lazer_shoot_miss"), 0.3f);
+        }
+    }
 
+    void CreateBullet(Vector3 bulletTarget, bool didHit)
+    {
+        var fab = _poolingObjectManager.Instantiate("bullet2_prefab");
+        var missDelta = new Vector3(Random.Range(1, 3), Random.Range(1, 3), Random.Range(1, 3));
 
-	}
+        fab.GetComponent<BulletController>().Initialize(_resolver, _bulletOrigin.transform.position + missDelta,
+                                                        didHit, Color.green, bulletTarget);
+    }
 
-	public void HandleChase ()
-	{
-		//Debug.Log ("Handle Chase");
-		//Calculate desired velocity
-		var dir = CalculateVelocity (tr.transform.position);
-		
-		
-		//Rotate towards targetDirection (filled in by CalculateVelocity)
-		RotateTowards (targetDirection);
-		dir.y = 0;
-		
-		controller.SimpleMove (dir);
-	}
+    private StatsBehaviour EvaluateTargets()
+    {
+        var potentialTargets = _levelManager.GetOpposition(Model.PirateNature);
+        if (potentialTargets.Count >= 1)
+        {
+            var bestTarget = potentialTargets[0];
+            var bestScore = float.MinValue;
+            foreach (var potentialTarget in potentialTargets)
+            {
+                var score = GenerateTargetEvaluation(potentialTarget);
+                if (score > bestScore)
+                {
+                    bestScore = score;
+                    bestTarget = potentialTarget;
+                }
+            }
+
+            return bestTarget;
+        }
+
+        return null;
+    }
+
+    private float GenerateTargetEvaluation(StatsBehaviour potentialTarget)
+    {
+        // TODO: chances are we care more about just distance here
+        // this is where we consider things like the opponent's strength & etc.
+        return Model.PirateRange - Vector3.Distance(potentialTarget.transform.position, transform.position);
+    }
 
 	public void UpdateUiPanel ()
 	{
 		_messager.Publish (new PirateMessage{
-
-			model = _pirateModel
+			model = Model
 		});
-	}
-
-	public PirateModel DataModel {
-		get {
-			return _pirateModel;
-		}
-		set {
-			_pirateModel = value;
-		}
 	}
 
 	private void ChangeState (PirateState newState)
 	{
-		_pirateState = newState;
+		_currentState = newState;
 		_stateText.text = newState.ToString ();
 	}
 
+    public void Delete()
+    {
+        _levelManager.OnPirateCreatedEvent -= OnPirateCreated;
+        _levelManager.OnBuildingCreatedEvent -= OnBuildingCreated;
+        Stats.OnCurrentHealthChangedEvent -= OnCurrentHealthChanged;
 
+        Destroy(gameObject);
+    }
 }
 

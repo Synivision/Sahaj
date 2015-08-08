@@ -1,46 +1,64 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using Assets.Code.UnityBehaviours;
 
-using Assets.Code.Models;
-public class StatsBehaviour {
-	StatBlock stats;
+public delegate void OnKilledEventHandler();
+public delegate void OnCurrentHealthChangedEventHandler(float oldValue, float newValue, float delta);
+
+public class StatsBehaviour : InitializeRequiredBehaviour {
+	public StatBlock Block;
 	
-	private float _currentDamage;
+	private float _currentHealth;
+    public float CurrentHealth
+    {
+        get { return _currentHealth; }
+        set
+        {
+            // cap our health values
+            if (value < 0)
+                value = 0;
+            if (value > Block.MaximumHealth)
+                value = Block.MaximumHealth;
+
+            // let everyone know
+            if (OnCurrentHealthChangedEvent != null)
+                OnCurrentHealthChangedEvent(_currentHealth, value, value - _currentHealth);
+
+            // set health
+            _currentHealth = value;
+
+            // die if we need to
+            if (_currentHealth <= 0)
+                Kill();
+        }
+    }
+    public OnCurrentHealthChangedEventHandler OnCurrentHealthChangedEvent;
+
+    public bool IsDead { get; private set; }
+    public OnKilledEventHandler OnKilledEvent;
+
 	private float _currentCourage;
-	
-	private PirateModel _pirateModel;
-	private BuildingModel _buildingModel;
-	public  StatsBehaviour(PirateModel pirateModel){
-		
-		_pirateModel = pirateModel;
-		CurrentHealth = _pirateModel.Health;
-		_currentDamage = _pirateModel.AttackDamage;
-		_currentCourage = _pirateModel.Courage;
-		
-	}
-	
-	public  StatsBehaviour(BuildingModel buildingModel){
-		
-		_buildingModel = buildingModel;
-		CurrentHealth = _buildingModel.Health;
 
+    public void Initialize(StatBlock block)
+    {
+        Block = block;
 
-		
-	}
-	public void ApplyDamage(float damage){
-		
-		CurrentHealth -= damage;
-	}
-	
-	public void Regenerate(){}
+        _currentHealth = block.MaximumHealth;
+        _currentCourage = block.MaximumCourage;
+
+        MarkAsInitialized();
+    }
+
+    public void Regenerate(){}
 	
 	public void Courage(){}
 	
 	public void UpgradeHealth(float newHeallth){
-		
-		stats.MaximumHealth = newHeallth;
-		
+		Block.MaximumHealth = newHeallth;
 	}
-	
-	public float CurrentHealth{get; set;}
+
+    public void Kill()
+    {
+        IsDead = true;
+        if (OnKilledEvent != null)
+            OnKilledEvent();
+    }
 }

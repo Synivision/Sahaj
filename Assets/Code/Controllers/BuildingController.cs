@@ -1,41 +1,44 @@
-﻿using UnityEngine;
-using Assets.Code.Ui.CanvasControllers;
-using System.Collections.Generic;
-using System.Linq;
-
+﻿using Assets.Code.Models;
+using UnityEngine;
 using Assets.Code.Messaging;
-using Assets.Code.Messaging.Messages;
 using Assets.Code.DataPipeline;
-using Assets.Code.UnityBehaviours.Pooling;
 using Assets.Code.UnityBehaviours;
 using Assets.Code.Logic.Pooling;
 using Assets.Code.DataPipeline.Providers;
 
-
-public class BuildingController : PoolingBehaviour {
-
+[RequireComponent(typeof(StatsBehaviour))]
+public class BuildingController : InitializeRequiredBehaviour {
+    /* REFERENCES */
+    // ioc
 	private  IoCResolver _resolver;
-	private  Messager _messager;
-	private  PoolingObjectManager _poolingObjectManager;
-	private BuildingModel _buildingModel;
-	private List<PirateController> _knownPirates;
-	private  LevelManager _levelManager;
-	private  PirateController nearestPlayer;
-	private UnityReferenceMaster _unityReference;
-	private StatsBehaviour _statsBehaviour;
-	private PoolingAudioPlayer _poolingAudioPlayer;
-	private float minShootTime=0;
-	private SoundProvider _soundProvider;
-	private PoolingBehaviour fabBullet;
-	private PoolingParticleManager _poolingParticleManager;
-	private GameObject _spawnPoint;
+    private Messager _messager;
+    private UnityReferenceMaster _unityReference;
+    private SoundProvider _soundProvider;
+    private PoolingAudioPlayer _poolingAudioPlayer;
+    private PoolingObjectManager _poolingObjectManager;
+    private PoolingParticleManager _poolingParticleManager;
+
+    private LevelManager _levelManager;
+
+    // other compenents
+    public StatsBehaviour Stats;
+    private GameObject _bulletOrigin;
+
+    // data
+	public BuildingModel Model;
+
+    /* PROPERTIES */
+	private  StatsBehaviour _currentTarget;
+    private float _timeTillNextShot;
+    private float _timeTillNextSearch;
 
 	public void Initialize (IoCResolver resolver,BuildingModel model,LevelManager levelmanager)
-	{
+    {
+        // resolve references
+        Model = model;
+        _levelManager = levelmanager;
 
 		_resolver = resolver;
-		_buildingModel = model;
-		_levelManager = levelmanager;
 		_resolver.Resolve (out _unityReference);
 		_resolver.Resolve (out _messager);
 		_resolver.Resolve (out _poolingObjectManager);
@@ -43,122 +46,122 @@ public class BuildingController : PoolingBehaviour {
 		_resolver.Resolve(out _soundProvider);
 		_resolver.Resolve(out _poolingParticleManager);
 
-		gameObject.GetComponent<Renderer> ().material.color = _buildingModel.BuildingColor;
-		this.name = _buildingModel.Name;
+        gameObject.GetComponent<Renderer>().material.color = Model.BuildingColor;
+        Stats = GetComponent<StatsBehaviour>();
+        _bulletOrigin = transform.FindChild("BulletSpawnPoint").gameObject;
 
-		_statsBehaviour = new StatsBehaviour (_buildingModel);
-		_knownPirates = _levelManager.GetKnownPirates();
-		_spawnPoint = transform.FindChild ("BulletSpawnPoint").gameObject;
-		UpdatePirateInfo ();
-		_levelManager.OnPirateGeneratedEvent += UpdatePirateInfo;
-		OnDeadEvent += () => _levelManager.OnPirateDead (this);
-	}
+        // initialize properties
+        _levelManager.OnPirateCreatedEvent += OnPirateCreated;
 
-	void Update ()
-	{
-		minShootTime += Time.deltaTime;
+        Stats.Initialize(model.Stats);
+	    Stats.OnCurrentHealthChangedEvent += OnCurrentHealthChanged;
 
+        MarkAsInitialized();
+    }
 
-		if (nearestPlayer != null) {
-			
-			//if(isChase == true){
+    private void OnCurrentHealthChanged(float oldHealth, float newHealth, float delta)
+    {
+        // you might here want to implement a tiered system, or a gradial one
+        // where the amount of damage is related to the amount of blood/horrible screaming (Y)
+        if (delta < 0)
+            // this bleeding building brought to you by steven king
+            _poolingParticleManager.Emit("blood_prefab", transform.position, Color.red, 100);
+    }
 
-		}
-		if (_knownPirates.Count >= 1 && nearestPlayer != null) {
-			
-			if (Vector3.Distance (nearestPlayer.transform.position, transform.position) < _buildingModel.Range) {
+    private void OnPirateCreated(PirateController newPirate)
+    {
+        if (newPirate.Model.PirateNature == PirateNature.Player)
+        {
+            if (_currentTarget == null)
+                _currentTarget = newPirate.Stats;
+                // TODO: again, maybe update this if buildings get natures 
+            else if (GenerateTargetEvaluation(_currentTarget) < GenerateTargetEvaluation(newPirate.Stats))
+                _currentTarget = newPirate.Stats;
+        }
+    }
 
-				if(minShootTime>1){
-					Shoot();
-					minShootTime=0;
-				}
+    public void Update()
+    {
+        _timeTillNextShot -= Time.deltaTime;
+        _timeTillNextSearch -= Time.deltaTime;
 
-			} else {
+        if (_currentTarget == null && _timeTillNextSearch <= 0f)
+        {
+            _currentTarget = EvaluateTargets();
+            _timeTillNextSearch = 2f;
+        }
+        else if (_currentTarget != null && _timeTillNextShot <= 0f &&
+                 Vector3.Distance(transform.position, _currentTarget.transform.position) <= Model.Range)
+        {
+            Shoot(_currentTarget);
+            _timeTillNextShot = 1f;
+        }
+    }
 
-			}
-			
-		}
+    private void Shoot(StatsBehaviour shootingTarget)
+    {
+        // hit target		
+        if (8 > Random.Range(0, 10))
+        {
+            _unityReference.FireDelayed(() =>
+            {
+                shootingTarget.CurrentHealth -= Model.Stats.MaximumDamage;
+            }, 0.1f);
 
-		if (_statsBehaviour.CurrentHealth < 0) {
-			
-			Delete ();
-			if (_levelManager.OnPirateGeneratedEvent != null) {
-				_levelManager.OnPirateGeneratedEvent ();
-			}
-		}
-		/*
-		*/
-		//_healthBar.value = _statsBehaviour.CurrentHealth;
-		
-	}
-	public void Shoot ()
-	{
-		//hit target		
-		if (8 > Random.Range (0, 10)) {
-			InstantiateBullet (true);
-			PerformHit ();
+            CreateBullet(shootingTarget.transform.position, true);
+            _poolingAudioPlayer.PlaySound(transform.position, _soundProvider.GetSound("lazer_shoot1"), 0.3f);
+        }
+        // miss
+        else
+        {
+            CreateBullet(shootingTarget.transform.position, false);
+            _poolingAudioPlayer.PlaySound(transform.position, _soundProvider.GetSound("lazer_shoot_miss"), 0.3f);
+        }
+    }
 
-			_poolingAudioPlayer.PlaySound (transform.position, _soundProvider.GetSound ("lazer_shoot1"), 0.3f);
-			
-		} else {
+    void CreateBullet(Vector3 bulletTarget, bool didHit)
+    {
+        var fab = _poolingObjectManager.Instantiate("bullet2_prefab");
+        var missDelta = new Vector3(Random.Range(1, 3), Random.Range(1, 3), Random.Range(1, 3));
 
-			InstantiateBullet (false);
-			_poolingAudioPlayer.PlaySound (transform.position, _soundProvider.GetSound ("lazer_shoot_miss"), 0.3f);
-		}
-	}
-	
-	void InstantiateBullet (bool hit)
-	{
-		
-		fabBullet = _poolingObjectManager.Instantiate ("bullet2_prefab");
-		Vector3 randomPos = new Vector3 (Random.Range (1, 3), Random.Range (1, 3), Random.Range (1, 3));
-		fabBullet.gameObject.GetComponent<BulletController> ().Initialize (_resolver, _spawnPoint.transform.position + randomPos, hit, Color.green, nearestPlayer);
-		
-	}
-	
-	void PerformHit ()
-	{
-		System.Action action = null;
-		_unityReference.FireDelayed (() => {
-			nearestPlayer.ApplyHit (Random.Range (10, 20));
-		}, .1f);
-	}
-	
-	public void ApplyHit (float damage)
-	{
-		_poolingParticleManager.Emit ("blood_prefab", this.transform.position, Color.red, 100);
-		if (_statsBehaviour.CurrentHealth > 0) {
-			_statsBehaviour.ApplyDamage (damage);
-		} 
-	}
+        fab.GetComponent<BulletController>().Initialize(_resolver, _bulletOrigin.transform.position + missDelta,
+                                                        didHit, Color.green, bulletTarget);
+    }
 
-	void UpdatePirateInfo ()
-	{
+    private StatsBehaviour EvaluateTargets()
+    {
+        // TODO: blah blah blah building natures blah
+        var potentialTargets = _levelManager.GetOpposition(PirateNature.Enemy);
+        if (potentialTargets.Count >= 1)
+        {
+            var bestTarget = potentialTargets[0];
+            var bestScore = float.MinValue;
+            foreach (var potentialTarget in potentialTargets)
+            {
+                var score = GenerateTargetEvaluation(potentialTarget);
+                if (score > bestScore)
+                {
+                    bestScore = score;
+                    bestTarget = potentialTarget;
+                }
+            }
 
-		_knownPirates = _levelManager.GetKnownPirates ();
-			
-		//_knownPirates = _knownPirates.Where (pirate => pirate.DataModel.PirateNature == (int)PirateModel.Nature.Player).ToList ();
+            return bestTarget;
+        }
 
+        return null;
+    }
 
-		if (_knownPirates.Count >= 1) {
-			
-			nearestPlayer = _knownPirates [0];
-			
-			foreach (PirateController pirate in _knownPirates) {
-				
-				if (Vector3.Distance (pirate.transform.position, transform.position) < Vector3.Distance (nearestPlayer.transform.position, transform.position)) {
-					
-					nearestPlayer = pirate;
-				}
-			}
-			if (nearestPlayer != null) {
-				
-				_unityReference.FireDelayed (() => {
-					UpdatePirateInfo ();
-				}, 2f);
+    private float GenerateTargetEvaluation(StatsBehaviour potentialTarget)
+    {
+        return Vector3.Distance(potentialTarget.transform.position, transform.position);
+    }
 
-			}
-		} 
-	}
+    public void Delete()
+    {
+        _levelManager.OnPirateCreatedEvent -= OnPirateCreated;
+        Stats.OnCurrentHealthChangedEvent -= OnCurrentHealthChanged;
 
+        Destroy(gameObject);
+    }
 }

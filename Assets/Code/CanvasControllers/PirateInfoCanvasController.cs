@@ -54,8 +54,8 @@ namespace Assets.Code.Ui.CanvasControllers
 		public void OnPirateInspectionSelected (PirateMessage message)
 		{
 
-			_healthText.text = "Health : " + message.model.Health.ToString ();
-			_attackDamageText.text = "Attack Damage : " + message.model.AttackDamage.ToString ();
+			_healthText.text = "Health : " + message.model.Stats.MaximumHealth;
+			_attackDamageText.text = "Attack Damage : " + message.model.Stats.MaximumDamage;
 			_nameText.text = "Name : " + message.model.PirateName;
 			_descriptionText.text = message.model.Descipriton;
 
