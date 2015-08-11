@@ -1,55 +1,61 @@
 ﻿using UnityEngine;
-using System.Collections;
 using Assets.Code.UnityBehaviours.Pooling;
 
-public class CameraController : PoolingBehaviour {
+public class CameraController : MonoBehaviour {
 
 	// The rate of change of the field of view in perspective mode.
-	public float perspectiveZoomSpeed = 0.5f;        
+	public float PerspectiveZoomSpeed = 0.5f;        
 	// The rate of change of the orthographic size in orthographic mode.s
-	public float orthoZoomSpeed = 0.5f;        
+	public float OrthoZoomSpeed = 0.5f;        
 
 
-	public float moveSensitivityX = 150.0f;
-	public float moveSensitivityY = 150.0f;
+	public float MoveSensitivityX = 150.0f;
+	public float MoveSensitivityY = 150.0f;
 
-	public bool invertMoveX = false;
-	public bool invertMoveY = false;
+	public bool InvertMoveX = false;
+	public bool InvertMoveY = false;
 
-	private float scrollVelocity = 0.0f;
-	private Vector2 scrollDirection = Vector2.zero;
+	private float _scrollVelocity = 0.0f;
+	private Vector2 _scrollDirection = Vector2.zero;
 
-	private float timeTouchPhaseEnded;
+	private float _timeTouchPhaseEnded;
 	private Camera _camera;
 
 	// How long the object should shake for.
-	public static float shake = 2f;
+	private float _shake = 2f;
 	
 	// Amplitude of the shake. A larger value shakes the camera harder.
-	public float shakeAmount = 0.7f;
-	public float decreaseFactor = 1.0f;
-	
-	Vector3 originalPos;
+    private const float ShakeScale = 2f;
+    private const float ShakeFallOff = 10.0f;
+    private const float MaxShake = 1f;
 
-	void Start(){
+    Vector3 originalPos;
 
-		_camera =GameObject.Find("Main Camera").GetComponent<Camera>();
+	public void Start(){
+
+		_camera = GetComponent<Camera>();
 		originalPos = _camera.transform.localPosition;
 	}
+
+    public void ApplyShake(float shakeAmount)
+    {
+        _shake += shakeAmount * ShakeScale;
+    }
 	
-	void Update()
+	public void Update()
 	{
-
-		if (shake > 0)
+		if (_shake > 0)
 		{
+		    if (_shake > MaxShake)
+		        _shake = MaxShake;
 
-			_camera.transform.localPosition = originalPos + Random.insideUnitSphere * shakeAmount;
+			_camera.transform.localPosition = originalPos + Random.insideUnitSphere * ShakeScale;
 			
-			shake -= Time.deltaTime * decreaseFactor;
+			_shake -= Time.deltaTime * ShakeFallOff;
 		}
 		else
 		{
-			shake = 0f;
+			_shake = 0f;
 			//_camera.transform.localPosition = originalPos;
 		}
 
@@ -59,33 +65,33 @@ public class CameraController : PoolingBehaviour {
 		{
 			if (touches[0].phase == TouchPhase.Began)
 			{
-				scrollVelocity = 0.0f;
+				_scrollVelocity = 0.0f;
 			}
 			else if (touches[0].phase == TouchPhase.Moved)
 			{
-				    shake = 0f;
+				    _shake = 0f;
 					Vector2 delta = touches[0].deltaPosition;
 					
-					float positionX = delta.x * moveSensitivityX * Time.deltaTime;
-					positionX = invertMoveX ? positionX : positionX * -1;
+					float positionX = delta.x * MoveSensitivityX * Time.deltaTime;
+					positionX = InvertMoveX ? positionX : positionX * -1;
 					
-					float positionY = delta.y * moveSensitivityY * Time.deltaTime;
-					positionY = invertMoveY ? positionY : positionY * -1;
+					float positionY = delta.y * MoveSensitivityY * Time.deltaTime;
+					positionY = InvertMoveY ? positionY : positionY * -1;
 					
 					_camera.transform.position += new Vector3 (positionX, 0, positionY);
 					
-					scrollDirection = touches[0].deltaPosition.normalized;
-					scrollVelocity = (touches[0].deltaPosition.magnitude / touches[0].deltaTime)*100f;
+					_scrollDirection = touches[0].deltaPosition.normalized;
+					_scrollVelocity = (touches[0].deltaPosition.magnitude / touches[0].deltaTime)*100f;
 					
-					print(scrollVelocity.ToString());
+					print(_scrollVelocity.ToString());
 					
-					if (scrollVelocity <= 500)
-						scrollVelocity = 0;
+					if (_scrollVelocity <= 500)
+						_scrollVelocity = 0;
 
 			}
 			else if (touches[0].phase == TouchPhase.Ended)
 			{
-				timeTouchPhaseEnded = Time.time;
+				_timeTouchPhaseEnded = Time.time;
 			}
 		}
 
@@ -111,7 +117,7 @@ public class CameraController : PoolingBehaviour {
 			if (_camera.orthographic)
 			{
 				// ... change the orthographic size based on the change in distance between the touches.
-				_camera.orthographicSize += deltaMagnitudeDiff * orthoZoomSpeed;
+				_camera.orthographicSize += deltaMagnitudeDiff * OrthoZoomSpeed;
 				
 				// Make sure the orthographic size never drops below zero.
 				_camera.orthographicSize = Mathf.Max(_camera.orthographicSize, 0.1f);
@@ -119,7 +125,7 @@ public class CameraController : PoolingBehaviour {
 			else
 			{
 				// Otherwise change the field of view based on the change in distance between the touches.
-				_camera.fieldOfView += deltaMagnitudeDiff * perspectiveZoomSpeed;
+				_camera.fieldOfView += deltaMagnitudeDiff * PerspectiveZoomSpeed;
 				
 				// Clamp the field of view to make sure it's between 0 and 180.
 				_camera.fieldOfView = Mathf.Clamp(_camera.fieldOfView, 40f, 140f);

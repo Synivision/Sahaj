@@ -12,6 +12,9 @@ namespace Assets.Code.UnityBehaviours
 
     public class UnityReferenceMaster : MonoBehaviour, IResolvableItem
     {
+        /* REFERENCES */
+        public CameraController Camera;
+
         /* PROPERTIES */
         private List<DelayedAction> _delayedActions;
 

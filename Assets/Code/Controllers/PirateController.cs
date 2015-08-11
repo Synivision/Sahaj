@@ -29,6 +29,7 @@ public class PirateController : AIPath
     private PoolingAudioPlayer _poolingAudioPlayer;
     private PoolingObjectManager _poolingObjectManager;
     private PoolingParticleManager _poolingParticleManager;
+    private UnityReferenceMaster _unityReference;
 
     private LevelManager _levelManager;
 
@@ -47,8 +48,6 @@ public class PirateController : AIPath
     /* PROPERTIES */
     private StatsBehaviour _currentTarget;
 
-	private  UnityReferenceMaster _unityReference;
-
     private float _timeTillNextShot;
     private float _timeTillNextSearch;
 
@@ -66,8 +65,8 @@ public class PirateController : AIPath
         _resolver.Resolve(out _poolingObjectManager);
         _resolver.Resolve(out _poolingAudioPlayer);
         _resolver.Resolve(out _soundProvider);
-        _resolver.Resolve(out _unityReference);
         _resolver.Resolve(out _prefabProvider);
+        _resolver.Resolve(out _unityReference);
 
         MoveBehaviour = GetComponent<MoveBehaviour>();
         Stats = GetComponent<StatsBehaviour>();
@@ -217,12 +216,14 @@ public class PirateController : AIPath
             }, 0.1f);
 
             CreateBullet(shootingTarget.transform.position, true);
+            _unityReference.Camera.ApplyShake(1f);
             _poolingAudioPlayer.PlaySound(transform.position, _soundProvider.GetSound("lazer_shoot1"), 0.3f);
         }
         // miss
         else
         {
             CreateBullet(shootingTarget.transform.position, false);
+            _unityReference.Camera.ApplyShake(1f);
             _poolingAudioPlayer.PlaySound(transform.position, _soundProvider.GetSound("lazer_shoot_miss"), 0.3f);
         }
     }

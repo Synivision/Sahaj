@@ -42,7 +42,6 @@ namespace Assets.Code.States
 		public Vector3 screenSpace;
 		public Vector3 offset;
 		private float _time = 5;
-		private CameraController myCameraController;
 		private InputSession _inputSession;
 		private InputSessionData _inputSessionData;
 		int pointerId = -1;

@@ -21,7 +21,6 @@ public class BulletController : PoolingBehaviour
 
 	public void Initialize (IoCResolver resolver, Vector3 startPos, bool hit, Color color, Vector3 target)
 	{
-		CameraController.shake = 1;
 		_color = color;
 		_resolver = resolver;
 		_startPos = startPos;
