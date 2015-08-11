@@ -13,6 +13,7 @@
 		NavySmooth.mat
 		PinkGrid.mat
 		PinkSmooth.mat
+		SwatchMauveAlbedo.mat
 		SwatchNavyDarkAlbedo.mat
 		SwatchOrangeAlbedo.mat
 		SwatchPinkDAlbedo.mat

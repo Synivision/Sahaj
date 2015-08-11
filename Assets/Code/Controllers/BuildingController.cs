@@ -32,6 +32,8 @@ public class BuildingController : InitializeRequiredBehaviour {
     private float _timeTillNextShot;
     private float _timeTillNextSearch;
 
+	int maxenemyPirateCount = 5;
+
 	public void Initialize (IoCResolver resolver,BuildingModel model,LevelManager levelmanager)
     {
         // resolve references
@@ -96,6 +98,13 @@ public class BuildingController : InitializeRequiredBehaviour {
             Shoot(_currentTarget);
             _timeTillNextShot = 1f;
         }
+
+		if(_currentTarget != null && Vector3.Distance(transform.position, _currentTarget.transform.position) <= Model.Range && Model.Type == BuildingModel.BuildingType.Defence_Platoons && maxenemyPirateCount > 0){
+
+			//creates pirates
+			_levelManager.CreatePirate("EnemyPirate1",new Vector3(transform.position.x + 20,transform.position.y,transform.position.z +20));
+			maxenemyPirateCount--;
+		}
     }
 
     private void Shoot(StatsBehaviour shootingTarget)

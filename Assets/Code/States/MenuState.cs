@@ -38,6 +38,7 @@ public class MenuState : BaseState{
 
 		_uiManager.RegisterUi(new MenuCanvasController(_resolver, _canvasProvider.GetCanvas("MenuCanvas")));
 
+
 	}
 
 	private void OnStartGame(StartGameMessage message)

@@ -75,10 +75,14 @@ namespace Assets.Code.Ui.CanvasControllers
 			var fab = Object.Instantiate(_prefabProvider.GetPrefab("PirateButton")).gameObject.GetComponent<Button>();
 			
 			fab.gameObject.name = name;
+
+			var buttonLabel = fab.transform.GetChild (0).GetComponent<Text>();
+			buttonLabel.text = name;
+
 			fab.onClick.AddListener(() => OnPirateButtonClicked(fab,name));
 			
 			fab.transform.SetParent(_parentButtonObject.transform);
-			fab.transform.localScale = Vector3.one;
+			//fab.transform.localScale = Vector3.one;
 			return fab;
 		}
 		

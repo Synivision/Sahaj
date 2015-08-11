@@ -66,13 +66,13 @@ namespace Assets.Code.States
 			_uiManager.RegisterUi (new PirateInfoCanvasController (_resolver, _canvasProvider.GetCanvas ("PirateInfoCanvas")));
 
 			_unlockedPirates = new Dictionary<string, bool>();
-			_unlockedPirates.Add("Pirate1",true);
-			_unlockedPirates.Add("Pirate2",true);
-			_unlockedPirates.Add("Pirate3",true);
-			_unlockedPirates.Add("EnemyPirate1",true);
-			_unlockedPirates.Add("EnemyPirate2",true);
-			_unlockedPirates.Add("EnemyPirate3",true);
-			_unlockedPirates.Add ("EnemyPirate4",false);
+			_unlockedPirates.Add("Captain",true);
+			_unlockedPirates.Add("Quarter Master",true);
+			_unlockedPirates.Add("Gunner",true);
+			_unlockedPirates.Add("Bomber",true);
+			_unlockedPirates.Add("Surgeon",true);
+			_unlockedPirates.Add("Carpenter",false);
+			_unlockedPirates.Add ("Chef",false);
 			_unlockedPirates.Add ("Pirate4",false);
 			_unlockedPirates.Add ("EnemyPirate5",false);
 
@@ -105,7 +105,7 @@ namespace Assets.Code.States
 
 
 			_inputSessionData = new InputSessionData();
-			_inputSessionData.Name = "Pirate1";
+			_inputSessionData.Name = "Gunner";
 			_inputSession.Initialize(_inputSessionData);
 
 		
@@ -113,33 +113,9 @@ namespace Assets.Code.States
 
 		public void OnCreatePirate (CreatePirateMessage message)
 		{
-			switch(message.PirateName){
-			
-			case "Pirate1":
-				levelManager.CreatePirate(message.PirateName,message.SpawnPosition);
-				break;
 
-			case "Pirate2":
 				levelManager.CreatePirate(message.PirateName,message.SpawnPosition);
-				break;
 
-			case "Pirate3":
-				levelManager.CreatePirate(message.PirateName,message.SpawnPosition);
-				break;
-
-			case "EnemyPirate1":
-				levelManager.CreatePirate(message.PirateName,message.SpawnPosition);
-				break;
-
-			case "EnemyPirate2":
-				levelManager.CreatePirate(message.PirateName,message.SpawnPosition);
-				break;
-
-			case "EnemyPirate3":
-				levelManager.CreatePirate(message.PirateName,message.SpawnPosition);
-				break;
-
-			}
 		}
 
 		public override void Update ()

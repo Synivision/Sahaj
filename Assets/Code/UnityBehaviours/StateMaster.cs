@@ -137,12 +137,13 @@ namespace Assets.Code.UnityBehaviours
                     MaximumHealth = 100,
                     MaximumDamage = 1,
                     MaximumCourage = -1
-                }
+                },
+				Type = BuildingModel.BuildingType.Defence_Platoons
             });
 
             /* PLAYER PIRATES */
             _gameDataProvider.AddData( new PirateModel {
-                Name = "Pirate1",
+                Name = "Captain",
                 Stats = new StatBlock
                 {
                     MaximumHealth = 200,
@@ -158,7 +159,7 @@ namespace Assets.Code.UnityBehaviours
 
             _gameDataProvider.AddData(new PirateModel
             {
-                Name = "Pirate2",
+				Name = "Quarter Master",
                 Stats = new StatBlock
                 {
                     MaximumHealth = 150,
@@ -173,7 +174,7 @@ namespace Assets.Code.UnityBehaviours
             });
             _gameDataProvider.AddData(new PirateModel
             {
-                Name = "Pirate3",
+				Name = "Gunner",
                 Stats = new StatBlock
                 {
                     MaximumHealth = 100,
@@ -186,6 +187,69 @@ namespace Assets.Code.UnityBehaviours
                 PirateNature = PirateNature.Player,
                 PirateColor = Color.yellow
             });
+
+			_gameDataProvider.AddData(new PirateModel
+			                          {
+				Name = "Bomber",
+				Stats = new StatBlock
+				{
+					MaximumHealth = 100,
+					MaximumDamage = 15,
+					MaximumCourage = 3
+				},
+				Descipriton = "Crew member : attacks and defends ship from cannon ports",
+				PirateName = "Bomber" + UnityEngine.Random.Range (0, 100),
+				PirateRange = (int)PirateModel.Range.Gunner2,
+				PirateNature = PirateNature.Player,
+				PirateColor = Color.white
+			});
+
+			_gameDataProvider.AddData(new PirateModel
+			                          {
+				Name = "Surgeon",
+				Stats = new StatBlock
+				{
+					MaximumHealth = 100,
+					MaximumDamage = 15,
+					MaximumCourage = 3
+				},
+				Descipriton = "Doctor : heals the troops after there return",
+				PirateName = "Surgeon" + UnityEngine.Random.Range (0, 100),
+				PirateRange = (int)PirateModel.Range.Gunner2,
+				PirateNature = PirateNature.Player,
+				PirateColor = Color.magenta
+			});
+		
+			_gameDataProvider.AddData(new PirateModel
+			                          {
+				Name = "Carpenter",
+				Stats = new StatBlock
+				{
+					MaximumHealth = 100,
+					MaximumDamage = 15,
+					MaximumCourage = 3
+				},
+				Descipriton = "Builder : builds/repairs the cabin of ship",
+				PirateName = "Carpenter" + UnityEngine.Random.Range (0, 100),
+				PirateRange = (int)PirateModel.Range.Gunner2,
+				PirateNature = PirateNature.Player,
+				PirateColor = Color.yellow
+			});
+			_gameDataProvider.AddData(new PirateModel
+			                          {
+				Name = "Chef",
+				Stats = new StatBlock
+				{
+					MaximumHealth = 100,
+					MaximumDamage = 15,
+					MaximumCourage = 3
+				},
+				Descipriton = "Cook : creates food for the crew",
+				PirateName = "Chef" + UnityEngine.Random.Range (0, 100),
+				PirateRange = (int)PirateModel.Range.Gunner2,
+				PirateNature = PirateNature.Player,
+				PirateColor = Color.yellow
+			});
 
             /* ENEMY PIRATES */
             _gameDataProvider.AddData(new PirateModel
