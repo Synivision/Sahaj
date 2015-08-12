@@ -23,6 +23,7 @@ public class BuildingController : InitializeRequiredBehaviour {
     // other compenents
     public StatsBehaviour Stats;
     private GameObject _bulletOrigin;
+	private GameObject _pirateSpawnPoint;
 
     // data
 	public BuildingModel Model;
@@ -31,7 +32,7 @@ public class BuildingController : InitializeRequiredBehaviour {
 	private  StatsBehaviour _currentTarget;
     private float _timeTillNextShot;
     private float _timeTillNextSearch;
-
+	private float _createPirateTime;
 	int maxenemyPirateCount = 5;
 
 	public void Initialize (IoCResolver resolver,BuildingModel model,LevelManager levelmanager)
@@ -48,10 +49,10 @@ public class BuildingController : InitializeRequiredBehaviour {
 		_resolver.Resolve(out _soundProvider);
 		_resolver.Resolve(out _poolingParticleManager);
 
-        gameObject.GetComponent<Renderer>().material.color = Model.BuildingColor;
+        //gameObject.GetComponent<Renderer>().material.color = Model.BuildingColor;
         Stats = GetComponent<StatsBehaviour>();
         _bulletOrigin = transform.FindChild("BulletSpawnPoint").gameObject;
-
+		_pirateSpawnPoint = transform.FindChild("PirateSpawnPoint").gameObject;
         // initialize properties
         _levelManager.OnPirateCreatedEvent += OnPirateCreated;
 
@@ -101,9 +102,14 @@ public class BuildingController : InitializeRequiredBehaviour {
 
 		if(_currentTarget != null && Vector3.Distance(transform.position, _currentTarget.transform.position) <= Model.Range && Model.Type == BuildingModel.BuildingType.Defence_Platoons && maxenemyPirateCount > 0){
 
-			//creates pirates
-			_levelManager.CreatePirate("EnemyPirate1",new Vector3(transform.position.x + 20,transform.position.y,transform.position.z +20));
-			maxenemyPirateCount--;
+
+			_createPirateTime += Time.deltaTime;
+			if(_createPirateTime >3){
+				_levelManager.CreatePirate("EnemyPirate3",_pirateSpawnPoint.transform.position);
+				maxenemyPirateCount--;
+				_createPirateTime = 0;
+			}
+			//_levelManager.CreatePirate("EnemyPirate1",new Vector3(transform.position.x + 20,transform.position.y,transform.position.z +20));
 		}
     }
 

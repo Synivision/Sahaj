@@ -33,13 +33,8 @@ public class LevelManager
 
 	//groundcovers
 	private  GameObject _groundCoverParent;
-	private int AreaToCover = 100;
 	private  List<GameObject> _groundCoversList;
-	//private int MaxGroundCover=5;
-	//private int MinGroundCover=0;
-	public float GridSize = 10;
-	private float _centreAdjustments;
-
+	
 	public LevelManager (IoCResolver resolver)
 	{
 		_resolver = resolver;
@@ -62,19 +57,17 @@ public class LevelManager
 		var building = Object.Instantiate (_prefabProvider.GetPrefab("AStarPlane"));
 
 	    CreateBuilding("building_a", new Vector3(50, 15, -20));
-        CreateBuilding("building_b", new Vector3(-85, 15, -85));
+        CreateBuilding("building_b", new Vector3(-85, 15, 85));
 
 		_groundCoverParent  = Object.Instantiate(_prefabProvider.GetPrefab("empty_prefab"));
 		_groundCoverParent.name = "GroundCovers";
 		for(int x = -5; x <5; x++ ){
 			for(int y = -5; y <5 ;y++){
-				int random = Random.Range(-20,20);
-				int random2 = Random.Range(Random.Range(-100,100),Random.Range(-100,100));
-				CreateGroundCovers((x*15)+random2+random,(y*15)+random2+random);
+				int random = Random.Range(-120,120);
+				int random2 = Random.Range(Random.Range(-120,120),Random.Range(-120,120));
+				CreateGroundCovers(random,random2);
 			}
-
 		}
-
 	}
 
     public List<StatsBehaviour> GetOpposition(PirateNature context)
@@ -103,20 +96,38 @@ public class LevelManager
     {
         var model = _gameDataProvider.GetData<BuildingModel>(buildingName);
 
-        var fab = Object.Instantiate(_prefabProvider.GetPrefab("Building"));
-        var buildingController = fab.GetComponent<BuildingController>();
+		if(buildingName == "building_b"){
+			var fab = Object.Instantiate(_prefabProvider.GetPrefab("SpawnBuilding"));
+			var buildingController = fab.GetComponent<BuildingController>();
+			
+			buildingController.Initialize(_resolver, model, this);
+			
+			fab.name = buildingName;
+			fab.transform.position = spawnPosition;
+			fab.transform.SetParent (_buildingsParent.transform);
+			if (OnBuildingCreatedEvent != null)
+				OnBuildingCreatedEvent(buildingController);
+			
+			buildingController.Stats.OnKilledEvent += () => OnBuildingKilled(buildingController);
+			
+			_knownBuildings.Add(buildingController);
 
-        buildingController.Initialize(_resolver, model, this);
+		}else{
 
-        fab.name = buildingName;
-        fab.transform.position = spawnPosition;
-		fab.transform.SetParent (_buildingsParent.transform);
-        if (OnBuildingCreatedEvent != null)
-            OnBuildingCreatedEvent(buildingController);
-
-        buildingController.Stats.OnKilledEvent += () => OnBuildingKilled(buildingController);
-
-        _knownBuildings.Add(buildingController);
+			var fab = Object.Instantiate(_prefabProvider.GetPrefab("Building"));
+			var buildingController = fab.GetComponent<BuildingController>();
+			
+			buildingController.Initialize(_resolver, model, this);
+			
+			fab.name = buildingName;
+			fab.transform.position = spawnPosition;
+			fab.transform.SetParent (_buildingsParent.transform);
+			if (OnBuildingCreatedEvent != null)
+				OnBuildingCreatedEvent(buildingController);
+			
+			buildingController.Stats.OnKilledEvent += () => OnBuildingKilled(buildingController);
+			_knownBuildings.Add(buildingController);
+		}
     }
 
 	public void CreateGroundCovers(int x,int y){
@@ -125,8 +136,7 @@ public class LevelManager
 		var groundCover = Object.Instantiate(_prefabProvider.GetPrefab("groundcover"));
 		_groundCoversList.Add (groundCover);
 		groundCover.transform.SetParent(_groundCoverParent.transform);
-		groundCover.transform.localPosition+=new Vector3(Random.Range(x ,y),0,Random.Range(x ,y));
-
+		groundCover.transform.localPosition+=new Vector3(x,0,y);
 	}
 	
     private void OnBuildingKilled(BuildingController building)
@@ -178,11 +188,7 @@ public class LevelManager
         Object.Destroy(_piratesParent);
         Object.Destroy(_buildingsParent);
 		//destroy ground covers
-
 		Object.Destroy(_groundCoverParent);
-
 	}
 
 }
-
-
