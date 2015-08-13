@@ -6,6 +6,7 @@ public class BuildingModel : IGameDataModel {
 	public string Name {get; set;}
     public StatBlock Stats { get; set; }
 	public string Descipriton{ get; set;}
+	public int GoldAmount{get;set;}
 	public BuildingType Type{get;set;}
 	public enum BuildingType{ 
 		Gold_Locker,

@@ -28,6 +28,16 @@ namespace Assets.Code.Ui.CanvasControllers
 
 		private readonly PrefabProvider _prefabProvider;
 
+		//player panels
+		private Slider _experiencePointBar;
+		private Slider _goldCoinBar;
+		private Text _goldText;
+		private Text _experienceLevelText;
+		private Text _availableGoldText;
+
+		//message tokens
+		private MessagingToken _onUpdateCanvasPanels;
+
 		private readonly Text _fpsText;
 		private Canvas _canvas;
 		private readonly Button _quitButton;
@@ -42,8 +52,9 @@ namespace Assets.Code.Ui.CanvasControllers
 		public GamePlayCanvasController (IoCResolver resolver, Canvas canvasView, PlayerManager playerManager) : base(canvasView)
 		{
 			_canvas = canvasView;
-			resolver.Resolve (out _prefabProvider);
+			_playerManager = playerManager;
 
+			resolver.Resolve (out _prefabProvider);
 			resolver.Resolve (out _messager);
 			resolver.Resolve (out _unityReference);
 			resolver.Resolve (out _inputSession);
@@ -53,13 +64,36 @@ namespace Assets.Code.Ui.CanvasControllers
 
 			var panel = GetElement("Scroll");
 			var contentpanel = panel.transform.GetChild(0);
-
 			_parentButtonObject = contentpanel.gameObject;
 
-			_quitButton.onClick.AddListener (OnQuitButtonClicked);
-			_playerManager = playerManager;
+			//initialize player ExperiencePanel
+			var playerExperinecePanel = GetElement("ExperiencePanel");
+			_experiencePointBar = playerExperinecePanel.transform.GetChild(0).GetComponent<Slider>();
+			_experienceLevelText = playerExperinecePanel.transform.GetChild(2).GetComponent<Text>();
 
-			List<string> currentPirateName = new List<string>();
+			//TODO get max value from player manager
+			_experiencePointBar.maxValue = 200;
+			_experiencePointBar.value = 0;
+
+			//initialize player GoldPanel
+			var playerGoldPanel = GetElement("GoldPanel");
+			_goldCoinBar = playerGoldPanel.transform.GetChild(0).GetComponent<Slider>();
+			_goldText = playerGoldPanel.transform.GetChild(2).GetComponent<Text>();
+			//TODO get max value from player manager
+			_goldCoinBar.maxValue = _playerManager.Model.MaxGoldCapacity;
+			_goldCoinBar.value = 0;
+
+			// initialize availableLootPanel contents
+			var availableLootPanel = GetElement("AvailableLootPanel");
+			_availableGoldText =  availableLootPanel.transform.GetChild(2).GetComponent<Text>();
+			 
+			//subsscribe messages
+			_onUpdateCanvasPanels = _messager.Subscribe<UpdateGamePlayUiMessage> (UpdateCanvasPanels);
+			InitializeCanvasPanels(_playerManager);
+
+			_quitButton.onClick.AddListener (OnQuitButtonClicked);
+
+
 			_buttonList = new List<Button>();
 
 			foreach(var item in _playerManager.Model.UnlockedPirates){
@@ -68,6 +102,27 @@ namespace Assets.Code.Ui.CanvasControllers
 					_buttonList.Add(CreatePirateButton(item.Key));
 				}
 			}
+		}
+		public void InitializeCanvasPanels(PlayerManager playerManager){
+
+			_experiencePointBar.value = playerManager.Model.ExperiencePoints;
+			_experienceLevelText.text = playerManager.Model.UserLevel.ToString(); 
+			_goldCoinBar.value = playerManager.Model.Gold;
+			_goldText.text = playerManager.Model.Gold.ToString();
+		
+		}
+
+		public void UpdateCanvasPanels(UpdateGamePlayUiMessage message){
+
+			//TODO Increase level of player
+			_experiencePointBar.value += message.ExperiencePoints;  
+			//_experienceLevelText 
+			if(message.availableGold > 0){
+				_goldCoinBar.value += message.Gold;
+				_goldText.text = _goldCoinBar.value.ToString();
+			}
+
+			_availableGoldText.text = message.availableGold.ToString();
 		}
 
 		public Button CreatePirateButton(string name)

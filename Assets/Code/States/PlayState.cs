@@ -29,7 +29,7 @@ namespace Assets.Code.States
 		private MessagingToken _onTearDownLevel;
 		private PoolingObjectManager _poolingObjectManager;
 		//level Manager
-
+		private Dictionary<string,int> _pirateCountDict;
 		private Dictionary<string,bool> _unlockedPirates;
 
 		LevelManager levelManager;
@@ -75,6 +75,17 @@ namespace Assets.Code.States
 			_unlockedPirates.Add ("Pirate4",false);
 			_unlockedPirates.Add ("EnemyPirate5",false);
 
+			_pirateCountDict = new Dictionary<string, int>();
+			_pirateCountDict.Add("Captain",1);
+			_pirateCountDict.Add("Quarter Master",2);
+			_pirateCountDict.Add("Gunner",2);
+			_pirateCountDict.Add("Bomber",3);
+			_pirateCountDict.Add("Surgeon",1);
+			_pirateCountDict.Add("Carpenter",2);
+			_pirateCountDict.Add ("Chef",2);
+			_pirateCountDict.Add ("Pirate4",1);
+			_pirateCountDict.Add ("EnemyPirate3",10);
+
 			//Initialize level manager
 			levelManager = new LevelManager (_resolver);
 
@@ -82,18 +93,19 @@ namespace Assets.Code.States
 			PlayerModel playerModel = new PlayerModel();
 			playerModel.Name = "User";
 			playerModel.Email = "user@gmail.com";
-			playerModel.Gold = 350;
-			playerModel.ExperiencePoints = 50;
-			playerModel.UserLevel =  34;
-			playerModel.UserRank = 89;
-			playerModel.Wins = 84;
-			playerModel.Gems = 895;
+			playerModel.Gold = 0;
+			playerModel.ExperiencePoints = 0;
+			playerModel.UserLevel =  0;
+			playerModel.UserRank = 0;
+			playerModel.Wins = 0;
+			playerModel.Gems = 100;
+			playerModel.MaxGoldCapacity = 2000;
 			playerModel.UnlockedPirates = _unlockedPirates;
-
+			playerModel.PirateCountDict = _pirateCountDict;
 
 
 			_playerManager.Initialize(_resolver,playerModel,levelManager);
-
+			levelManager.PirateCountDict = _pirateCountDict;
 			_uiManager.RegisterUi (new GamePlayCanvasController (_resolver, _canvasProvider.GetCanvas ("GamePlayCanvas"), _playerManager));
 			//Debug.Log ("Play state initialized.");
 

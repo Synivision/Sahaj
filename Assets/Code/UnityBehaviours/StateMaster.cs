@@ -116,30 +116,59 @@ namespace Assets.Code.UnityBehaviours
             #region DATA DEFINITIONS (eventually to be moved to data)
             _gameDataProvider.AddData (new BuildingModel
             {
-                Name = "building_a",
+				Name = "GunnerTower",
                 BuildingColor = Color.gray,
-                Range = 50,
+                Range = 100,
                 Stats = new StatBlock
                 {
-                    MaximumHealth = 100,
-                    MaximumDamage = 1,
-                    MaximumCourage = -1
-                }
-            });
-
-            _gameDataProvider.AddData (new BuildingModel
-            {
-                Name = "building_b",
-                BuildingColor = Color.red,
-                Range = 50,
-                Stats = new StatBlock
-                {
-                    MaximumHealth = 100,
-                    MaximumDamage = 1,
+                    MaximumHealth = 200,
+                    MaximumDamage = 5,
                     MaximumCourage = -1
                 },
-				Type = BuildingModel.BuildingType.Defence_Platoons
+				Type = BuildingModel.BuildingType.Defence_Gunner_Towers
             });
+		
+			_gameDataProvider.AddData (new BuildingModel
+			                           {
+				Name = "Gold_Storage",
+				BuildingColor = Color.red,
+				Range = 50,
+				GoldAmount = 1000,
+				Stats = new StatBlock
+				{
+					MaximumHealth = 300,
+					MaximumDamage = 1,
+					MaximumCourage = -1
+				},
+				Type = BuildingModel.BuildingType.Gold_Locker
+			});
+			
+			_gameDataProvider.AddData (new BuildingModel
+			                           {
+				Name = "Platoons",
+				BuildingColor = Color.red,
+				Range = 150,
+				Stats = new StatBlock
+				{
+					MaximumHealth = 100,
+					MaximumDamage = 1,
+					MaximumCourage = -1
+				},
+				Type = BuildingModel.BuildingType.Defence_Platoons
+			});
+			_gameDataProvider.AddData (new BuildingModel
+			                           {
+				Name = "Water_Cannon",
+				BuildingColor = Color.blue,
+				Range = 150,
+				Stats = new StatBlock
+				{
+					MaximumHealth = 100,
+					MaximumDamage = 1,
+					MaximumCourage = -1
+				},
+				Type = BuildingModel.BuildingType.Defence_Water_Cannons
+			});
 
             /* PLAYER PIRATES */
             _gameDataProvider.AddData( new PirateModel {

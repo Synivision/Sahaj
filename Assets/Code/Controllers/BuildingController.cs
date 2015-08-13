@@ -17,6 +17,7 @@ public class BuildingController : InitializeRequiredBehaviour {
     private PoolingAudioPlayer _poolingAudioPlayer;
     private PoolingObjectManager _poolingObjectManager;
     private PoolingParticleManager _poolingParticleManager;
+	private PlayerManager _playerManager;
 
     private LevelManager _levelManager;
 
@@ -26,7 +27,7 @@ public class BuildingController : InitializeRequiredBehaviour {
 	private GameObject _pirateSpawnPoint;
 
     // data
-	public BuildingModel Model;
+	private BuildingModel Model;
 
     /* PROPERTIES */
 	private  StatsBehaviour _currentTarget;
@@ -48,13 +49,18 @@ public class BuildingController : InitializeRequiredBehaviour {
 		_resolver.Resolve(out _poolingAudioPlayer);
 		_resolver.Resolve(out _soundProvider);
 		_resolver.Resolve(out _poolingParticleManager);
+		_resolver.Resolve(out _playerManager);
 
         //gameObject.GetComponent<Renderer>().material.color = Model.BuildingColor;
         Stats = GetComponent<StatsBehaviour>();
-        _bulletOrigin = transform.FindChild("BulletSpawnPoint").gameObject;
-		_pirateSpawnPoint = transform.FindChild("PirateSpawnPoint").gameObject;
+       
         // initialize properties
         _levelManager.OnPirateCreatedEvent += OnPirateCreated;
+
+		if (Model.Type != BuildingModel.BuildingType.Gold_Locker && Model.Type != BuildingModel.BuildingType.Defence_Water_Cannons) {
+			_bulletOrigin = transform.FindChild ("BulletSpawnPoint").gameObject;
+			_pirateSpawnPoint = transform.FindChild("PirateSpawnPoint").gameObject;
+		}
 
         Stats.Initialize(model.Stats);
 	    Stats.OnCurrentHealthChangedEvent += OnCurrentHealthChanged;
@@ -66,9 +72,34 @@ public class BuildingController : InitializeRequiredBehaviour {
     {
         // you might here want to implement a tiered system, or a gradial one
         // where the amount of damage is related to the amount of blood/horrible screaming (Y)
-        if (delta < 0)
+	
+
+
+		//TODO Calculate available gold
+		//TODO check if building is of type gold
+		if (Model.Type == BuildingModel.BuildingType.Gold_Locker){
+
+			if(Model.GoldAmount<0){
+				return;
+			}
+			_messager.Publish(new UpdateGamePlayUiMessage{
+				availableGold = Model.GoldAmount ,
+				Gold = 100 , 
+				ExperiencePoints = 5
+					
+			});
+
+			Model.GoldAmount -= 100;
+			_poolingAudioPlayer.PlaySound(transform.position, _soundProvider.GetSound("coin_drop"), 0.3f);
+
+		}
+
+		if (delta < 0){
             // this bleeding building brought to you by steven king
+			//display coin effect and sound
             _poolingParticleManager.Emit("blood_prefab", transform.position, Color.red, 100);
+
+		}
     }
 
     private void OnPirateCreated(PirateController newPirate)
@@ -85,31 +116,29 @@ public class BuildingController : InitializeRequiredBehaviour {
 
     public void Update()
     {
-        _timeTillNextShot -= Time.deltaTime;
-        _timeTillNextSearch -= Time.deltaTime;
-
-        if (_currentTarget == null && _timeTillNextSearch <= 0f)
-        {
-            _currentTarget = EvaluateTargets();
-            _timeTillNextSearch = 2f;
-        }
-        else if (_currentTarget != null && _timeTillNextShot <= 0f &&
-                 Vector3.Distance(transform.position, _currentTarget.transform.position) <= Model.Range)
-        {
-            Shoot(_currentTarget);
-            _timeTillNextShot = 1f;
-        }
-
+		_timeTillNextShot -= Time.deltaTime;
+		_timeTillNextSearch -= Time.deltaTime;
+		
+		if (Model.Type != BuildingModel.BuildingType.Gold_Locker && Model.Type != BuildingModel.BuildingType.Defence_Water_Cannons) {
+			if (_currentTarget == null && _timeTillNextSearch <= 0f) {
+				_currentTarget = EvaluateTargets ();
+				_timeTillNextSearch = 2f;
+			} else if (_currentTarget != null && _timeTillNextShot <= 0f &&
+			           Vector3.Distance (transform.position, _currentTarget.transform.position) <= Model.Range) {
+				Shoot (_currentTarget);
+				_timeTillNextShot = 1f;
+			}
+		}
 		if(_currentTarget != null && Vector3.Distance(transform.position, _currentTarget.transform.position) <= Model.Range && Model.Type == BuildingModel.BuildingType.Defence_Platoons && maxenemyPirateCount > 0){
-
-
+			
+			Debug.Log ("create enemy platoon");
 			_createPirateTime += Time.deltaTime;
-			if(_createPirateTime >3){
-				_levelManager.CreatePirate("EnemyPirate3",_pirateSpawnPoint.transform.position);
+			if(_createPirateTime >.5){
+				_levelManager.CreatePirate("EnemyPirate3",_pirateSpawnPoint.transform.position + new Vector3(Random.Range(0,15),0,Random.Range(0,15)));
 				maxenemyPirateCount--;
 				_createPirateTime = 0;
 			}
-			//_levelManager.CreatePirate("EnemyPirate1",new Vector3(transform.position.x + 20,transform.position.y,transform.position.z +20));
+			
 		}
     }
 

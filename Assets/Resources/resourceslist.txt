@@ -47,6 +47,7 @@
 	{
 		bgmusic.mp3
 		bonus.wav
+		coin_drop.mp3
 		gameover.mp3
 		hit.wav
 		lazer_shoot1.wav

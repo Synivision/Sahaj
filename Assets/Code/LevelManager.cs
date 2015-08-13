@@ -34,7 +34,9 @@ public class LevelManager
 	//groundcovers
 	private  GameObject _groundCoverParent;
 	private  List<GameObject> _groundCoversList;
-	
+
+	public Dictionary<string,int> PirateCountDict{ get; set;}
+
 	public LevelManager (IoCResolver resolver)
 	{
 		_resolver = resolver;
@@ -54,11 +56,17 @@ public class LevelManager
 	}
 
 	public void GenerateLevelMap(){
+
 		var building = Object.Instantiate (_prefabProvider.GetPrefab("AStarPlane"));
-
-	    CreateBuilding("building_a", new Vector3(50, 15, -20));
-        CreateBuilding("building_b", new Vector3(-85, 15, 85));
-
+		
+		CreateBuilding("GunnerTower", new Vector3(91, 15, 81));
+		CreateBuilding("GunnerTower", new Vector3(-85, 15, -88));
+		CreateBuilding("Gold_Storage", new Vector3(16, 15, 0));
+		CreateBuilding("Gold_Storage", new Vector3(-63, 15, 0));
+		CreateBuilding("Platoons", new Vector3(-100, 15, 85));
+		CreateBuilding("Platoons", new Vector3(85, 15, -85));
+		CreateBuilding("Water_Cannon", new Vector3(-10, 15, 0));
+		
 		_groundCoverParent  = Object.Instantiate(_prefabProvider.GetPrefab("empty_prefab"));
 		_groundCoverParent.name = "GroundCovers";
 		for(int x = -5; x <5; x++ ){
@@ -68,8 +76,16 @@ public class LevelManager
 				CreateGroundCovers(random,random2);
 			}
 		}
+
+		GenerateTraps();
 	}
 
+	public void GenerateTraps(){
+		var fab = Object.Instantiate(_prefabProvider.GetPrefab("Trap"));
+		var trapController = fab.GetComponent<TrapController>();
+		trapController.Initialize(_resolver, new Vector3(50,0,40));
+
+	}
     public List<StatsBehaviour> GetOpposition(PirateNature context)
     {
         var opposition = _knownPirates.Where(pirate => pirate.Model.PirateNature != context)
@@ -94,11 +110,13 @@ public class LevelManager
 
     public void CreateBuilding(string buildingName, Vector3 spawnPosition)
     {
-        var model = _gameDataProvider.GetData<BuildingModel>(buildingName);
-
-		if(buildingName == "building_b"){
-			var fab = Object.Instantiate(_prefabProvider.GetPrefab("SpawnBuilding"));
-			var buildingController = fab.GetComponent<BuildingController>();
+		var model = _gameDataProvider.GetData<BuildingModel>(buildingName);
+		GameObject fab;
+		BuildingController buildingController;
+		
+		switch(buildingName){
+		case "Gold_Storage":	 fab = Object.Instantiate(_prefabProvider.GetPrefab("Gold_Storage"));
+			buildingController = fab.GetComponent<BuildingController>();
 			
 			buildingController.Initialize(_resolver, model, this);
 			
@@ -111,11 +129,11 @@ public class LevelManager
 			buildingController.Stats.OnKilledEvent += () => OnBuildingKilled(buildingController);
 			
 			_knownBuildings.Add(buildingController);
-
-		}else{
-
-			var fab = Object.Instantiate(_prefabProvider.GetPrefab("Building"));
-			var buildingController = fab.GetComponent<BuildingController>();
+			break;
+			
+		case "Platoons":
+			fab = Object.Instantiate(_prefabProvider.GetPrefab("Platoons"));
+			buildingController = fab.GetComponent<BuildingController>();
 			
 			buildingController.Initialize(_resolver, model, this);
 			
@@ -127,6 +145,37 @@ public class LevelManager
 			
 			buildingController.Stats.OnKilledEvent += () => OnBuildingKilled(buildingController);
 			_knownBuildings.Add(buildingController);
+			break;
+			
+		case "Water_Cannon":
+			fab = Object.Instantiate(_prefabProvider.GetPrefab("Water_Cannon"));
+			buildingController = fab.GetComponent<BuildingController>();
+			
+			buildingController.Initialize(_resolver, model, this);
+			
+			fab.name = buildingName;
+			fab.transform.position = spawnPosition;
+			fab.transform.SetParent (_buildingsParent.transform);
+			if (OnBuildingCreatedEvent != null)
+				OnBuildingCreatedEvent(buildingController);
+			
+			buildingController.Stats.OnKilledEvent += () => OnBuildingKilled(buildingController);
+			_knownBuildings.Add(buildingController);
+			break;
+		default:fab = Object.Instantiate(_prefabProvider.GetPrefab("Building"));
+			buildingController = fab.GetComponent<BuildingController>();
+			
+			buildingController.Initialize(_resolver, model, this);
+			
+			fab.name = buildingName;
+			fab.transform.position = spawnPosition;
+			fab.transform.SetParent (_buildingsParent.transform);
+			if (OnBuildingCreatedEvent != null)
+				OnBuildingCreatedEvent(buildingController);
+			
+			buildingController.Stats.OnKilledEvent += () => OnBuildingKilled(buildingController);
+			_knownBuildings.Add(buildingController);
+			break;
 		}
     }
 
@@ -154,23 +203,29 @@ public class LevelManager
         // NOTE: we might also use this model to define the pirate's prefab
         // this way we could have special pirates with scripts alternate to the default
         // (same applies to buildings above)
-	    var model = _gameDataProvider.GetData<PirateModel>(pirateName);
-
-	    var fab = Object.Instantiate(_prefabProvider.GetPrefab("Sphere"));
-	    var pirateController = fab.GetComponent<PirateController>();
-
-        pirateController.Initialize(_resolver, model, this);
-
-	    fab.name = pirateName;
-		fab.transform.position = spawnposition;
-		fab.transform.SetParent(_piratesParent.transform);
-
-		if(OnPirateCreatedEvent != null)
-			OnPirateCreatedEvent(pirateController);
-        
-        pirateController.Stats.OnKilledEvent += () => OnPirateKilled(pirateController);
-
-        _knownPirates.Add(pirateController);
+		if (PirateCountDict.ContainsKey(pirateName)){
+			int val = PirateCountDict [pirateName];
+			if (val > 0) {
+				PirateCountDict [pirateName] = val - 1;
+				var model = _gameDataProvider.GetData<PirateModel> (pirateName);
+				
+				var fab = Object.Instantiate (_prefabProvider.GetPrefab ("Sphere"));
+				var pirateController = fab.GetComponent<PirateController> ();
+				
+				pirateController.Initialize (_resolver, model, this);
+				
+				fab.name = pirateName;
+				fab.transform.position = spawnposition;
+				fab.transform.SetParent (_piratesParent.transform);
+				
+				if (OnPirateCreatedEvent != null)
+					OnPirateCreatedEvent (pirateController);
+				
+				pirateController.Stats.OnKilledEvent += () => OnPirateKilled (pirateController);
+				
+				_knownPirates.Add (pirateController);
+			}
+		}
 	}
 
     private void OnPirateKilled(PirateController pirate)
