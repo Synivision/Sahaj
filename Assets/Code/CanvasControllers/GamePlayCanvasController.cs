@@ -41,23 +41,28 @@ namespace Assets.Code.Ui.CanvasControllers
 		private readonly Text _fpsText;
 		private Canvas _canvas;
 		private readonly Button _quitButton;
-		
+		private IoCResolver _resolver;
 		private UnityReferenceMaster _unityReference;
 
 		private List<Button> _buttonList;
 		private PlayerManager _playerManager;
 
 		private InputSession _inputSession;
-
+		private UiManager _uiManager;
+		private CanvasProvider _canvasProvider;
+		private readonly MessagingToken _onWin;
 		public GamePlayCanvasController (IoCResolver resolver, Canvas canvasView, PlayerManager playerManager) : base(canvasView)
 		{
 			_canvas = canvasView;
 			_playerManager = playerManager;
-
+			_resolver = resolver;
 			resolver.Resolve (out _prefabProvider);
 			resolver.Resolve (out _messager);
 			resolver.Resolve (out _unityReference);
 			resolver.Resolve (out _inputSession);
+			_uiManager = new UiManager ();
+
+			_resolver.Resolve(out _canvasProvider);
 
 			ResolveElement (out _fpsText,"FpsText");
 			ResolveElement(out _quitButton,"QuitButton");
@@ -102,6 +107,9 @@ namespace Assets.Code.Ui.CanvasControllers
 					_buttonList.Add(CreatePirateButton(item.Key));
 				}
 			}
+
+			_onWin = _messager.Subscribe<WinMessage> (OnWin);
+
 		}
 		public void InitializeCanvasPanels(PlayerManager playerManager){
 
@@ -110,6 +118,13 @@ namespace Assets.Code.Ui.CanvasControllers
 			_goldCoinBar.value = playerManager.Model.Gold;
 			_goldText.text = playerManager.Model.Gold.ToString();
 		
+		}
+
+		private  void OnWin (WinMessage message)
+		{
+			_uiManager.RegisterUi(new WinCanvasController(_resolver, _canvasProvider.GetCanvas("WinCanvas")));
+			TearDown();
+			
 		}
 
 		public void UpdateCanvasPanels(UpdateGamePlayUiMessage message){

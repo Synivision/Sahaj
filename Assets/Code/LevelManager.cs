@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using Assets.Code.DataPipeline;
 using Assets.Code.DataPipeline.Providers;
 using Assets.Code.Logic.Pooling;
+using Assets.Code.Messaging;
+using Assets.Code.Messaging.Messages;
 
 public delegate void OnPirateCreatedEventHandler(PirateController newPirate);
 public delegate void OnPirateKilledEventHandler(PirateController killedPirate);
@@ -17,7 +19,7 @@ public class LevelManager
     readonly GameDataProvider _gameDataProvider;
 	private readonly PrefabProvider _prefabProvider;
 	private readonly PoolingObjectManager _poolingObjectmanager;
-
+	private Messager _messager;
     /* PROPERTIES */
     private readonly List<PirateController> _knownPirates;
     private readonly List<BuildingController> _knownBuildings;
@@ -44,7 +46,7 @@ public class LevelManager
 		_resolver.Resolve (out _prefabProvider);
 		_resolver.Resolve (out _gameDataProvider);
 		_resolver.Resolve (out _poolingObjectmanager);
-
+		_resolver.Resolve(out _messager);
 		_piratesParent = Object.Instantiate(_prefabProvider.GetPrefab("empty_prefab"));
 		_piratesParent.name = "Pirates";
         
@@ -61,7 +63,7 @@ public class LevelManager
 		
 		CreateBuilding("GunnerTower", new Vector3(91, 15, 81));
 		CreateBuilding("GunnerTower", new Vector3(-85, 15, -88));
-		CreateBuilding("Gold_Storage", new Vector3(16, 15, 0));
+		CreateBuilding("Gold_Storage", new Vector3(40, 15, 0));
 		CreateBuilding("Gold_Storage", new Vector3(-63, 15, 0));
 		CreateBuilding("Platoons", new Vector3(-100, 15, 85));
 		CreateBuilding("Platoons", new Vector3(85, 15, -85));
@@ -115,7 +117,7 @@ public class LevelManager
 		BuildingController buildingController;
 		
 		switch(buildingName){
-		case "Gold_Storage":	 fab = Object.Instantiate(_prefabProvider.GetPrefab("Gold_Storage"));
+		case "Gold_Storage":	 fab = Object.Instantiate(_prefabProvider.GetPrefab("Gold_Storage2"));
 			buildingController = fab.GetComponent<BuildingController>();
 			
 			buildingController.Initialize(_resolver, model, this);
@@ -132,7 +134,7 @@ public class LevelManager
 			break;
 			
 		case "Platoons":
-			fab = Object.Instantiate(_prefabProvider.GetPrefab("Platoons"));
+			fab = Object.Instantiate(_prefabProvider.GetPrefab("Platoons2"));
 			buildingController = fab.GetComponent<BuildingController>();
 			
 			buildingController.Initialize(_resolver, model, this);
@@ -148,7 +150,7 @@ public class LevelManager
 			break;
 			
 		case "Water_Cannon":
-			fab = Object.Instantiate(_prefabProvider.GetPrefab("Water_Cannon"));
+			fab = Object.Instantiate(_prefabProvider.GetPrefab("Water_Cannon3"));
 			buildingController = fab.GetComponent<BuildingController>();
 			
 			buildingController.Initialize(_resolver, model, this);
@@ -162,7 +164,7 @@ public class LevelManager
 			buildingController.Stats.OnKilledEvent += () => OnBuildingKilled(buildingController);
 			_knownBuildings.Add(buildingController);
 			break;
-		default:fab = Object.Instantiate(_prefabProvider.GetPrefab("Building"));
+		default:fab = Object.Instantiate(_prefabProvider.GetPrefab("tower"));
 			buildingController = fab.GetComponent<BuildingController>();
 			
 			buildingController.Initialize(_resolver, model, this);
@@ -196,6 +198,11 @@ public class LevelManager
 
         if (building != null)
             building.Delete();
+
+		if(_knownBuildings.Count == 0){
+
+			_messager.Publish(new WinMessage{});
+		}
     }
 
 	public void CreatePirate (string pirateName, Vector3 spawnposition)

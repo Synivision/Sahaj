@@ -58,8 +58,10 @@ public class BuildingController : InitializeRequiredBehaviour {
         _levelManager.OnPirateCreatedEvent += OnPirateCreated;
 
 		if (Model.Type != BuildingModel.BuildingType.Gold_Locker && Model.Type != BuildingModel.BuildingType.Defence_Water_Cannons) {
-			_bulletOrigin = transform.FindChild ("BulletSpawnPoint").gameObject;
-			_pirateSpawnPoint = transform.FindChild("PirateSpawnPoint").gameObject;
+			//_bulletOrigin = transform.FindChild ("BulletSpawnPoint").gameObject;
+			//_pirateSpawnPoint = transform.FindChild("PirateSpawnPoint").gameObject;
+			_bulletOrigin = this.gameObject;
+			_pirateSpawnPoint = this.gameObject;
 		}
 
         Stats.Initialize(model.Stats);
@@ -116,6 +118,10 @@ public class BuildingController : InitializeRequiredBehaviour {
 
     public void Update()
     {
+
+		transform.LookAt(_unityReference.Camera.transform,-Vector3.down);
+
+
 		_timeTillNextShot -= Time.deltaTime;
 		_timeTillNextSearch -= Time.deltaTime;
 		

@@ -53,6 +53,15 @@
 		lazer_shoot1.wav
 		lazer_shoot_miss.wav
 	}
+	Sprites
+	{
+		GoldStorage10.png
+		LargeBarracks.png
+		Picture1.png
+		Residence5_NEW.png
+		Water_Cannon2.png
+		Water_Cannon3.png
+	}
 	Textures
 	{
 		GridEmissive.png
