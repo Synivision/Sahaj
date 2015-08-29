@@ -55,12 +55,14 @@
 	}
 	Sprites
 	{
-		GoldStorage10.png
-		LargeBarracks.png
-		Picture1.png
-		Residence5_NEW.png
-		Water_Cannon2.png
-		Water_Cannon3.png
+		gold_storage.png
+		gunner_tower.png
+		platoons.png
+		residence.png
+		shipp.png
+		water_cannon.png
+		water_cannon3.png
+		win.png
 	}
 	Textures
 	{

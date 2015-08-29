@@ -20,7 +20,11 @@ public class CameraController : MonoBehaviour {
 	
 	private float _timeTouchPhaseEnded;
 	private Camera _camera;
-	
+
+	private float _maxBoundRight;
+	private float _maxBoundLeft;
+	private float _maxBoundTop;
+	private float _maxBoundBottom;
 	// How long the object should shake for.
 	private float _shake = 2f;
 	
@@ -37,6 +41,10 @@ public class CameraController : MonoBehaviour {
 		
 		_camera = GetComponent<Camera>();
 		originalPos = _camera.transform.localPosition;
+		_maxBoundRight = this.transform.position.x + 100;
+		_maxBoundLeft = this.transform.position.x - 100;
+		_maxBoundTop = this.transform.position.z + 100;
+		_maxBoundBottom = this.transform.position.z - 100;
 	}
 	
 	public void ApplyShake(float shakeAmount)
@@ -113,8 +121,21 @@ public class CameraController : MonoBehaviour {
 		if (Input.GetMouseButton(0))
 		{
 			Vector3 delta  = Input.mousePosition - lastPosition;
-			transform.Translate(delta.x * mouseSensitivity, delta.y * mouseSensitivity, 0);
 			lastPosition =  Input.mousePosition;
+
+			if (this.transform.position.x > _maxBoundRight){
+				transform.Translate(delta.x * mouseSensitivity ,delta.y * mouseSensitivity, 0);
+				transform.position = new Vector3(_maxBoundRight,transform.position.y,transform.position.z);
+				return;
+			}
+			if (this.transform.position.x < _maxBoundLeft){
+				transform.Translate(delta.x * mouseSensitivity ,delta.y * mouseSensitivity, 0);
+				transform.position = new Vector3(_maxBoundLeft,transform.position.y,transform.position.z);
+				return;
+			}
+
+			transform.Translate(delta.x * mouseSensitivity,delta.y * mouseSensitivity, 0);
+
 		}
 		
 		if (Input.touchCount == 2 )
@@ -154,4 +175,10 @@ public class CameraController : MonoBehaviour {
 			
 		}
 	}
+
+
+
+		
+
+
 }

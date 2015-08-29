@@ -23,7 +23,7 @@ public class TrapController : PoolingBehaviour {
 		Debug.Log("trigger");
 		if(other.gameObject.tag == "Player"){
 
-			_poolingParticleManager.Emit("Explosion05", transform.position, Color.red, 1000);
+			_poolingParticleManager.Emit("explosion_05", transform.position, Color.red, 1000);
 			int pirateCurrentHealth  = (int)other.gameObject.GetComponent<PirateController>().Stats.CurrentHealth; 
 			other.gameObject.GetComponent<PirateController>().Stats.CurrentHealth = pirateCurrentHealth - 70;
 			other.gameObject.GetComponent<PirateController>()._healthBar.value = pirateCurrentHealth - 70;

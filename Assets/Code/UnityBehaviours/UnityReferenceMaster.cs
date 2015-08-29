@@ -14,7 +14,7 @@ namespace Assets.Code.UnityBehaviours
     {
         /* REFERENCES */
         public CameraController Camera;
-
+		public GameObject Sun;
         /* PROPERTIES */
         private List<DelayedAction> _delayedActions;
 

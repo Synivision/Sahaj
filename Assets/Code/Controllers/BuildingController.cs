@@ -36,6 +36,7 @@ public class BuildingController : InitializeRequiredBehaviour {
 	private float _createPirateTime;
 	int maxenemyPirateCount = 5;
 
+
 	public void Initialize (IoCResolver resolver,BuildingModel model,LevelManager levelmanager)
     {
         // resolve references
@@ -119,7 +120,7 @@ public class BuildingController : InitializeRequiredBehaviour {
     public void Update()
     {
 
-		transform.LookAt(_unityReference.Camera.transform,-Vector3.down);
+		transform.LookAt(_unityReference.Sun.transform,-Vector3.down);
 
 
 		_timeTillNextShot -= Time.deltaTime;

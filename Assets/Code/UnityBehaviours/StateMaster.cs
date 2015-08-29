@@ -59,6 +59,22 @@ namespace Assets.Code.UnityBehaviours
             // texture provider
             var textureProvider = new TextureProvider();
             var spriteProvider = new SpriteProvider();
+
+			List<String> spriteNames = new List<String>();
+			spriteNames.Add ("gold_storage");
+			spriteNames.Add ("gunner_tower");
+			spriteNames.Add ("platoons");
+			spriteNames.Add ("residence");
+			spriteNames.Add ("water_cannon");
+			spriteNames.Add ("water_cannon3");
+			spriteNames.Add ("win");
+			for(int i = 0; i < spriteNames.Count; i++){
+
+				spriteProvider.AddSprite(Resources.Load<Sprite>("Sprites/"+spriteNames[i]));
+
+			}
+
+
             TextureLoader.LoadTextures(textureProvider, spriteProvider, "Textures");
             _resolver.RegisterItem(textureProvider);
             _resolver.RegisterItem(spriteProvider);
@@ -116,7 +132,7 @@ namespace Assets.Code.UnityBehaviours
             #region DATA DEFINITIONS (eventually to be moved to data)
             _gameDataProvider.AddData (new BuildingModel
             {
-				Name = "GunnerTower",
+				Name = "gunner_tower",
                 BuildingColor = Color.gray,
                 Range = 100,
                 Stats = new StatBlock
@@ -130,7 +146,7 @@ namespace Assets.Code.UnityBehaviours
 		
 			_gameDataProvider.AddData (new BuildingModel
 			                           {
-				Name = "Gold_Storage",
+				Name = "gold_storage",
 				BuildingColor = Color.red,
 				Range = 50,
 				GoldAmount = 1000,
@@ -145,7 +161,7 @@ namespace Assets.Code.UnityBehaviours
 			
 			_gameDataProvider.AddData (new BuildingModel
 			                           {
-				Name = "Platoons",
+				Name = "platoons",
 				BuildingColor = Color.red,
 				Range = 150,
 				Stats = new StatBlock
@@ -158,7 +174,7 @@ namespace Assets.Code.UnityBehaviours
 			});
 			_gameDataProvider.AddData (new BuildingModel
 			                           {
-				Name = "Water_Cannon",
+				Name = "water_cannon",
 				BuildingColor = Color.blue,
 				Range = 150,
 				Stats = new StatBlock

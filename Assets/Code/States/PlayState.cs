@@ -116,7 +116,7 @@ namespace Assets.Code.States
 
 
 			_inputSessionData = new InputSessionData();
-			_inputSessionData.Name = "Gunner";
+			_inputSessionData.Name = "None";
 			_inputSession.Initialize(_inputSessionData);
 
 		

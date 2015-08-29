@@ -142,7 +142,7 @@ namespace Assets.Code.Ui.CanvasControllers
 
 		public Button CreatePirateButton(string name)
 		{
-			var fab = Object.Instantiate(_prefabProvider.GetPrefab("PirateButton")).gameObject.GetComponent<Button>();
+			var fab = Object.Instantiate(_prefabProvider.GetPrefab("pirate_button")).gameObject.GetComponent<Button>();
 			
 			fab.gameObject.name = name;
 
