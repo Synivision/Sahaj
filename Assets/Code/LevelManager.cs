@@ -227,7 +227,7 @@ public class LevelManager
 		var model = _gameDataProvider.GetData<BuildingModel>(buildingName);
 		GameObject fab;
 		BuildingController buildingController;
-		fab = Object.Instantiate(_prefabProvider.GetPrefab("building"));
+		fab = Object.Instantiate(_prefabProvider.GetPrefab("Building"));
 
 		fab.GetComponent<SpriteRenderer>().sprite = _spriteProvider.GetSprite(buildingName);
 
@@ -289,7 +289,7 @@ public class LevelManager
 				PirateCountDict [pirateName] = val - 1;
 				var model = _gameDataProvider.GetData<PirateModel> (pirateName);
 				
-				var fab = Object.Instantiate (_prefabProvider.GetPrefab ("sphere"));
+				var fab = Object.Instantiate (_prefabProvider.GetPrefab ("Sphere"));
 				var pirateController = fab.GetComponent<PirateController> ();
 				
 				pirateController.Initialize (_resolver, model, this);
