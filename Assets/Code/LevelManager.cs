@@ -43,14 +43,23 @@ public class LevelManager
 	public Dictionary<string,int> PirateCountDict{ get; set;}
 
 	//Grid Map generator
-	private int AreaToCover;
-	public float GridSize;
+	private int AreaToCover = 25;
+	public float GridSize = 10;
 	private float _centreAdjustments;
+	private string[,] blueprint;
 
-	public LevelManager (IoCResolver resolver)
+	private MapLayout _mapLayout;
+	private List<string> BuildingList;
+	private List<string> MapItemsList;
+	public enum PassabilityType {
+		Impassible,
+		Passible
+	};
+
+	public LevelManager (IoCResolver resolver, MapLayout map)
 	{
 		_resolver = resolver;
-
+		_mapLayout = map;
 		_resolver.Resolve (out _prefabProvider);
 		_resolver.Resolve (out _gameDataProvider);
 		_resolver.Resolve (out _poolingObjectmanager);
@@ -64,22 +73,22 @@ public class LevelManager
 		_buildingsParent.name = "Buildings";
 		_knownPirates = new List<PirateController> ();
         _knownBuildings = new List<BuildingController>();
+
 		GenerateLevelMap();
-		GenerateGrid ();
+
+
+		// Debug.Log(GetTileAt(new Vector3(12,0,13)));
 	}
 
 	public void GenerateLevelMap(){
 
 		var building = Object.Instantiate (_prefabProvider.GetPrefab("a_star_plane"));
-		
-		CreateBuilding("gunner_tower", new Vector3(91, 15, 81));
-		CreateBuilding("gunner_tower", new Vector3(-85, 15, -88));
-		CreateBuilding("gold_storage", new Vector3(40, 15, 0));
-		CreateBuilding("gold_storage", new Vector3(-63, 15, 0));
-		CreateBuilding("platoons", new Vector3(-100, 15, 85));
-		CreateBuilding("platoons", new Vector3(85, 15, -85));
-		CreateBuilding("water_cannon", new Vector3(-10, 15, 0));
-		
+
+		InitializeStringList();
+
+		GenerateGrid ();
+
+		/*
 		_groundCoverParent  = Object.Instantiate(_prefabProvider.GetPrefab("empty_prefab"));
 		_groundCoverParent.name = "GroundCovers";
 		for(int x = -5; x <5; x++ ){
@@ -92,6 +101,97 @@ public class LevelManager
 
 		GenerateTraps();
 		GenerateShip ();
+		*/
+	}
+
+
+	public PassabilityType GetCoordinatePassability(Vector3 point)
+	{
+
+		string tile = GetTileAt(point);
+		if(tile == "empty" && tile == "wall"){
+
+			return PassabilityType.Impassible;
+		}
+		else {
+
+			return PassabilityType.Passible;
+
+		}
+	}
+	public string GetTileAt(Vector3 point){
+
+		string tileName = "empty";
+
+		int x = (int)(point.x/GridSize);
+		int z = (int)(point.z/GridSize);
+
+
+
+		if( (x >= 0 && x < 25) && (z >= 0 && z < 25) ){
+
+		    tileName = blueprint[x,z];
+		}
+		Debug.Log("Tilename = " +tileName);
+		return tileName;
+	}
+	public void GenerateGrid(){
+		
+		var parentGameObject = _poolingObjectManager.Instantiate("empty2");
+		parentGameObject.transform.position = new Vector3(0,0,0);
+		parentGameObject.gameObject.name = "Grid";
+		
+		AreaToCover = 25;
+		GridSize = 10;
+		
+		_centreAdjustments = AreaToCover * GridSize / 2;
+		 blueprint = new string[AreaToCover,AreaToCover];
+
+
+
+		foreach (MapItemSpawn mapItem in _mapLayout.mapItemSpawnList){
+			
+			blueprint[mapItem.gridXPosition,mapItem.gridZPosition] = mapItem.Name;
+		}
+
+		foreach (BuildingSpawn building in _mapLayout.buildingSpawnList){
+			
+			blueprint[building.gridXPosition,building.gridZPosition] = building.Name;
+		}
+		//instantiate onjects as per the blueprint
+		for (var x=0; x<AreaToCover; x++){
+			for (var y=0; y<AreaToCover; y++){
+				FillBlueprint (parentGameObject.gameObject,blueprint[x,y],x,y);
+			}
+		}
+	}
+
+	public void InitializeStringList(){
+		BuildingList = new List<string>();
+		BuildingList.Add("gold_storage");
+		BuildingList.Add("gunner_tower");
+		BuildingList.Add("platoons");
+		BuildingList.Add("water_cannon");
+
+		MapItemsList = new List<string>();
+		MapItemsList.Add("river");
+		MapItemsList.Add("wall");
+		//MapItemsList.Add("empty");
+
+	}
+	private void FillBlueprint(GameObject parentGameObject,string type,int x ,int y){
+
+
+		if(BuildingList.Contains(type)){
+
+			var fab2 = CreateBuilding(type,new Vector3(0,0,0));
+			SetObjectToCorrectTransform(parentGameObject,fab2.gameObject,x,y);
+		}
+		if (MapItemsList.Contains(type)){
+
+			var fab = _poolingObjectManager.Instantiate(type);
+			SetObjectToCorrectTransform(parentGameObject,fab.gameObject,x,y);
+		}
 	}
 
 	public void GenerateTraps(){
@@ -122,7 +222,7 @@ public class LevelManager
         return context == PirateNature.Player ? _knownBuildings : new List<BuildingController>();
     } 
 
-    public void CreateBuilding(string buildingName, Vector3 spawnPosition)
+    public GameObject CreateBuilding(string buildingName, Vector3 spawnPosition)
     {
 		var model = _gameDataProvider.GetData<BuildingModel>(buildingName);
 		GameObject fab;
@@ -137,12 +237,14 @@ public class LevelManager
 		fab.transform.position = spawnPosition;
 		fab.transform.SetParent (_buildingsParent.transform);
 
-		if (OnBuildingCreatedEvent != null)
+		if (OnBuildingCreatedEvent != null){
 			OnBuildingCreatedEvent(buildingController);
+		}
 
 		buildingController.Stats.OnKilledEvent += () => OnBuildingKilled(buildingController);
 		_knownBuildings.Add(buildingController);
 
+		return fab;
 
     }
 
@@ -224,65 +326,12 @@ public class LevelManager
 		Object.Destroy(_groundCoverParent);
 	}
 
-	public void GenerateGrid(){
-		
-		var parentGameObject = _poolingObjectManager.Instantiate("empty2");
-		parentGameObject.transform.position = new Vector3(0,0,0);
-		parentGameObject.gameObject.name = "Grid";
-		
-		AreaToCover = 25;
-		GridSize = 10;
-		
-		_centreAdjustments = AreaToCover * GridSize / 2;
-		var blueprint = new string[AreaToCover,AreaToCover];
-		
-		//fill up blueprint with walls
-		for (var x=0; x<AreaToCover;x++){
-			for(var y=0; y<AreaToCover; y++){
-				blueprint[x,y]="wall";
-			}
-		}
-		//River
-		for (var x=0; x<5;x++){
-			for(var y=0; y<5; y++){
-				blueprint[x,y]="river";
-			}
-		}
-		
-		//instantiate onjects as per the blueprint
-		for (var x=0; x<AreaToCover; x++){
-			for (var y=0; y<AreaToCover; y++){
-				FillBlueprint (parentGameObject.gameObject,blueprint[x,y],x,y);
-			}
-		}
-	}
 
-	private void FillBlueprint(GameObject parentGameObject,string type,int x ,int y){
-		
-		
-		if (type == "wall") {
-			
-			var fab = _poolingObjectManager.Instantiate("empty");
-			SetObjectToCorrectTransform(parentGameObject,fab.gameObject,x,y);
-			
-		}
-		else if(type=="empty"){
-			
-		}
-		
-		else if (type == "river") {
-			var fab = _poolingObjectManager.Instantiate("empty2");
-			SetObjectToCorrectTransform(parentGameObject,fab.gameObject,x,y);
-		}
-		
-	}
-	
-	
 	private void SetObjectToCorrectTransform(GameObject parentGameObject,GameObject subject,int x,int y){
-		subject.transform.localPosition = new Vector3 ((x * GridSize)+GridSize / 2-_centreAdjustments, 0, (y * GridSize)+GridSize / 2-_centreAdjustments);
+		subject.transform.localPosition = new Vector3 ((x * GridSize)+GridSize / 2-_centreAdjustments, 15, (y * GridSize)+GridSize / 2-_centreAdjustments);
 		//subject.transform.localScale*=GridSize;
 		subject.transform.parent = parentGameObject.transform;
-		
+		subject.transform.localScale=new Vector3(GridSize,GridSize,GridSize);
 		
 	}
 }

@@ -34,7 +34,7 @@ namespace Assets.Code.States
 
 		LevelManager levelManager;
 		PlayerManager _playerManager;
-
+		MapLayout _mapLayout;
 		//Input Controller requirements
 
 		private bool _mouseState;
@@ -46,8 +46,9 @@ namespace Assets.Code.States
 		private InputSessionData _inputSessionData;
 		int pointerId = -1;
 
-		public PlayState (IoCResolver resolver) : base(resolver)
+		public PlayState (IoCResolver resolver, MapLayout mapLayout) : base(resolver)
 		{
+			_mapLayout = mapLayout;
 			_resolver.Resolve (out _messager);
 			_resolver.Resolve (out _prefabProvider);
 			_resolver.Resolve (out _canvasProvider);
@@ -86,9 +87,10 @@ namespace Assets.Code.States
 			_pirateCountDict.Add ("Pirate4",1);
 			_pirateCountDict.Add ("EnemyPirate3",10);
 
-			//Initialize level manager
-			levelManager = new LevelManager (_resolver);
 
+
+			//Initialize level manager
+			levelManager = new LevelManager (_resolver, _mapLayout);
 
 			PlayerModel playerModel = new PlayerModel();
 			playerModel.Name = "User";
@@ -148,10 +150,13 @@ namespace Assets.Code.States
 			
 			//used to move cube around 
 			if (Input.GetMouseButtonDown (0)) {
-				
+
+
+
 				RaycastHit hitInfo;
 				target = GetClickedObject (out hitInfo);
-				
+
+
 				if (target != null && (target.gameObject.tag == "Cube" )) {
 					_mouseState = true;
 					screenSpace = Camera.main.WorldToScreenPoint (target.transform.position);
@@ -184,6 +189,8 @@ namespace Assets.Code.States
 					{
 						
 						Vector3 spawnPosition = new Vector3(hitInfo.point.x,5.2f,hitInfo.point.z);
+
+						levelManager.GetTileAt(spawnPosition+new Vector3(125,0,125));
 						//Debug.Log ("Spawn Point from Input Controller = " + spawnPosition.ToString());
 						_messager.Publish (new CreatePirateMessage{
 							PirateName = _inputSession.CurrentlySelectedPirateName,
@@ -192,8 +199,6 @@ namespace Assets.Code.States
 					}
 					
 				}
-				
-				
 			}
 			
 			if (Input.GetMouseButtonUp (0)) {

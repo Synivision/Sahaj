@@ -43,7 +43,7 @@ public class MenuState : BaseState{
 
 	private void OnStartGame(StartGameMessage message)
 	{
-		SwitchState(new PlayState(_resolver));
+		SwitchState(new PlayState(_resolver, message.MapLayout));
 	}
 
 	public override void Update ()

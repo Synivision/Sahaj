@@ -342,6 +342,7 @@ namespace Assets.Code.UnityBehaviours
                 PirateNature = PirateNature.Enemy,
                 PirateColor = Color.black
             });
+
             #endregion
         }
 
