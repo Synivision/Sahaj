@@ -62,7 +62,7 @@
 		residence.png
 		shipp.png
 		water_cannon.png
-		water_cannon3.png
+		Water_Cannon3.png
 		win.png
 	}
 	Textures
