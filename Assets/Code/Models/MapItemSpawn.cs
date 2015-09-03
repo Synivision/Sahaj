@@ -9,6 +9,6 @@ using System.Collections.Generic;
 public class MapItemSpawn : IGameDataModel {
 
 	public string Name {get; set;}
-	public int gridXPosition;
-	public int gridZPosition;
+	public int xGridCoord;
+	public int zGridCoord;
 }

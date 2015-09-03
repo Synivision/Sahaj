@@ -44,8 +44,12 @@ namespace Assets.Code.States
 		private float _time = 5;
 		private InputSession _inputSession;
 		private InputSessionData _inputSessionData;
+
+		private GameObject tile;
 		int pointerId = -1;
 
+		Vector3 curPosition;
+		Vector3 selectedgameObjectPosition = new Vector3(0,0,0);
 		public PlayState (IoCResolver resolver, MapLayout mapLayout) : base(resolver)
 		{
 			_mapLayout = mapLayout;
@@ -120,6 +124,10 @@ namespace Assets.Code.States
 			_inputSessionData.Name = "None";
 			_inputSession.Initialize(_inputSessionData);
 
+
+			var tileo = _poolingObjectManager.Instantiate("tile");
+			tile = tileo.gameObject;
+			tile.SetActive(false);
 		}
 
 		public override void Update ()
@@ -141,49 +149,26 @@ namespace Assets.Code.States
 			
 			//used to move cube around 
 			if (Input.GetMouseButtonDown (0)) {
-
-
-
 				RaycastHit hitInfo;
 				target = GetClickedObject (out hitInfo);
 
 
 				if (target != null && (target.gameObject.tag == "Cube" )) {
 					_mouseState = true;
-					screenSpace = Camera.main.WorldToScreenPoint (target.transform.position);
-					offset = target.transform.position - Camera.main.ScreenToWorldPoint (new Vector3 (Input.mousePosition.x, Input.mousePosition.y, screenSpace.z));
-					
-					//myCameraController.enabled = false;
-					
+					//get position of object selected 
+					selectedgameObjectPosition = target.transform.position;
+
+
 				}
-				//&& target.gameObject.tag == "Player"
-				if (target != null) {
-					
-					//send message to pirate canvas controller to display pirate info
-					/*PirateController playerObject = target.GetComponent<PirateController> ();
-				playerObject.UpdateUiPanel ();
-				_time = 0;
-				
-				_messager.Publish (new PirateInfoCanvasMessage{
-					toggleValue = true
-				});
-				*/
-				}
-				
+
 				Ray ray;
-				
-				
 				ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-				if(UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject(pointerId)== false){
-					//&& target.gameObject.tag=="Plane"
+				if( UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject(pointerId)== false){
 					if(Physics.Raycast(ray,out hitInfo)&& target.gameObject.tag!="Cube" )
 					{
-						
 						Vector3 spawnPosition = new Vector3(hitInfo.point.x,5.2f,hitInfo.point.z);
-
-						levelManager.GetTileAt(spawnPosition+new Vector3(125,0,125));
+	
 						//Debug.Log ("Spawn Point from Input Controller = " + spawnPosition.ToString()
-
 						levelManager.CreatePirate(_inputSession.CurrentlySelectedPirateName,spawnPosition);
 					}
 					
@@ -191,16 +176,39 @@ namespace Assets.Code.States
 			}
 			
 			if (Input.GetMouseButtonUp (0)) {
+
+				//update the grid tile of moved object if grid tile is empty
+
+				if(_mouseState && levelManager.GetCoordinatePassability(curPosition + new Vector3(125,0,125)) == LevelManager.PassabilityType.Passible){
+					levelManager.UpdateBlueprint(selectedgameObjectPosition + new Vector3(125,0,125),curPosition + new Vector3(125,0,125));
+				}
+				else{
+					if(target!=null){
+						target.transform.position = selectedgameObjectPosition;
+					}
+
+					
+				}
 				_mouseState = false;
-				//myCameraController.enabled = true;
+				tile.SetActive(false);
 			}
 			
 			if (_mouseState) {
-				
+				screenSpace = Camera.main.WorldToScreenPoint (target.transform.position);
 				var curScreenSpace = new Vector3 (Input.mousePosition.x, Input.mousePosition.y, screenSpace.z);
-				var curPosition = Camera.main.ScreenToWorldPoint (curScreenSpace) + offset;
+				curPosition = Camera.main.ScreenToWorldPoint (curScreenSpace) + offset;
 				curPosition.y = target.transform.position.y;
 				target.transform.position = curPosition;
+				//Get grid on curposition
+				//Debug.Log(levelManager.GetCoordinatePassability(curPosition + new Vector3(125,0,125)));
+				//instantiate red or green according to grid
+				tile.SetActive(true);
+				tile.transform.position = curPosition+new Vector3(0,-10,0);
+				if(levelManager.GetCoordinatePassability(curPosition + new Vector3(125,0,125)) == LevelManager.PassabilityType.Passible){
+					tile.GetComponent<Renderer>().material.color = Color.green;
+				}else{
+					tile.GetComponent<Renderer>().material.color = Color.red;
+				}
 			}
 
 

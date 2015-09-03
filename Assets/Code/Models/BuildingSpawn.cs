@@ -11,6 +11,6 @@ public class BuildingSpawn : IGameDataModel {
 
 	//name = Spritename
 	public string Name {get; set;}
-	public int gridXPosition;
-	public int gridZPosition;
+	public int xGridCoord;
+	public int zGridCoord;
 }

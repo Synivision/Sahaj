@@ -104,35 +104,45 @@ public class LevelManager
 		*/
 	}
 	
-	
+	public void UpdateBlueprint(Vector3 oldPos, Vector3 newPos){
+
+		var oldx = (int)(oldPos.x/GridSize);
+		var oldz = (int)(oldPos.z/GridSize);
+		var newx = (int)(newPos.x/GridSize);
+		var newz = (int)(newPos.z/GridSize);
+
+		if( (oldx >= 0 && oldx < 25) && (oldz >= 0 && oldz < 25) && (newx >= 0 && newx < 25) && (newz >= 0 && newz < 25) ){
+			
+			var temp = blueprint[oldx,oldz];
+			blueprint[oldx,oldz] = "empty";
+			blueprint[(int)(newPos.x/GridSize),(int)(newPos.z/GridSize)] = temp;
+
+		}
+	}
+
 	public PassabilityType GetCoordinatePassability(Vector3 point)
 	{
 		
 		string tile = GetTileAt(point);
-		if(tile == "empty" && tile == "wall"){
-			
-			return PassabilityType.Impassible;
+		if(tile == "empty"){
+			return PassabilityType.Passible;
 		}
 		else {
-			
-			return PassabilityType.Passible;
-			
+			return PassabilityType.Impassible;
 		}
 	}
 	public string GetTileAt(Vector3 point){
 		
-		string tileName = "empty";
+		string tileName = "outOfBounds";
 		
 		int x = (int)(point.x/GridSize);
 		int z = (int)(point.z/GridSize);
-		
-		
-		
+
 		if( (x >= 0 && x < 25) && (z >= 0 && z < 25) ){
 			
 			tileName = blueprint[x,z];
 		}
-		Debug.Log("Tilename = " +tileName);
+		//Debug.Log("Tilename = " +tileName);
 		return tileName;
 	}
 	public void GenerateGrid(){
@@ -146,19 +156,18 @@ public class LevelManager
 		
 		_centreAdjustments = AreaToCover * GridSize / 2;
 		blueprint = new string[AreaToCover,AreaToCover];
-		
-		
-		
-		foreach (MapItemSpawn mapItem in _mapLayout.mapItemSpawnList){
+
+		foreach (var mapItem in _mapLayout.mapItemSpawnList){
 			
-			blueprint[mapItem.gridXPosition,mapItem.gridZPosition] = mapItem.Name;
+			blueprint[mapItem.xGridCoord,mapItem.zGridCoord] = mapItem.Name;
 		}
 		
-		foreach (BuildingSpawn building in _mapLayout.buildingSpawnList){
+		foreach (var building in _mapLayout.buildingSpawnList){
 			
-			blueprint[building.gridXPosition,building.gridZPosition] = building.Name;
+			blueprint[building.xGridCoord,building.zGridCoord] = building.Name;
 		}
 		//instantiate onjects as per the blueprint
+
 		for (var x=0; x<AreaToCover; x++){
 			for (var y=0; y<AreaToCover; y++){
 				FillBlueprint (parentGameObject.gameObject,blueprint[x,y],x,y);
@@ -199,7 +208,7 @@ public class LevelManager
 		subject.transform.localPosition = new Vector3 ((x * GridSize)+GridSize / 2-_centreAdjustments, subject.transform.localScale.y, (y * GridSize)+GridSize / 2-_centreAdjustments);
 		//subject.transform.localScale*=GridSize;
 		subject.transform.parent = parentGameObject.transform;
-		subject.transform.localScale=new Vector3(GridSize,GridSize,GridSize);
+		subject.transform.localScale = new Vector3(GridSize, subject.transform.localScale.y ,GridSize);
 		
 	}
 	

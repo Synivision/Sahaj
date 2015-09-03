@@ -141,7 +141,6 @@ namespace Assets.Code.Ui.CanvasControllers
 
 			foreach(KeyValuePair<string, int> entry in _playerManager.Model.PirateCountDict){
 
-				Debug.Log(entry.Key);
 				if(_playerManager.Model.UnlockedPirates.ContainsKey(entry.Key)&&_playerManager.Model.UnlockedPirates[entry.Key] == true){
 
 					var text = _numberLabelDict[entry.Key];

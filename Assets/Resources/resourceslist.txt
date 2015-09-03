@@ -44,7 +44,6 @@
 	Prefabs
 	{
 		border.png
-		grid.png
 	}
 	Sounds
 	{
