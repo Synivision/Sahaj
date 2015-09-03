@@ -18,13 +18,6 @@ namespace Assets.Code.Ui.CanvasControllers
 		private GameObject _parentButtonObject;
 		private Button _previouslyClickedTileButton;
 
-		private readonly Button _makePirate1Button;
-		private readonly Button _makePirate2Button;
-		private readonly Button _makePirate3Button;
-		
-		private readonly Button _makeEnemyPirate1Button;
-		private readonly Button _makeEnemyPirate2Button;
-		private readonly Button _makeEnemyPirate3Button;
 
 		private readonly PrefabProvider _prefabProvider;
 
@@ -37,6 +30,8 @@ namespace Assets.Code.Ui.CanvasControllers
 
 		//message tokens
 		private MessagingToken _onUpdateCanvasPanels;
+		private MessagingToken _onUpdatePirateButtonNumberLabel;
+		private MessagingToken _PirateDictToken;
 
 		private readonly Text _fpsText;
 		private Canvas _canvas;
@@ -45,12 +40,14 @@ namespace Assets.Code.Ui.CanvasControllers
 		private UnityReferenceMaster _unityReference;
 
 		private List<Button> _buttonList;
+		private Dictionary<string, Text> _numberLabelDict;
 		private PlayerManager _playerManager;
 
 		private InputSession _inputSession;
 		private UiManager _uiManager;
 		private CanvasProvider _canvasProvider;
 		private readonly MessagingToken _onWin;
+
 		public GamePlayCanvasController (IoCResolver resolver, Canvas canvasView, PlayerManager playerManager) : base(canvasView)
 		{
 			_canvas = canvasView;
@@ -96,10 +93,13 @@ namespace Assets.Code.Ui.CanvasControllers
 			_onUpdateCanvasPanels = _messager.Subscribe<UpdateGamePlayUiMessage> (UpdateCanvasPanels);
 			InitializeCanvasPanels(_playerManager);
 
+
+			_onUpdatePirateButtonNumberLabel = _messager.Subscribe<UpdatePirateNumber>(UpdatePirateButtonNumberLabel);
 			_quitButton.onClick.AddListener (OnQuitButtonClicked);
 
 
 			_buttonList = new List<Button>();
+			_numberLabelDict = new Dictionary<string, Text>();
 
 			foreach(var item in _playerManager.Model.UnlockedPirates){
 
@@ -109,6 +109,8 @@ namespace Assets.Code.Ui.CanvasControllers
 			}
 
 			_onWin = _messager.Subscribe<WinMessage> (OnWin);
+
+			InitializePirateButtonNumberLabel();
 
 		}
 		public void InitializeCanvasPanels(PlayerManager playerManager){
@@ -127,6 +129,27 @@ namespace Assets.Code.Ui.CanvasControllers
 			
 		}
 
+		public void UpdatePirateButtonNumberLabel(UpdatePirateNumber message){
+
+
+			var text = _numberLabelDict[message.PirateName];
+			text.text = message.PirateNumber.ToString();
+
+		}
+
+		public void InitializePirateButtonNumberLabel(){
+
+			foreach(KeyValuePair<string, int> entry in _playerManager.Model.PirateCountDict){
+
+				Debug.Log(entry.Key);
+				if(_playerManager.Model.UnlockedPirates.ContainsKey(entry.Key)&&_playerManager.Model.UnlockedPirates[entry.Key] == true){
+
+					var text = _numberLabelDict[entry.Key];
+					text.text =  entry.Value.ToString();
+				}
+			}
+
+		}
 		public void UpdateCanvasPanels(UpdateGamePlayUiMessage message){
 
 			//TODO Increase level of player
@@ -148,6 +171,9 @@ namespace Assets.Code.Ui.CanvasControllers
 
 			var buttonLabel = fab.transform.GetChild (0).GetComponent<Text>();
 			buttonLabel.text = name;
+			var buttonNumberLabel = fab.transform.GetChild (1).GetComponent<Text>();
+
+			_numberLabelDict.Add(name,buttonNumberLabel);
 
 			fab.onClick.AddListener(() => OnPirateButtonClicked(fab,name));
 			

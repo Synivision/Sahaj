@@ -20,11 +20,14 @@ public class CameraController : MonoBehaviour {
 	
 	private float _timeTouchPhaseEnded;
 	private Camera _camera;
-
-	private float _maxBoundRight;
-	private float _maxBoundLeft;
-	private float _maxBoundTop;
-	private float _maxBoundBottom;
+	
+	private float _maxBoundX;
+	private float _maxBoundY;
+	private float _maxBoundZ;
+	private float _minBoundX;
+	private float _minBoundY;
+	private float _minBoundZ;
+	
 	// How long the object should shake for.
 	private float _shake = 2f;
 	
@@ -41,10 +44,13 @@ public class CameraController : MonoBehaviour {
 		
 		_camera = GetComponent<Camera>();
 		originalPos = _camera.transform.localPosition;
-		_maxBoundRight = this.transform.position.x + 100;
-		_maxBoundLeft = this.transform.position.x - 100;
-		_maxBoundTop = this.transform.position.z + 100;
-		_maxBoundBottom = this.transform.position.z - 100;
+		_maxBoundX = this.transform.position.x + 30;
+		_minBoundX = this.transform.position.x - 30;
+		_maxBoundZ = this.transform.position.z + 30;
+		_minBoundZ = this.transform.position.z - 30;
+		_maxBoundY = this.transform.position.y;
+		_minBoundY = this.transform.position.y;
+		
 	}
 	
 	public void ApplyShake(float shakeAmount)
@@ -54,7 +60,7 @@ public class CameraController : MonoBehaviour {
 	
 	public void Update()
 	{
-
+		
 		originalPos = _camera.transform.localPosition;
 		if (_shake > 0)
 		{
@@ -122,20 +128,13 @@ public class CameraController : MonoBehaviour {
 		{
 			Vector3 delta  = Input.mousePosition - lastPosition;
 			lastPosition =  Input.mousePosition;
-
-			if (this.transform.position.x > _maxBoundRight){
-				transform.Translate(delta.x * mouseSensitivity ,delta.y * mouseSensitivity, 0);
-				transform.position = new Vector3(_maxBoundRight,transform.position.y,transform.position.z);
-				return;
-			}
-			if (this.transform.position.x < _maxBoundLeft){
-				transform.Translate(delta.x * mouseSensitivity ,delta.y * mouseSensitivity, 0);
-				transform.position = new Vector3(_maxBoundLeft,transform.position.y,transform.position.z);
-				return;
-			}
-
-			transform.Translate(delta.x * mouseSensitivity,delta.y * mouseSensitivity, 0);
-
+			
+			
+			transform.Translate(delta.x * mouseSensitivity,delta.y * mouseSensitivity,0);
+			transform.position = new Vector3(
+				Mathf.Clamp(transform.position.x, _minBoundX, _maxBoundX),
+				Mathf.Clamp(transform.position.y, _minBoundY, _maxBoundY),
+				Mathf.Clamp(transform.position.z, _minBoundZ, _maxBoundZ));
 		}
 		
 		if (Input.touchCount == 2 )
@@ -175,10 +174,5 @@ public class CameraController : MonoBehaviour {
 			
 		}
 	}
-
-
-
-		
-
-
+	
 }

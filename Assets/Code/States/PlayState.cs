@@ -79,9 +79,9 @@ namespace Assets.Code.States
 			_pirateCountDict = new Dictionary<string, int>();
 			_pirateCountDict.Add("Captain",1);
 			_pirateCountDict.Add("Quarter Master",2);
-			_pirateCountDict.Add("Gunner",2);
+			_pirateCountDict.Add("Gunner",5);
 			_pirateCountDict.Add("Bomber",3);
-			_pirateCountDict.Add("Surgeon",1);
+			_pirateCountDict.Add("Surgeon",4);
 			_pirateCountDict.Add("Carpenter",2);
 			_pirateCountDict.Add ("Chef",2);
 			_pirateCountDict.Add ("Pirate4",1);
@@ -113,21 +113,12 @@ namespace Assets.Code.States
 
 			//Message tokens
 			_onQuitGame = _messager.Subscribe<QuitGameMessage> (OnQuitGame);
-			_onCreatePirate = _messager.Subscribe<CreatePirateMessage> (OnCreatePirate);
 			_onTearDownLevel = _messager.Subscribe<TearDownLevelMessage> (OnTearDownLevel);
 
 
 			_inputSessionData = new InputSessionData();
 			_inputSessionData.Name = "None";
 			_inputSession.Initialize(_inputSessionData);
-
-		
-		}
-
-		public void OnCreatePirate (CreatePirateMessage message)
-		{
-
-				levelManager.CreatePirate(message.PirateName,message.SpawnPosition);
 
 		}
 
@@ -191,11 +182,9 @@ namespace Assets.Code.States
 						Vector3 spawnPosition = new Vector3(hitInfo.point.x,5.2f,hitInfo.point.z);
 
 						levelManager.GetTileAt(spawnPosition+new Vector3(125,0,125));
-						//Debug.Log ("Spawn Point from Input Controller = " + spawnPosition.ToString());
-						_messager.Publish (new CreatePirateMessage{
-							PirateName = _inputSession.CurrentlySelectedPirateName,
-							SpawnPosition = spawnPosition
-						});
+						//Debug.Log ("Spawn Point from Input Controller = " + spawnPosition.ToString()
+
+						levelManager.CreatePirate(_inputSession.CurrentlySelectedPirateName,spawnPosition);
 					}
 					
 				}

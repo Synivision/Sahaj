@@ -9,6 +9,7 @@
 	{
 		Fairy Dust.mat
 		FlameA.mat
+		gridm.mat
 		NavyGrid.mat
 		NavySmooth.mat
 		PinkGrid.mat
@@ -43,6 +44,7 @@
 	Prefabs
 	{
 		border.png
+		grid.png
 	}
 	Sounds
 	{
@@ -54,20 +56,14 @@
 		lazer_shoot1.wav
 		lazer_shoot_miss.wav
 	}
-	Sprites
+	Textures
 	{
 		gold_storage.png
+		GridEmissive.png
 		gunner_tower.png
 		platoons.png
 		residence.png
 		shipp.png
-		water_cannon.png
-		Water_Cannon3.png
-		win.png
-	}
-	Textures
-	{
-		GridEmissive.png
 		SwatchMauveAlbedo.png
 		SwatchNavyAlbedo.png
 		SwatchNavyDarkAlbedo.png
@@ -77,5 +73,8 @@
 		SwatchTurquoiseAlbedo.png
 		SwatchWhiteAlbedo.png
 		SwatchYellowAlbedo.png
+		water_cannon.png
+		Water_Cannon3.png
+		win.png
 	}
 }

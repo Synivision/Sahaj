@@ -60,21 +60,6 @@ namespace Assets.Code.UnityBehaviours
             var textureProvider = new TextureProvider();
             var spriteProvider = new SpriteProvider();
 
-			List<String> spriteNames = new List<String>();
-			spriteNames.Add ("gold_storage");
-			spriteNames.Add ("gunner_tower");
-			spriteNames.Add ("platoons");
-			spriteNames.Add ("residence");
-			spriteNames.Add ("water_cannon");
-			spriteNames.Add ("water_cannon3");
-			spriteNames.Add ("win");
-			for(int i = 0; i < spriteNames.Count; i++){
-
-				spriteProvider.AddSprite(Resources.Load<Sprite>("Sprites/"+spriteNames[i]));
-
-			}
-
-
             TextureLoader.LoadTextures(textureProvider, spriteProvider, "Textures");
             _resolver.RegisterItem(textureProvider);
             _resolver.RegisterItem(spriteProvider);
