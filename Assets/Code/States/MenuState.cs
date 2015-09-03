@@ -18,7 +18,7 @@ public class MenuState : BaseState{
 	private UiManager _uiManager;
 	private MessagingToken _onStartGame;
 	private PoolingObjectManager _poolingObjectManager;
-
+	private MessagingToken _onOpenShipBaseMessage;
 	
 	/* PROPERTIES */
 	
@@ -34,6 +34,7 @@ public class MenuState : BaseState{
 		//Debug.Log ("Menu state initialized.");
 		//message tokens
 		_onStartGame = _messager.Subscribe<StartGameMessage>(OnStartGame);
+		_onOpenShipBaseMessage = _messager.Subscribe<OpenShipBaseMessage>(OnOpenShipBaseMessage);
 		_uiManager = new UiManager ();
 
 		_uiManager.RegisterUi(new MenuCanvasController(_resolver, _canvasProvider.GetCanvas("MenuCanvas")));
@@ -44,6 +45,12 @@ public class MenuState : BaseState{
 	private void OnStartGame(StartGameMessage message)
 	{
 		SwitchState(new PlayState(_resolver, message.MapLayout));
+	}
+
+	private void OnOpenShipBaseMessage(OpenShipBaseMessage message){
+		
+		SwitchState(new ShipBaseState(_resolver));
+		
 	}
 
 	public override void Update ()
