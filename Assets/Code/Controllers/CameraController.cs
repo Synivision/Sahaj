@@ -61,7 +61,7 @@ public class CameraController : MonoBehaviour {
 	public void Update()
 	{
 		
-		originalPos = _camera.transform.localPosition;
+
 		if (_shake > 0)
 		{
 			if (_shake > MaxShake)
@@ -114,11 +114,7 @@ public class CameraController : MonoBehaviour {
 		}
 		
 		// If there are two touches on the device...
-		
-		
-		
-		
-		
+
 		if (Input.GetMouseButtonDown(0))
 		{
 			lastPosition =  Input.mousePosition;
@@ -135,6 +131,12 @@ public class CameraController : MonoBehaviour {
 				Mathf.Clamp(transform.position.x, _minBoundX, _maxBoundX),
 				Mathf.Clamp(transform.position.y, _minBoundY, _maxBoundY),
 				Mathf.Clamp(transform.position.z, _minBoundZ, _maxBoundZ));
+		}
+
+		if (Input.GetMouseButtonUp (0)) {
+		
+			originalPos = _camera.transform.localPosition;
+		
 		}
 		
 		if (Input.touchCount == 2 )

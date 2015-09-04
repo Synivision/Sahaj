@@ -60,7 +60,6 @@ namespace Assets.Code.Ui.CanvasControllers
 			resolver.Resolve (out _unityReference);
 			resolver.Resolve (out _inputSession);
 			_uiManager = new UiManager ();
-
 			_resolver.Resolve(out _canvasProvider);
 
 			ResolveElement (out _fpsText,"FpsText");
@@ -83,6 +82,7 @@ namespace Assets.Code.Ui.CanvasControllers
 			var playerGoldPanel = GetElement("GoldPanel");
 			_goldCoinBar = playerGoldPanel.transform.GetChild(0).GetComponent<Slider>();
 			_goldText = playerGoldPanel.transform.GetChild(2).GetComponent<Text>();
+
 			//TODO get max value from player manager
 			_goldCoinBar.maxValue = _playerManager.Model.MaxGoldCapacity;
 			_goldCoinBar.value = 0;
@@ -95,16 +95,11 @@ namespace Assets.Code.Ui.CanvasControllers
 			ResolveElement (out _shipBaseButton, "_shipBaseButton");
 			_shipBaseButton.onClick.AddListener(ChangeStateToShipBase);
 
-
 			//subsscribe messages
 			_onUpdateCanvasPanels = _messager.Subscribe<UpdateGamePlayUiMessage> (UpdateCanvasPanels);
 			InitializeCanvasPanels(_playerManager);
-
-
 			_onUpdatePirateButtonNumberLabel = _messager.Subscribe<UpdatePirateNumber>(UpdatePirateButtonNumberLabel);
 			_quitButton.onClick.AddListener (OnQuitButtonClicked);
-
-
 			_buttonList = new List<Button>();
 			_numberLabelDict = new Dictionary<string, Text>();
 
@@ -125,7 +120,6 @@ namespace Assets.Code.Ui.CanvasControllers
 		public void ChangeStateToShipBase(){
 
 			//send message to playstate to switch state
-		
 			_messager.Publish(new PlayStateToShipBaseMessage{});
 		}
 
@@ -135,7 +129,7 @@ namespace Assets.Code.Ui.CanvasControllers
 			_experienceLevelText.text = playerManager.Model.UserLevel.ToString(); 
 			_goldCoinBar.value = playerManager.Model.Gold;
 			_goldText.text = playerManager.Model.Gold.ToString();
-		
+
 		}
 
 		private  void OnWin (WinMessage message)
