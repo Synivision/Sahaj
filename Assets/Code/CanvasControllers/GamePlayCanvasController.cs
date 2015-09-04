@@ -36,6 +36,8 @@ namespace Assets.Code.Ui.CanvasControllers
 		private readonly Text _fpsText;
 		private Canvas _canvas;
 		private readonly Button _quitButton;
+		private readonly Button _shipBaseButton;
+
 		private IoCResolver _resolver;
 		private UnityReferenceMaster _unityReference;
 
@@ -89,6 +91,11 @@ namespace Assets.Code.Ui.CanvasControllers
 			var availableLootPanel = GetElement("AvailableLootPanel");
 			_availableGoldText =  availableLootPanel.transform.GetChild(2).GetComponent<Text>();
 			 
+			//change state button
+			ResolveElement (out _shipBaseButton, "_shipBaseButton");
+			_shipBaseButton.onClick.AddListener(ChangeStateToShipBase);
+
+
 			//subsscribe messages
 			_onUpdateCanvasPanels = _messager.Subscribe<UpdateGamePlayUiMessage> (UpdateCanvasPanels);
 			InitializeCanvasPanels(_playerManager);
@@ -113,6 +120,15 @@ namespace Assets.Code.Ui.CanvasControllers
 			InitializePirateButtonNumberLabel();
 
 		}
+
+
+		public void ChangeStateToShipBase(){
+
+			//send message to playstate to switch state
+		
+			_messager.Publish(new PlayStateToShipBaseMessage{});
+		}
+
 		public void InitializeCanvasPanels(PlayerManager playerManager){
 
 			_experiencePointBar.value = playerManager.Model.ExperiencePoints;
@@ -184,7 +200,6 @@ namespace Assets.Code.Ui.CanvasControllers
 		private void OnPirateButtonClicked(Button button,string name)
 		{
 			_inputSession.CurrentlySelectedPirateName = name;
-			Debug.Log (name);
 			if (_previouslyClickedTileButton == button) return;
 			
 			if (_previouslyClickedTileButton != null)

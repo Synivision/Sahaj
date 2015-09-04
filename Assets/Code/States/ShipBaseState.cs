@@ -17,8 +17,10 @@ namespace Assets.Code.States
 		
 		private CanvasProvider _canvasProvider;
 		private UiManager _uiManager;
-
+		ShipLevelManager shipLevelManager;
 		private readonly Messager _messager;
+		private MessagingToken _onChangeStateToAttack;
+		MapLayout _map;
 
 		public ShipBaseState (IoCResolver resolver) : base(resolver){
 			
@@ -31,8 +33,19 @@ namespace Assets.Code.States
 
 			_uiManager = new UiManager ();
 			_uiManager.RegisterUi(new ShipBaseCanvasController(_resolver,_canvasProvider.GetCanvas("ShipBaseCanvas")));
-		}
 		
+			_map = new MapLayout();
+
+			shipLevelManager = new ShipLevelManager(_resolver,_map);
+			_onChangeStateToAttack = _messager.Subscribe<ShipBaseToAttackStateMessage>(OnChangeStateToAttack);	
+		
+		}
+
+		public void OnChangeStateToAttack(ShipBaseToAttackStateMessage message){
+
+			SwitchState (new PlayState(_resolver,message.MapLayout));
+		}
+
 		public override void Update (){
 			
 		}
@@ -42,7 +55,9 @@ namespace Assets.Code.States
 		}
 		
 		public override void TearDown (){
-			
+
+			_uiManager.TearDown();
+			shipLevelManager.TearDown();
 		}
 
 

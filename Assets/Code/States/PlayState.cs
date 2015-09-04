@@ -28,6 +28,7 @@ namespace Assets.Code.States
 		private MessagingToken _onCreatePirate;
 		private MessagingToken _onTearDownLevel;
 		private PoolingObjectManager _poolingObjectManager;
+		private MessagingToken _onPlayStateToShipBase;
 		//level Manager
 		private Dictionary<string,int> _pirateCountDict;
 		private Dictionary<string,bool> _unlockedPirates;
@@ -118,7 +119,7 @@ namespace Assets.Code.States
 			//Message tokens
 			_onQuitGame = _messager.Subscribe<QuitGameMessage> (OnQuitGame);
 			_onTearDownLevel = _messager.Subscribe<TearDownLevelMessage> (OnTearDownLevel);
-
+			_onPlayStateToShipBase = _messager.Subscribe<PlayStateToShipBaseMessage>(OnPlayStateToShipBase);
 
 			_inputSessionData = new InputSessionData();
 			_inputSessionData.Name = "None";
@@ -128,6 +129,11 @@ namespace Assets.Code.States
 			var tileo = _poolingObjectManager.Instantiate("tile");
 			tile = tileo.gameObject;
 			tile.SetActive(false);
+		}
+
+		public void OnPlayStateToShipBase(PlayStateToShipBaseMessage message){
+
+			SwitchState(new ShipBaseState(_resolver));
 		}
 
 		public override void Update ()
@@ -244,7 +250,7 @@ namespace Assets.Code.States
 
 		public override void TearDown ()
 		{
-			_messager.CancelSubscription (_onQuitGame, _onTearDownLevel, _onCreatePirate);
+			//_messager.CancelSubscription (_onQuitGame, _onTearDownLevel, _onCreatePirate);
 			levelManager.TearDownLevel ();
 			_uiManager.TearDown ();
 

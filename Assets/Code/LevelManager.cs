@@ -51,6 +51,7 @@ public class LevelManager
 	private MapLayout _mapLayout;
 	private List<string> BuildingList;
 	private List<string> MapItemsList;
+	GameObject aStarPlane;
 	public enum PassabilityType {
 		Impassible,
 		Passible
@@ -82,7 +83,7 @@ public class LevelManager
 	
 	public void GenerateLevelMap(){
 		
-		var building = Object.Instantiate (_prefabProvider.GetPrefab("a_star_plane"));
+		 aStarPlane = Object.Instantiate (_prefabProvider.GetPrefab("a_star_plane"));
 		
 		InitializeStringList();
 		
@@ -347,6 +348,7 @@ public class LevelManager
 	{
 		Object.Destroy(_piratesParent);
 		Object.Destroy(_buildingsParent);
+		Object.Destroy(aStarPlane);
 		//destroy ground covers
 		Object.Destroy(_groundCoverParent);
 	}
