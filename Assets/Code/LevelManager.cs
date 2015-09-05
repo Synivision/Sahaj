@@ -7,6 +7,7 @@ using Assets.Code.DataPipeline.Providers;
 using Assets.Code.Logic.Pooling;
 using Assets.Code.Messaging;
 using Assets.Code.Messaging.Messages;
+using Assets.Code.UnityBehaviours;
 
 public delegate void OnPirateCreatedEventHandler(PirateController newPirate);
 public delegate void OnPirateKilledEventHandler(PirateController killedPirate);
@@ -22,12 +23,11 @@ public class LevelManager
 	private readonly PoolingObjectManager _poolingObjectmanager;
 	private Messager _messager;
 	private readonly PoolingObjectManager _poolingObjectManager;
-	
+	private readonly UnityReferenceMaster _unityReferenceMaster;
 	/* PROPERTIES */
 	private readonly List<PirateController> _knownPirates;
 	private readonly List<BuildingController> _knownBuildings;
 	private readonly IoCResolver _resolver;
-	
 	private readonly GameObject _piratesParent;
 	private readonly GameObject _buildingsParent;
 	
@@ -51,7 +51,7 @@ public class LevelManager
 	private MapLayout _mapLayout;
 	private List<string> BuildingList;
 	private List<string> MapItemsList;
-	GameObject aStarPlane;
+
 	public enum PassabilityType {
 		Impassible,
 		Passible
@@ -67,6 +67,8 @@ public class LevelManager
 		_resolver.Resolve (out _messager);
 		_resolver.Resolve (out _spriteProvider);
 		_resolver.Resolve (out _poolingObjectManager);
+		_resolver.Resolve(out _unityReferenceMaster);
+
 		_piratesParent = Object.Instantiate(_prefabProvider.GetPrefab("empty_prefab"));
 		_piratesParent.name = "Pirates";
 		
@@ -83,8 +85,8 @@ public class LevelManager
 	
 	public void GenerateLevelMap(){
 		
-		 aStarPlane = Object.Instantiate (_prefabProvider.GetPrefab("a_star_plane"));
-		
+		// aStarPlane = Object.Instantiate (_prefabProvider.GetPrefab("a_star_plane"));
+		_unityReferenceMaster.AStarPlane.SetActive(true);
 		InitializeStringList();
 		
 		GenerateGrid ();
@@ -346,9 +348,9 @@ public class LevelManager
 	
 	public void TearDownLevel ()
 	{
+		_unityReferenceMaster.AStarPlane.SetActive(false);
 		Object.Destroy(_piratesParent);
 		Object.Destroy(_buildingsParent);
-		Object.Destroy(aStarPlane);
 		//destroy ground covers
 		Object.Destroy(_groundCoverParent);
 	}

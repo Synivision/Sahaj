@@ -34,10 +34,13 @@ namespace Assets.Code.UnityBehaviours
         public void Start()
         {
             _resolver = new IoCResolver();
+			AssetDatabase.Refresh();
 
             /* RESOURCE LIST CREATION */
 #if UNITY_EDITOR
+			AssetDatabase.Refresh();
             FileServices.CreateResourcesList("Assets/Resources/resourceslist.txt");
+
 #endif
             FileServices.LoadResourcesList("resourceslist");
 

@@ -7,6 +7,7 @@ using Assets.Code.DataPipeline.Providers;
 using Assets.Code.Logic.Pooling;
 using Assets.Code.Messaging;
 using Assets.Code.Messaging.Messages;
+using Assets.Code.UnityBehaviours;
 
 public class ShipLevelManager {
 
@@ -18,7 +19,7 @@ public class ShipLevelManager {
 	private Messager _messager;
 	private readonly PoolingObjectManager _poolingObjectManager;
 	private readonly IoCResolver _resolver;
-	GameObject shipBase;
+	private readonly UnityReferenceMaster _unityReferenceMaster;
 
 	//Grid Map generator
 	private int AreaToCover = 25;
@@ -37,20 +38,20 @@ public class ShipLevelManager {
 		_resolver.Resolve (out _messager);
 		_resolver.Resolve (out _spriteProvider);
 		_resolver.Resolve (out _poolingObjectManager);
+		_resolver.Resolve(out _unityReferenceMaster);
 
 		_map = map;
 
+		//_messager.Subscribe<OpenShopMessage>(EnableShopCanvas);
 		GenerateLevelMap();
 	}
 
 	public void GenerateLevelMap(){
-
-		shipBase = Object.Instantiate (_prefabProvider.GetPrefab("ship_plane"));
-
+		_unityReferenceMaster.AStarPlane.SetActive(true);
 	}
-
+	
 	public void TearDown(){
 
-		Object.Destroy(shipBase);
+		_unityReferenceMaster.AStarPlane.SetActive(false);
 	}
 }

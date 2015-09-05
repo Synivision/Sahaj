@@ -232,6 +232,7 @@ namespace Assets.Code.States
 
 		private void OnQuitGame (QuitGameMessage message)
 		{
+			TearDown();
 			SwitchState (new MenuState (_resolver));
 
 		}
@@ -249,11 +250,13 @@ namespace Assets.Code.States
 
 		public override void TearDown ()
 		{
-			_messager.CancelSubscription (_onQuitGame, _onTearDownLevel, _onPlayStateToShipBase);
 			levelManager.TearDownLevel ();
+
+
 			_uiManager.TearDown ();
 
 			_poolingObjectManager.TearDown ();
+			_messager.CancelSubscription (_onQuitGame, _onTearDownLevel, _onPlayStateToShipBase);
 
 		}
 	}

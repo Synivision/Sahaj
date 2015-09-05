@@ -15,6 +15,7 @@ namespace Assets.Code.UnityBehaviours
         /* REFERENCES */
         public CameraController Camera;
 		public GameObject Sun;
+		public GameObject AStarPlane;
         /* PROPERTIES */
         private List<DelayedAction> _delayedActions;
 
@@ -41,6 +42,7 @@ namespace Assets.Code.UnityBehaviours
         public void Awake()
         {
             _delayedActions = new List<DelayedAction>();
+			AStarPlane.SetActive(false);
         }
 
         public void PauseGame()

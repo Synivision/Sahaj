@@ -32,7 +32,13 @@ namespace Assets.Code.Ui.CanvasControllers
 			ResolveElement (out _fps,"FpsText");
 
 			_attackButton.onClick.AddListener (OnAttackClicked);
+			_shopButton.onClick.AddListener(OnShopButtonClicked);
+		}
 
+
+		public void OnShopButtonClicked(){
+
+			_messager.Publish(new OpenShopMessage{});
 		}
 
 		public void OnAttackClicked(){
