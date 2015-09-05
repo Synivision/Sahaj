@@ -25,7 +25,6 @@ namespace Assets.Code.States
 
 		//tokens
 		private MessagingToken _onQuitGame;
-		private MessagingToken _onCreatePirate;
 		private MessagingToken _onTearDownLevel;
 		private PoolingObjectManager _poolingObjectManager;
 		private MessagingToken _onPlayStateToShipBase;
@@ -189,7 +188,7 @@ namespace Assets.Code.States
 					levelManager.UpdateBlueprint(selectedgameObjectPosition + new Vector3(125,0,125),curPosition + new Vector3(125,0,125));
 				}
 				else{
-					if(target!=null){
+					if(target!=null && target.gameObject.tag != "Plane"){
 						target.transform.position = selectedgameObjectPosition;
 					}
 
@@ -250,7 +249,7 @@ namespace Assets.Code.States
 
 		public override void TearDown ()
 		{
-			//_messager.CancelSubscription (_onQuitGame, _onTearDownLevel, _onCreatePirate);
+			_messager.CancelSubscription (_onQuitGame, _onTearDownLevel, _onPlayStateToShipBase);
 			levelManager.TearDownLevel ();
 			_uiManager.TearDown ();
 
