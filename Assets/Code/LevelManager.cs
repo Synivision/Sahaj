@@ -78,8 +78,6 @@ public class LevelManager
 		_knownBuildings = new List<BuildingController>();
 		
 		GenerateLevelMap();
-		
-		
 		// Debug.Log(GetTileAt(new Vector3(12,0,13)));
 	}
 	
@@ -92,16 +90,6 @@ public class LevelManager
 		GenerateGrid ();
 		
 		/*
-		_groundCoverParent  = Object.Instantiate(_prefabProvider.GetPrefab("empty_prefab"));
-		_groundCoverParent.name = "GroundCovers";
-		for(int x = -5; x <5; x++ ){
-			for(int y = -5; y <5 ;y++){
-				int random = Random.Range(-120,120);
-				int random2 = Random.Range(Random.Range(-120,120),Random.Range(-120,120));
-				CreateGroundCovers(random,random2);
-			}
-		}
-
 		GenerateTraps();
 		GenerateShip ();
 		*/
@@ -214,13 +202,7 @@ public class LevelManager
 		subject.transform.localScale = new Vector3(GridSize, subject.transform.localScale.y ,GridSize);
 		
 	}
-	
-	public void GenerateTraps(){
-		var fab = Object.Instantiate(_prefabProvider.GetPrefab("trap"));
-		var trapController = fab.GetComponent<TrapController>();
-		trapController.Initialize(_resolver, new Vector3(50,0,40));
-		
-	}
+
 	public List<StatsBehaviour> GetOpposition(PirateNature context)
 	{
 		var opposition = _knownPirates.Where(pirate => pirate.Model.PirateNature != context)
@@ -267,21 +249,6 @@ public class LevelManager
 		
 		return fab;
 		
-	}
-	
-	public void CreateGroundCovers(int x,int y){
-		
-		_groundCoversList = new List<GameObject> ();
-		var groundCover = Object.Instantiate(_prefabProvider.GetPrefab("groundcover"));
-		_groundCoversList.Add (groundCover);
-		groundCover.transform.SetParent(_groundCoverParent.transform);
-		groundCover.transform.localPosition+=new Vector3(x,0,y);
-	}
-	
-	public void GenerateShip(){
-		var fab = Object.Instantiate(_prefabProvider.GetPrefab("ship"));
-		var shipBehaviour = fab.GetComponent<ShipBehaviour>();
-		shipBehaviour.Initialize(_resolver, this, new Vector3(-180,40,-25));
 	}
 	
 	private void OnBuildingKilled(BuildingController building)
@@ -335,7 +302,13 @@ public class LevelManager
 			}
 		}
 	}
-	
+
+	public void GenerateShip(){
+		var fab = Object.Instantiate(_prefabProvider.GetPrefab("ship"));
+		var shipBehaviour = fab.GetComponent<ShipBehaviour>();
+		shipBehaviour.Initialize(_resolver, this, new Vector3(-180,40,-25));
+	}
+
 	private void OnPirateKilled(PirateController pirate)
 	{
 		_knownPirates.Remove(pirate);

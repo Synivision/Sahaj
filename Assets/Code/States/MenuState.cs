@@ -49,7 +49,7 @@ public class MenuState : BaseState{
 
 	private void OnOpenShipBaseMessage(OpenShipBaseMessage message){
 		
-		SwitchState(new ShipBaseState(_resolver));
+		//SwitchState(new ShipBaseState(_resolver));
 		
 	}
 

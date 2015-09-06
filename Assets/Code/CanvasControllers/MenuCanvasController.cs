@@ -23,27 +23,20 @@ namespace Assets.Code.Ui.CanvasControllers
 		{
 			_resolver = resolver;
 			ResolveElement (out _playGameButton, "play_game_button");
-			ResolveElement (out _shipBaseGameButton, "ship_base_game_button");
+
 			
 			_resolver.Resolve(out _messager);
 			_resolver.Resolve(out _canvasProvider);
 			_uiManager = new UiManager ();
 			
 			_playGameButton.onClick.AddListener (OnPlaygameClicked);
-			_shipBaseGameButton.onClick.AddListener (OnShipBaseGameButtonClicked);
+
 		}
 		
 		void OnPlaygameClicked(){
 			
 			_uiManager.RegisterUi(new LevelSelectCanvasController(_resolver, _canvasProvider.GetCanvas("LevelSelectCanvas")));
 			TearDown();
-		}
-		
-		void OnShipBaseGameButtonClicked(){
-			
-			_messager.Publish(new OpenShipBaseMessage{});
-			TearDown ();
-			
 		}
 		
 		public override void TearDown()

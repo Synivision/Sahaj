@@ -20,7 +20,7 @@ public class BuildingController : InitializeRequiredBehaviour {
 	private PlayerManager _playerManager;
 
     private LevelManager _levelManager;
-
+	private ShipLevelManager _shipLevelManager;
     // other compenents
     public StatsBehaviour Stats;
     private GameObject _bulletOrigin;
@@ -70,6 +70,40 @@ public class BuildingController : InitializeRequiredBehaviour {
 
         MarkAsInitialized();
     }
+
+	public void Initialize (IoCResolver resolver,BuildingModel model,ShipLevelManager shiplevelmanager)
+	{
+		// resolve references
+		Model = model;
+		_shipLevelManager = shiplevelmanager;
+		
+		_resolver = resolver;
+		_resolver.Resolve (out _unityReference);
+		_resolver.Resolve (out _messager);
+		_resolver.Resolve (out _poolingObjectManager);
+		_resolver.Resolve(out _poolingAudioPlayer);
+		_resolver.Resolve(out _soundProvider);
+		_resolver.Resolve(out _poolingParticleManager);
+		_resolver.Resolve(out _playerManager);
+		
+		//gameObject.GetComponent<Renderer>().material.color = Model.BuildingColor;
+		Stats = GetComponent<StatsBehaviour>();
+		
+		// initialize properties
+		
+		if (Model.Type != BuildingModel.BuildingType.Gold_Locker && Model.Type != BuildingModel.BuildingType.Defence_Water_Cannons) {
+			//_bulletOrigin = transform.FindChild ("BulletSpawnPoint").gameObject;
+			//_pirateSpawnPoint = transform.FindChild("PirateSpawnPoint").gameObject;
+			_bulletOrigin = this.gameObject;
+			_pirateSpawnPoint = this.gameObject;
+		}
+		
+		Stats.Initialize(model.Stats);
+		Stats.OnCurrentHealthChangedEvent += OnCurrentHealthChanged;
+		
+		MarkAsInitialized();
+	}
+
 
     private void OnCurrentHealthChanged(float oldHealth, float newHealth, float delta)
     {
@@ -183,24 +217,28 @@ public class BuildingController : InitializeRequiredBehaviour {
     private StatsBehaviour EvaluateTargets()
     {
         // TODO: blah blah blah building natures blah
-        var potentialTargets = _levelManager.GetOpposition(PirateNature.Enemy);
-        if (potentialTargets.Count >= 1)
-        {
-            var bestTarget = potentialTargets[0];
-            var bestScore = float.MinValue;
-            foreach (var potentialTarget in potentialTargets)
-            {
-                var score = GenerateTargetEvaluation(potentialTarget);
-                if (score > bestScore)
-                {
-                    bestScore = score;
-                    bestTarget = potentialTarget;
-                }
-            }
+		if(_levelManager!=null){
 
-            return bestTarget;
-        }
+			var potentialTargets = _levelManager.GetOpposition(PirateNature.Enemy);
+			if (potentialTargets.Count >= 1)
+			{
+				var bestTarget = potentialTargets[0];
+				var bestScore = float.MinValue;
+				foreach (var potentialTarget in potentialTargets)
+				{
+					var score = GenerateTargetEvaluation(potentialTarget);
+					if (score > bestScore)
+					{
+						bestScore = score;
+						bestTarget = potentialTarget;
+					}
+				}
+				
+				return bestTarget;
+			}
 
+		}
+        
         return null;
     }
 

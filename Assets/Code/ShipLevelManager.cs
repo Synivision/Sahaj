@@ -21,13 +21,26 @@ public class ShipLevelManager {
 	private readonly IoCResolver _resolver;
 	private readonly UnityReferenceMaster _unityReferenceMaster;
 
+	private readonly GameObject _buildingsParent;
+	private readonly List<BuildingController> _knownBuildings;
+	//groundcovers
+	private  GameObject _groundCoverParent;
+	private  List<GameObject> _groundCoversList;
+
 	//Grid Map generator
 	private int AreaToCover = 25;
 	public float GridSize = 10;
 	private float _centreAdjustments;
 	private string[,] blueprint;
-
-	MapLayout _map;
+	
+	private MapLayout _mapLayout;
+	private List<string> BuildingList;
+	private List<string> MapItemsList;
+	
+	public enum PassabilityType {
+		Impassible,
+		Passible
+	};
 
 	public ShipLevelManager (IoCResolver resolver, MapLayout map)
 	{
@@ -40,18 +53,196 @@ public class ShipLevelManager {
 		_resolver.Resolve (out _poolingObjectManager);
 		_resolver.Resolve(out _unityReferenceMaster);
 
-		_map = map;
+		_mapLayout = map;
 
 		//_messager.Subscribe<OpenShopMessage>(EnableShopCanvas);
+		_buildingsParent = Object.Instantiate(_prefabProvider.GetPrefab("empty_prefab"));
+		_buildingsParent.name = "Buildings";
+
 		GenerateLevelMap();
 	}
 
 	public void GenerateLevelMap(){
+		InitializeStringList();
 		_unityReferenceMaster.AStarPlane.SetActive(true);
+		GenerateGrid();
+	}
+
+	public void InitializeStringList(){
+		BuildingList = new List<string>();
+		BuildingList.Add("gold_storage");
+		BuildingList.Add("gunner_tower");
+		BuildingList.Add("platoons");
+		BuildingList.Add("water_cannon");
+		
+		MapItemsList = new List<string>();
+		MapItemsList.Add("river");
+		MapItemsList.Add("wall");
+		//MapItemsList.Add("empty");
+		
+	}
+
+	public void GenerateGrid(){
+
+	
+
+		var parentGameObject = _poolingObjectManager.Instantiate("empty2");
+		parentGameObject.transform.position = new Vector3(0,0,0);
+		parentGameObject.gameObject.name = "Grid";
+		
+		AreaToCover = 25;
+		GridSize = 10;
+		
+		_centreAdjustments = AreaToCover * GridSize / 2;
+		blueprint = new string[AreaToCover,AreaToCover];
+		
+		foreach (var mapItem in _mapLayout.mapItemSpawnList){
+			
+			blueprint[mapItem.xGridCoord,mapItem.zGridCoord] = mapItem.Name;
+		}
+		
+		foreach (var building in _mapLayout.buildingSpawnList){
+			
+			blueprint[building.xGridCoord,building.zGridCoord] = building.Name;
+		}
+		//instantiate onjects as per the blueprint
+		
+		for (var x=0; x<AreaToCover; x++){
+			for (var y=0; y<AreaToCover; y++){
+				FillBlueprint (parentGameObject.gameObject,blueprint[x,y],x,y);
+			}
+		}
+	}
+
+
+	private void FillBlueprint(GameObject parentGameObject,string type,int x ,int y){
+		
+
+		if(BuildingList.Contains(type)){
+			
+			var fab2 = CreateBuilding(type,new Vector3(0,0,0));
+			SetObjectToCorrectTransform(parentGameObject,fab2.gameObject,x,y);
+		}
+		if (MapItemsList.Contains(type)){
+			
+			var fab = _poolingObjectManager.Instantiate(type);
+			SetObjectToCorrectTransform(parentGameObject,fab.gameObject,x,y);
+		}
+	}
+
+	public GameObject CreateBuilding(string buildingName, Vector3 spawnPosition)
+	{
+		var model = _gameDataProvider.GetData<BuildingModel>(buildingName);
+		GameObject fab;
+		BuildingController buildingController;
+		fab = Object.Instantiate(_prefabProvider.GetPrefab("Building"));
+		
+		fab.GetComponent<SpriteRenderer>().sprite = _spriteProvider.GetSprite(buildingName);
+		
+		buildingController = fab.GetComponent<BuildingController>();
+		buildingController.Initialize(_resolver, model, this);
+		fab.name = buildingName;
+		fab.transform.position = spawnPosition;
+		fab.transform.SetParent (_buildingsParent.transform);
+		
+		//if (OnBuildingCreatedEvent != null){
+		//	OnBuildingCreatedEvent(buildingController);
+		//}
+		
+		//buildingController.Stats.OnKilledEvent += () => OnBuildingKilled(buildingController);
+		//_knownBuildings.Add(buildingController);
+		
+		return fab;
+		
+	}
+
+	private void SetObjectToCorrectTransform(GameObject parentGameObject,GameObject subject,int x,int y){
+		subject.transform.localPosition = new Vector3 ((x * GridSize)+GridSize / 2-_centreAdjustments, subject.transform.localScale.y, (y * GridSize)+GridSize / 2-_centreAdjustments);
+		//subject.transform.localScale*=GridSize;
+		subject.transform.parent = parentGameObject.transform;
+		subject.transform.localScale = new Vector3(GridSize, subject.transform.localScale.y ,GridSize);
+		
+	}
+
+	public void UpdateBlueprint(Vector3 oldPos, Vector3 newPos){
+		
+		var oldx = (int)(oldPos.x/GridSize);
+		var oldz = (int)(oldPos.z/GridSize);
+		var newx = (int)(newPos.x/GridSize);
+		var newz = (int)(newPos.z/GridSize);
+		
+		if( (oldx >= 0 && oldx < 25) && (oldz >= 0 && oldz < 25) && (newx >= 0 && newx < 25) && (newz >= 0 && newz < 25) ){
+			
+			var temp = blueprint[oldx,oldz];
+			blueprint[oldx,oldz] = "empty";
+			blueprint[(int)(newPos.x/GridSize),(int)(newPos.z/GridSize)] = temp;
+			
+		}
 	}
 	
+	public PassabilityType GetCoordinatePassability(Vector3 point)
+	{
+		
+		string tile = GetTileAt(point);
+		if(tile == "empty"){
+			return PassabilityType.Passible;
+		}
+		else {
+			return PassabilityType.Impassible;
+		}
+	}
+	public string GetTileAt(Vector3 point){
+		
+		string tileName = "outOfBounds";
+		
+		int x = (int)(point.x/GridSize);
+		int z = (int)(point.z/GridSize);
+		
+		if( (x >= 0 && x < 25) && (z >= 0 && z < 25) ){
+			
+			tileName = blueprint[x,z];
+		}
+		//Debug.Log("Tilename = " +tileName);
+		return tileName;
+	}
+
+	public void GenerateGroundCovers(){
+
+		_groundCoverParent  = Object.Instantiate(_prefabProvider.GetPrefab("empty_prefab"));
+		_groundCoverParent.name = "GroundCovers";
+		for(int x = -5; x <5; x++ ){
+			for(int y = -5; y <5 ;y++){
+				int random = Random.Range(-120,120);
+				int random2 = Random.Range(Random.Range(-120,120),Random.Range(-120,120));
+				CreateGroundCovers(random,random2);
+			}
+		}
+
+	}
+
+	public void CreateGroundCovers(int x,int y){
+		
+		_groundCoversList = new List<GameObject> ();
+		var groundCover = Object.Instantiate(_prefabProvider.GetPrefab("groundcover"));
+		_groundCoversList.Add (groundCover);
+		groundCover.transform.SetParent(_groundCoverParent.transform);
+		groundCover.transform.localPosition+=new Vector3(x,0,y);
+	}
+	
+
+
+	public void GenerateTraps(){
+		var fab = Object.Instantiate(_prefabProvider.GetPrefab("trap"));
+		var trapController = fab.GetComponent<TrapController>();
+		trapController.Initialize(_resolver, new Vector3(50,0,40));
+		
+	}
+
 	public void TearDown(){
 
 		_unityReferenceMaster.AStarPlane.SetActive(false);
+		Object.Destroy(_buildingsParent);
+		//destroy ground covers
+		Object.Destroy(_buildingsParent);
 	}
 }
