@@ -22,20 +22,21 @@ namespace Assets.Code.Ui.CanvasControllers
 		public MenuCanvasController (IoCResolver resolver, Canvas canvasView) : base(canvasView)
 		{
 			_resolver = resolver;
-			ResolveElement (out _playGameButton, "play_game_button");
+			ResolveElement (out _shipBaseGameButton, "ship_base_button");
 
 			
 			_resolver.Resolve(out _messager);
 			_resolver.Resolve(out _canvasProvider);
 			_uiManager = new UiManager ();
 			
-			_playGameButton.onClick.AddListener (OnPlaygameClicked);
+			_shipBaseGameButton.onClick.AddListener (OnShipBaseButtonClicked);
 
 		}
 		
-		void OnPlaygameClicked(){
+		void OnShipBaseButtonClicked(){
 			
-			_uiManager.RegisterUi(new LevelSelectCanvasController(_resolver, _canvasProvider.GetCanvas("LevelSelectCanvas")));
+			//_uiManager.RegisterUi(new LevelSelectCanvasController(_resolver, _canvasProvider.GetCanvas("LevelSelectCanvas")));
+			_messager.Publish (new OpenShipBaseMessage{});
 			TearDown();
 		}
 		
@@ -43,7 +44,7 @@ namespace Assets.Code.Ui.CanvasControllers
 		{	
 			
 			//Remove Listeners
-			_playGameButton.onClick.RemoveAllListeners();
+			_shipBaseGameButton.onClick.RemoveAllListeners();
 			base.TearDown();
 		}
 	}

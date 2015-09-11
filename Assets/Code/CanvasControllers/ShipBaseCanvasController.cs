@@ -20,13 +20,17 @@ namespace Assets.Code.Ui.CanvasControllers
 		private Canvas _canvasView;
 		private IoCResolver _resolver;
 		private readonly Messager _messager;
+		private UiManager _uiManager;
+		private CanvasProvider _canvasProvider;
 		
 		public ShipBaseCanvasController (IoCResolver resolver, Canvas canvasView) : base(canvasView)
 		{
 			_canvasView = canvasView;
 			_resolver = resolver;
 			_resolver.Resolve (out _messager);
-			
+			_resolver.Resolve (out _canvasProvider);
+			_uiManager = new UiManager ();
+
 			ResolveElement (out _attackButton, "AttackButton");
 			ResolveElement (out _shopButton, "ShopButton");
 			ResolveElement (out _fps,"FpsText");
@@ -44,7 +48,8 @@ namespace Assets.Code.Ui.CanvasControllers
 		public void OnAttackClicked(){
 			//send message to switch state
 			//generate map layout
-			MapLayout map = new MapLayout();
+			/*
+			 MapLayout map = new MapLayout();
 			
 			for (var x=0; x<25; x++){
 				for (var z=0; z<25; z++){
@@ -128,7 +133,9 @@ namespace Assets.Code.Ui.CanvasControllers
 				LevelName = "level1",
 				MapLayout = map
 			});
+			*/
 
+			_uiManager.RegisterUi(new LevelSelectCanvasController(_resolver, _canvasProvider.GetCanvas("LevelSelectCanvas")));
 			TearDown();
 
 		}

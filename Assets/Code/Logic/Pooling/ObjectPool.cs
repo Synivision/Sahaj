@@ -68,7 +68,9 @@ namespace Assets.Code.Logic.Pooling
         {
 
             foreach(var item in _objects){
-                Object.Destroy(item.gameObject);
+			
+				Object.Destroy(item.gameObject);
+                
 
 			}
 			//UnityEngine.Debug.Log("Object Length : " + _objects.Count.ToString());

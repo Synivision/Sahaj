@@ -8,6 +8,7 @@ using Assets.Code.Logic.Pooling;
 using Assets.Code.Messaging;
 using Assets.Code.Messaging.Messages;
 using Assets.Code.UnityBehaviours;
+using Assets.Code.UnityBehaviours.Pooling;
 
 public delegate void OnPirateCreatedEventHandler(PirateController newPirate);
 public delegate void OnPirateKilledEventHandler(PirateController killedPirate);
@@ -29,13 +30,14 @@ public class LevelManager
 	private readonly List<BuildingController> _knownBuildings;
 	private readonly IoCResolver _resolver;
 	private readonly GameObject _piratesParent;
-	private readonly GameObject _buildingsParent;
 	
 	public OnPirateCreatedEventHandler OnPirateCreatedEvent;
 	public OnPirateKilledEventHandler OnPirateKilledEvent;
 	public OnBuildingCreatedEventHandler OnBuildingCreatedEvent;
 	public OnBuildingDestroyedEventHandler OnBuildingDestroyedEvent;
-	
+
+	private GameObject _buildingsParent;
+
 	//groundcovers
 	private  GameObject _groundCoverParent;
 	private  List<GameObject> _groundCoversList;
@@ -72,8 +74,7 @@ public class LevelManager
 		_piratesParent = Object.Instantiate(_prefabProvider.GetPrefab("empty_prefab"));
 		_piratesParent.name = "Pirates";
 		
-		_buildingsParent = Object.Instantiate(_prefabProvider.GetPrefab("empty_prefab"));
-		_buildingsParent.name = "Buildings";
+
 		_knownPirates = new List<PirateController> ();
 		_knownBuildings = new List<BuildingController>();
 		
@@ -138,9 +139,9 @@ public class LevelManager
 	}
 	public void GenerateGrid(){
 		
-		var parentGameObject = _poolingObjectManager.Instantiate("empty2");
-		parentGameObject.transform.position = new Vector3(0,0,0);
-		parentGameObject.gameObject.name = "Grid";
+		_buildingsParent = Object.Instantiate(_prefabProvider.GetPrefab("empty1"));
+		_buildingsParent.transform.position = new Vector3(0,0,0);
+		_buildingsParent.gameObject.name = "LevelManager Grid";
 		
 		AreaToCover = 25;
 		GridSize = 10;
@@ -161,7 +162,7 @@ public class LevelManager
 
 		for (var x=0; x<AreaToCover; x++){
 			for (var y=0; y<AreaToCover; y++){
-				FillBlueprint (parentGameObject.gameObject,blueprint[x,y],x,y);
+				FillBlueprint (_buildingsParent.gameObject,blueprint[x,y],x,y);
 			}
 		}
 	}
@@ -322,9 +323,9 @@ public class LevelManager
 	public void TearDownLevel ()
 	{
 		_unityReferenceMaster.AStarPlane.SetActive(false);
-		Object.Destroy(_piratesParent);
-		Object.Destroy(_buildingsParent);
+		//Object.Destroy(_piratesParent);
+		Object.Destroy (_buildingsParent);
 		//destroy ground covers
-		Object.Destroy(_groundCoverParent);
+		//Object.Destroy(_groundCoverParent);
 	}
 }

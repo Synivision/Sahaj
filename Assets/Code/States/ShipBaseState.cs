@@ -51,7 +51,7 @@ namespace Assets.Code.States
 		
 
 			shipLevelManager = new ShipLevelManager(_resolver,_map);
-			_onChangeStateToAttack = _messager.Subscribe<ShipBaseToAttackStateMessage>(OnChangeStateToAttack);	
+			_onChangeStateToAttack = _messager.Subscribe<StartGameMessage>(OnChangeStateToAttack);	
 
 			//generate tile and disable it
 			var tileo = _poolingObjectManager.Instantiate("tile");
@@ -60,9 +60,10 @@ namespace Assets.Code.States
 		
 		}
 
-		public void OnChangeStateToAttack(ShipBaseToAttackStateMessage message){
+		public void OnChangeStateToAttack(StartGameMessage message){
 
 			SwitchState (new PlayState(_resolver,message.MapLayout));
+
 		}
 
 		public override void Update (){
@@ -143,6 +144,7 @@ namespace Assets.Code.States
 		public override void TearDown (){
 
 			_uiManager.TearDown();
+			Object.Destroy (tile.gameObject);
 			shipLevelManager.TearDown();
 		}
 	}

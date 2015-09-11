@@ -8,6 +8,7 @@ using Assets.Code.Logic.Pooling;
 using Assets.Code.Messaging;
 using Assets.Code.Messaging.Messages;
 using Assets.Code.UnityBehaviours;
+using Assets.Code.UnityBehaviours.Pooling;
 
 public class ShipLevelManager {
 
@@ -21,7 +22,7 @@ public class ShipLevelManager {
 	private readonly IoCResolver _resolver;
 	private readonly UnityReferenceMaster _unityReferenceMaster;
 
-	private readonly GameObject _buildingsParent;
+	private GameObject _buildingsParent;
 	private readonly List<BuildingController> _knownBuildings;
 	//groundcovers
 	private  GameObject _groundCoverParent;
@@ -51,15 +52,13 @@ public class ShipLevelManager {
 		_resolver.Resolve (out _messager);
 		_resolver.Resolve (out _spriteProvider);
 		_resolver.Resolve (out _poolingObjectManager);
-		_resolver.Resolve(out _unityReferenceMaster);
+		_resolver.Resolve (out _unityReferenceMaster);
 
 		_mapLayout = map;
 
 		//_messager.Subscribe<OpenShopMessage>(EnableShopCanvas);
-		_buildingsParent = Object.Instantiate(_prefabProvider.GetPrefab("empty_prefab"));
-		_buildingsParent.name = "Buildings";
-
 		GenerateLevelMap();
+
 	}
 
 	public void GenerateLevelMap(){
@@ -86,10 +85,10 @@ public class ShipLevelManager {
 
 	
 
-		var parentGameObject = _poolingObjectManager.Instantiate("empty2");
-		parentGameObject.transform.position = new Vector3(0,0,0);
-		parentGameObject.gameObject.name = "Grid";
-		
+		_buildingsParent = Object.Instantiate(_prefabProvider.GetPrefab("empty2"));
+		_buildingsParent.transform.position = new Vector3(0,0,0);
+		_buildingsParent.gameObject.name = "Ship Base Grid";
+
 		AreaToCover = 25;
 		GridSize = 10;
 		
@@ -109,7 +108,7 @@ public class ShipLevelManager {
 		
 		for (var x=0; x<AreaToCover; x++){
 			for (var y=0; y<AreaToCover; y++){
-				FillBlueprint (parentGameObject.gameObject,blueprint[x,y],x,y);
+				FillBlueprint (_buildingsParent.gameObject,blueprint[x,y],x,y);
 			}
 		}
 	}
@@ -241,8 +240,8 @@ public class ShipLevelManager {
 	public void TearDown(){
 
 		_unityReferenceMaster.AStarPlane.SetActive(false);
-		Object.Destroy(_buildingsParent);
+		Object.Destroy (_buildingsParent);
 		//destroy ground covers
-		Object.Destroy(_buildingsParent);
+		//Object.Destroy(_buildingsParent);
 	}
 }
