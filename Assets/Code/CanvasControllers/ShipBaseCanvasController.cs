@@ -22,7 +22,9 @@ namespace Assets.Code.Ui.CanvasControllers
 		private readonly Messager _messager;
 		private UiManager _uiManager;
 		private CanvasProvider _canvasProvider;
-		
+
+
+
 		public ShipBaseCanvasController (IoCResolver resolver, Canvas canvasView) : base(canvasView)
 		{
 			_canvasView = canvasView;

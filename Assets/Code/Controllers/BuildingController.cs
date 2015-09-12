@@ -5,6 +5,7 @@ using Assets.Code.DataPipeline;
 using Assets.Code.UnityBehaviours;
 using Assets.Code.Logic.Pooling;
 using Assets.Code.DataPipeline.Providers;
+using Assets.Code.Ui.CanvasControllers;
 
 [RequireComponent(typeof(StatsBehaviour))]
 public class BuildingController : InitializeRequiredBehaviour {
@@ -69,6 +70,9 @@ public class BuildingController : InitializeRequiredBehaviour {
 	    Stats.OnCurrentHealthChangedEvent += OnCurrentHealthChanged;
 
         MarkAsInitialized();
+
+
+
     }
 
 	public void Initialize (IoCResolver resolver,BuildingModel model,ShipLevelManager shiplevelmanager)
@@ -102,6 +106,10 @@ public class BuildingController : InitializeRequiredBehaviour {
 		Stats.OnCurrentHealthChangedEvent += OnCurrentHealthChanged;
 		
 		MarkAsInitialized();
+
+		var inspectorCanvasGameObject = transform.GetChild (0);
+		var inspectorCanvas = inspectorCanvasGameObject.GetComponent<Canvas> ();
+		inspectorCanvasGameObject.GetComponent<InspectorCanvasController>().Initialize(inspectorCanvas,Model.Type);
 	}
 
 
