@@ -29,7 +29,9 @@ namespace Assets.Code.States
 		private GameObject target;
 		public Vector3 screenSpace;
 		public Vector3 offset;
-		
+
+		private GameObject inventoryCanvas;
+
 		Vector3 curPosition;
 		Vector3 selectedgameObjectPosition = new Vector3(0,0,0);
 
@@ -75,21 +77,32 @@ namespace Assets.Code.States
 				pointerId = touch[0].fingerId;
 			
 			//used to move cube around 
-			if (Input.GetMouseButtonDown (0)) {
+			if (Input.GetMouseButtonDown (0)  && !isButton()) {
 				RaycastHit hitInfo;
 				target = GetClickedObject (out hitInfo);
-				
-				
+
+				//turn off any inspector canvas visible on clicking any place other than that canvas button
+				if(inventoryCanvas != null){
+					inventoryCanvas.SetActive(false);
+				}
+
 				if (target != null && (target.gameObject.tag == "Cube" )) {
 					_mouseState = true;
 					//get position of object selected 
 					selectedgameObjectPosition = target.transform.position;		
-					
 				}
 			}
 			
-			if (Input.GetMouseButtonUp (0)) {
-				
+			if (Input.GetMouseButtonUp (0) ) {
+
+				//show inspector if selected and current tilename and objectname is same espectively.
+				if( _mouseState && shipLevelManager.GetTileAt(curPosition + new Vector3(125,0,125)) == target.gameObject.name){
+
+					inventoryCanvas = target.transform.GetChild(0).gameObject;
+					inventoryCanvas.SetActive(true);
+
+				}
+
 				//update the grid tile of moved object if grid tile is empty
 				
 				if(_mouseState && shipLevelManager.GetCoordinatePassability(curPosition + new Vector3(125,0,125)) == ShipLevelManager.PassabilityType.Passible){
@@ -99,11 +112,11 @@ namespace Assets.Code.States
 					if(target!=null && target.gameObject.tag != "Plane"){
 						target.transform.position = selectedgameObjectPosition;
 					}
-					
-					
 				}
+
 				_mouseState = false;
 				tile.SetActive(false);
+
 			}
 			
 			if (_mouseState) {
@@ -112,18 +125,28 @@ namespace Assets.Code.States
 				curPosition = Camera.main.ScreenToWorldPoint (curScreenSpace) + offset;
 				curPosition.y = target.transform.position.y;
 				target.transform.position = curPosition;
+
 				//Get grid on curposition
-				//Debug.Log(levelManager.GetCoordinatePassability(curPosition + new Vector3(125,0,125)));
 				//instantiate red or green according to grid
 				tile.SetActive(true);
 				tile.transform.position = curPosition+new Vector3(0,-10,0);
+
+
 				if(shipLevelManager.GetCoordinatePassability(curPosition + new Vector3(125,0,125)) == ShipLevelManager.PassabilityType.Passible){
 					tile.GetComponent<Renderer>().material.color = Color.green;
 				}else{
-					tile.GetComponent<Renderer>().material.color = Color.red;
+
+					//if the position is clicked and not moved.. then also for that object the tile is available
+					if(shipLevelManager.GetTileAt(curPosition + new Vector3(125,0,125)) == target.gameObject.name){
+						tile.GetComponent<Renderer>().material.color = Color.green;
+					}
+					else{
+						tile.GetComponent<Renderer>().material.color = Color.red;
+					}
 				}
 			}
-			
+
+
 			
 		}
 
@@ -146,6 +169,19 @@ namespace Assets.Code.States
 			_uiManager.TearDown();
 			Object.Destroy (tile.gameObject);
 			shipLevelManager.TearDown();
+		}
+
+		private bool isButton()
+		{
+			bool result = true;
+			UnityEngine.EventSystems.EventSystem ct
+				= UnityEngine.EventSystems.EventSystem.current;
+			
+			if (! ct.IsPointerOverGameObject() ) result = false;
+			if (! ct.currentSelectedGameObject ) result = false;
+			
+			
+			return result;
 		}
 	}
 	

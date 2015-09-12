@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using Assets.Code.UnityBehaviours.Pooling;
 
 public class CameraController : MonoBehaviour {
@@ -120,7 +121,7 @@ public class CameraController : MonoBehaviour {
 			lastPosition =  Input.mousePosition;
 		}
 		
-		if (Input.GetMouseButton(0))
+		if (Input.GetMouseButton(0) && isButton() == false)
 		{
 			Vector3 delta  = Input.mousePosition - lastPosition;
 			lastPosition =  Input.mousePosition;
@@ -133,13 +134,13 @@ public class CameraController : MonoBehaviour {
 				Mathf.Clamp(transform.position.z, _minBoundZ, _maxBoundZ));
 		}
 
-		if (Input.GetMouseButtonUp (0)) {
+		if (Input.GetMouseButtonUp (0) && isButton() == false) {
 		
 			originalPos = _camera.transform.localPosition;
 		
 		}
 		
-		if (Input.touchCount == 2 )
+		if (Input.touchCount == 2 && isButton() == false)
 		{
 			// Store both touches.
 			Touch touchZero = Input.GetTouch(0);
@@ -175,6 +176,21 @@ public class CameraController : MonoBehaviour {
 			}
 			
 		}
+
+
+	}
+
+	private bool isButton()
+	{
+		bool result = true;
+		UnityEngine.EventSystems.EventSystem ct
+			= UnityEngine.EventSystems.EventSystem.current;
+		
+		if (! ct.IsPointerOverGameObject() ) result = false;
+		if (! ct.currentSelectedGameObject ) result = false;
+
+		
+		return result;
 	}
 	
 }
