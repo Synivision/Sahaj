@@ -21,6 +21,7 @@ namespace Assets.Code.States
 		ShipLevelManager shipLevelManager;
 		private readonly Messager _messager;
 		private MessagingToken _onChangeStateToAttack;
+		private MessagingToken _onInventoryOpen;
 		MapLayout _map;
 		private float _time = 5;
 		private GameObject tile;
@@ -54,12 +55,18 @@ namespace Assets.Code.States
 
 			shipLevelManager = new ShipLevelManager(_resolver,_map);
 			_onChangeStateToAttack = _messager.Subscribe<StartGameMessage>(OnChangeStateToAttack);	
-
+			_onInventoryOpen = _messager.Subscribe<OpenInventory>(OpenInventoryBuilding);
 			//generate tile and disable it
 			var tileo = _poolingObjectManager.Instantiate("tile");
 			tile = tileo.gameObject;
 			tile.SetActive(false);
 		
+		}
+
+		public void OpenInventoryBuilding(OpenInventory message){
+			
+			_uiManager.RegisterUi (new InventoryCanvasController (_resolver, _canvasProvider.GetCanvas ("InventoryCanvas")));
+			
 		}
 
 		public void OnChangeStateToAttack(StartGameMessage message){
@@ -71,6 +78,7 @@ namespace Assets.Code.States
 		public override void Update (){
 
 			_uiManager.Update ();
+		
 
 			Touch[] touch = Input.touches;
 			if (Application.platform == RuntimePlatform.Android)

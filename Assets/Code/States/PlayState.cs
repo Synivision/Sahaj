@@ -27,6 +27,7 @@ namespace Assets.Code.States
 		private MessagingToken _onQuitGame;
 		private MessagingToken _onTearDownLevel;
 		private MessagingToken _onPlayStateToShipBase;
+
 		private PoolingObjectManager _poolingObjectManager;
 
 		//level Manager
@@ -128,7 +129,7 @@ namespace Assets.Code.States
 		}
 
 
-
+	
 		public override void Update ()
 		{
 			_uiManager.Update ();

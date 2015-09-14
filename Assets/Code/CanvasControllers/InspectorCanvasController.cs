@@ -17,21 +17,22 @@ namespace Assets.Code.Ui.CanvasControllers
 	public class InspectorCanvasController : MonoBehaviour
 	{
 		private Canvas _canvasView;
-		private IoCResolver _resolver;
 		private UiManager _uiManager;
 		private CanvasProvider _canvasProvider;
-		
+		private IoCResolver _resolver;
 		private Button _upgrade;
 		private Button _info;
 		private Button _action;
+		private Messager _messager;
 		
 		private Dictionary<string, GameObject> _elements;
 
 		private BuildingModel.BuildingType _type;
 		
-		public void Initialize (Canvas canvasView,BuildingModel.BuildingType type) 
+		public void Initialize (IoCResolver resolver,Canvas canvasView,BuildingModel.BuildingType type) 
 		{
-			
+			_resolver = resolver;
+			_resolver.Resolve(out _messager);
 			_canvasView = canvasView;
 			_uiManager = new UiManager ();
 			_type = type;
@@ -58,6 +59,8 @@ namespace Assets.Code.Ui.CanvasControllers
 			_upgrade.onClick.AddListener (OnUpgradeClicked);
 			_info.onClick.AddListener (OnInfoClicked);
 			_action.onClick.AddListener (OnActionClicked);
+
+
 		}
 		
 		
@@ -79,7 +82,9 @@ namespace Assets.Code.Ui.CanvasControllers
 			
 			//ToDo Open Respective Action Canvas depending on the BuildingModel.BuildingType i.e. _type
 			Debug.Log ("On Action Clicked");
-			
+			_messager.Publish(new OpenInventory{});
+
+
 		}
 		
 		// Use this for initialization
