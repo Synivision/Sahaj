@@ -28,19 +28,20 @@ namespace Assets.Code.Ui.CanvasControllers{
 			_resolver.Resolve (out _messager);
 			_resolver.Resolve (out _canvasProvider);
 			_uiManager = new UiManager ();
-			
-			
-			ResolveElement(out _closeButton, "CloseButton");
+
+
+			var mainPanel = GetElement("MainPanel");
 			_canvasView.gameObject.SetActive (true);
 			// subscriptions
 			//_onFindInventoryItem = _messager.Subscribe<FindInventoryItemMessage>(OnFindInventoryItem);
+			_closeButton = mainPanel.transform.GetChild(1).GetComponent<Button>();
 
 			_closeButton.onClick.AddListener(onCloseClicked);
 		}
 
 		void onCloseClicked(){
 
-
+			TearDown();
 		}
 		
 		public void OnFindInventoryItem(FindInventoryItemMessage message){
@@ -51,7 +52,8 @@ namespace Assets.Code.Ui.CanvasControllers{
 		
 		public override void TearDown()
 		{
-
+			_closeButton.onClick.RemoveAllListeners();
+			base.TearDown();
 
 		}
 		
