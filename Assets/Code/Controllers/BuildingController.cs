@@ -70,9 +70,6 @@ public class BuildingController : InitializeRequiredBehaviour {
 	    Stats.OnCurrentHealthChangedEvent += OnCurrentHealthChanged;
 
         MarkAsInitialized();
-
-
-
     }
 
 	public void Initialize (IoCResolver resolver,BuildingModel model,ShipLevelManager shiplevelmanager)

@@ -1,6 +1,8 @@
 {
 	GUI
 	{
+		arrow.png
+		arrow_down.png
 		goldcoin.png
 		icon.jpg
 		star.png
