@@ -47,7 +47,13 @@ namespace Assets.Code.States
 		private InputSession _inputSession;
 		private InputSessionData _inputSessionData;
 
-		private GameObject tile;
+        //ship lerp
+        public float speed = 1.0F;
+        private float startTime;
+        private float journeyLength;
+        GameObject shipPrefab;
+
+        private GameObject tile;
 		int pointerId = -1;
 
 		Vector3 curPosition;
@@ -126,13 +132,26 @@ namespace Assets.Code.States
 			_inputSessionData.Name = "None";
 			_inputSession.Initialize(_inputSessionData);
 
+
+            // ship  lerp into level
+            startTime = Time.time;
+            shipPrefab = _poolingObjectManager.Instantiate("revolutionaryship").gameObject;
+            journeyLength = Vector3.Distance(shipPrefab.transform.position, new Vector3(-120,15,-120));
+            
+            //shipPrefab.gameObject.transform.position.lerp
 		}
 
 
 	
 		public override void Update ()
 		{
-			_uiManager.Update ();
+
+            float distCovered = (Time.time - startTime) * speed;
+            float fracJourney = distCovered / journeyLength;
+            shipPrefab.transform.position = Vector3.Lerp(shipPrefab.transform.position, new Vector3(-120, 15, -120), fracJourney);
+
+
+            _uiManager.Update ();
             
 			// input controller update
 			_time += Time.deltaTime;
