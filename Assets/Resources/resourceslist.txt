@@ -64,6 +64,7 @@
 		gunner_tower.png
 		platoons.png
 		residence.png
+		row_boat.png
 		shipp.png
 		SwatchMauveAlbedo.png
 		SwatchNavyAlbedo.png
