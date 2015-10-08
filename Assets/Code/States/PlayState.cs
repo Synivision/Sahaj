@@ -139,6 +139,9 @@ namespace Assets.Code.States
             journeyLength = Vector3.Distance(shipPrefab.transform.position, new Vector3(-120,15,-120));
             shipPrefab.GetComponent<ShipBehaviour>().Initialize(_resolver,levelManager, shipPrefab.transform.position);
             //shipPrefab.gameObject.transform.position.lerp
+
+			GameObject rowBoat = _poolingObjectManager.Instantiate ("row_boat").gameObject;
+			rowBoat.GetComponent<RowBoatController> ().Initialize (_resolver);
 		}
 
 
