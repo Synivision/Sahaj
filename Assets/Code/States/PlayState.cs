@@ -186,7 +186,7 @@ namespace Assets.Code.States
 						levelManager.CreatePirate(_inputSession.CurrentlySelectedPirateName,spawnPosition);
 					}
 
-                    if (target.gameObject.tag == "Cube")
+					if (target.gameObject.tag != null && target.gameObject.tag == "Cube")
                     {
                         Vector3 fireBulletAtPos = new Vector3(hitInfo.point.x, 5.2f, hitInfo.point.z);
                         shipPrefab.GetComponent<ShipBehaviour>().shoot(fireBulletAtPos);
