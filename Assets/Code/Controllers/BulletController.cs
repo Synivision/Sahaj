@@ -19,7 +19,7 @@ public class BulletController : PoolingBehaviour
 	private LineRenderer _lineRenderer;
 	Vector3 randomPosition;
 
-	public void Initialize (IoCResolver resolver, Vector3 startPos, bool hit, Color color, Vector3 target)
+	public void Initialize (IoCResolver resolver, Vector3 startPos, bool hit, Color color, Vector3 target,string sender)
 	{
 		_color = color;
 		_resolver = resolver;
@@ -41,9 +41,14 @@ public class BulletController : PoolingBehaviour
 		}
 
 		_resolver.Resolve (out _unityReference);
+        if (sender.Equals("Ship")) {
+            _unityReference.FireDelayed(() => { Delete(); }, 1f);
+        }
+        else if (sender.Equals("Player")) {
 
-	
-		_unityReference.FireDelayed (() =>{ Delete(); }, .15f);
+            _unityReference.FireDelayed(() => { Delete(); }, .15f);
+        }
+		
 
 
 		_unityReference.FireDelayed (() => {
