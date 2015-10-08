@@ -37,8 +37,13 @@ namespace Assets.Code.Ui.CanvasControllers
 		private Canvas _canvas;
 		private readonly Button _quitButton;
 		private readonly Button _shipBaseButton;
-		
-		private IoCResolver _resolver;
+        //ship attack buttons
+        private Button shipBombAttackButton;
+        private Button shipGunAttackButton;
+        private Button shipFireAttackButton;
+        private Button shipGasAttackButton;
+
+        private IoCResolver _resolver;
 		private UnityReferenceMaster _unityReference;
 		
 		private List<Button> _buttonList;
@@ -64,8 +69,15 @@ namespace Assets.Code.Ui.CanvasControllers
 			
 			ResolveElement (out _fpsText,"FpsText");
 			ResolveElement(out _quitButton,"QuitButton");
-			
-			var panel = GetElement("Scroll");
+
+            var shipAttackspanel = GetElement("ShipAttacksPanel");
+            //shipAttackspanel.transform.GetChild(8);
+            /*shipBombAttackButton =  
+            shipGunAttackButton =  
+            shipFireAttackButton = 
+            shipGasAttackButton = 
+            */
+            var panel = GetElement("Scroll");
 			var contentpanel = panel.transform.GetChild(0);
 			_parentButtonObject = contentpanel.gameObject;
 			

@@ -5,6 +5,10 @@
 		arrow_down.png
 		goldcoin.png
 		icon.jpg
+		shipbomb.png
+		ship_fire.png
+		ship_gas.png
+		ship_gun.png
 		star.png
 	}
 	Materials
