@@ -137,7 +137,7 @@ namespace Assets.Code.States
             startTime = Time.time;
             shipPrefab = _poolingObjectManager.Instantiate("revolutionaryship").gameObject;
             journeyLength = Vector3.Distance(shipPrefab.transform.position, new Vector3(-120,15,-120));
-            
+            shipPrefab.GetComponent<ShipBehaviour>().Initialize(_resolver,levelManager, shipPrefab.transform.position);
             //shipPrefab.gameObject.transform.position.lerp
 
 			GameObject rowBoat = _poolingObjectManager.Instantiate ("row_boat").gameObject;
@@ -185,8 +185,16 @@ namespace Assets.Code.States
 						//Debug.Log ("Spawn Point from Input Controller = " + spawnPosition.ToString()
 						levelManager.CreatePirate(_inputSession.CurrentlySelectedPirateName,spawnPosition);
 					}
-					
-				}
+
+                    if (target.gameObject.tag == "Cube")
+                    {
+                        Vector3 fireBulletAtPos = new Vector3(hitInfo.point.x, 5.2f, hitInfo.point.z);
+                        shipPrefab.GetComponent<ShipBehaviour>().shoot(fireBulletAtPos);
+                        //damage building behaviour
+                        target.GetComponent<BuildingController>().Stats.CurrentHealth -= 50;
+                    }
+
+                }
 			}
 			
 			if (Input.GetMouseButtonUp (0)) {

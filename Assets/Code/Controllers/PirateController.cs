@@ -234,7 +234,7 @@ public class PirateController : AIPath
         var missDelta = new Vector3(Random.Range(1, 3), Random.Range(1, 3), Random.Range(1, 3));
 
         fab.GetComponent<BulletController>().Initialize(_resolver, _bulletOrigin.transform.position + missDelta,
-                                                        didHit, Color.green, bulletTarget);
+                                                        didHit, Color.green, bulletTarget,"Player");
     }
 
     private StatsBehaviour EvaluateTargets()
