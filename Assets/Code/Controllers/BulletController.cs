@@ -26,8 +26,9 @@ public class BulletController : PoolingBehaviour
 		_startPos = startPos;
 		_hit = hit;
 		_target = target;
+        gameObject.GetComponent<Renderer>().material.color = color;
 
-		muzzleFlash = this.gameObject.GetComponent<Light> ();
+        muzzleFlash = this.gameObject.GetComponent<Light> ();
 		muzzleFlash.enabled = true;
 		
 		startTime = Time.time;
@@ -49,8 +50,6 @@ public class BulletController : PoolingBehaviour
             _unityReference.FireDelayed(() => { Delete(); }, .15f);
         }
 		
-
-
 		_unityReference.FireDelayed (() => {
 				muzzleFlash.enabled = false;
 				}, muzzleFlashTime);
