@@ -91,6 +91,12 @@ public class BuildingController : InitializeRequiredBehaviour {
 		Stats = GetComponent<StatsBehaviour>();
 		
 		// initialize properties
+
+		if (Model.Type == BuildingModel.BuildingType.Gold_Locker) {
+
+			Model.GoldAmount = 1000;
+
+		}
 		
 		if (Model.Type != BuildingModel.BuildingType.Gold_Locker && Model.Type != BuildingModel.BuildingType.Defence_Water_Cannons) {
 			//_bulletOrigin = transform.FindChild ("BulletSpawnPoint").gameObject;

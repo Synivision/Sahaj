@@ -335,8 +335,6 @@ namespace Assets.Code.States
 
 
 			_uiManager.TearDown ();
-
-		//	_poolingObjectManager.TearDown ();
 			_messager.CancelSubscription (_onQuitGame, _onTearDownLevel, _onPlayStateToShipBase);
 
 		}

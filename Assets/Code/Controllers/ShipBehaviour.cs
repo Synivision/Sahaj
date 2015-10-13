@@ -94,4 +94,10 @@ public class ShipBehaviour : MonoBehaviour {
 			_createPirateTime = 0;
 		}*/
 	}
+	/*public override void TearDown ()
+	{
+		_messager.CancelSubscription (OnAttackSelected);
+
+	}*/
+
 }

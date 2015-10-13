@@ -70,7 +70,7 @@ namespace Assets.Code.Ui.CanvasControllers
 
 		public override void TearDown()
 		{	
-
+			_messager.CancelSubscription (_onToggleCanvas,_onPirateInspectionSelected);
 			base.TearDown();
 		}
 			

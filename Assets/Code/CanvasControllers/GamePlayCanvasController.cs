@@ -320,7 +320,7 @@ namespace Assets.Code.Ui.CanvasControllers
                 button.gameObject.SetActive(false);
 
             }
-
+			_messager.CancelSubscription (_onUpdateCanvasPanels,_onUpdatePirateButtonNumberLabel);
             _buttonList.Clear();
             _quitButton.onClick.RemoveAllListeners();
             base.TearDown();
