@@ -15,6 +15,8 @@ public class PlayerModel : IGameDataModel {
 	public int UserLevel{get;set;}
 	public int UserRank{get;set;}
 	public Dictionary<string, bool> UnlockedPirates{get;set;}
+	public Dictionary<string, bool> UnlockedShipAttacks { get; set; }
+	public Dictionary<string, int> ShipAttacksCountDict { get; set; }
 	public int LevelUnLocked{get;set;}
 	public int Wins{get;set;}
 	public int Gems{get;set;}

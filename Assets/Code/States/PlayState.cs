@@ -47,13 +47,13 @@ namespace Assets.Code.States
 		private InputSession _inputSession;
 		private InputSessionData _inputSessionData;
 
-        //ship lerp
-        public float speed = 1.0F;
-        private float startTime;
-        private float journeyLength;
-        GameObject shipPrefab;
+		//ship lerp
+		public float speed = 1.0F;
+		private float startTime;
+		private float journeyLength;
+		GameObject shipPrefab;
 
-        private GameObject tile;
+		private GameObject tile;
 		int pointerId = -1;
 
 		Vector3 curPosition;
@@ -133,12 +133,12 @@ namespace Assets.Code.States
 			_inputSession.Initialize(_inputSessionData);
 
 
-            // ship  lerp into level
-            startTime = Time.time;
-            shipPrefab = _poolingObjectManager.Instantiate("revolutionaryship").gameObject;
-            journeyLength = Vector3.Distance(shipPrefab.transform.position, new Vector3(-120,15,-120));
-            shipPrefab.GetComponent<ShipBehaviour>().Initialize(_resolver,levelManager, shipPrefab.transform.position);
-            //shipPrefab.gameObject.transform.position.lerp
+			// ship  lerp into level
+			startTime = Time.time;
+			shipPrefab = _poolingObjectManager.Instantiate("revolutionaryship").gameObject;
+			journeyLength = Vector3.Distance(shipPrefab.transform.position, new Vector3(-120,15,-120));
+			shipPrefab.GetComponent<ShipBehaviour>().Initialize(_resolver,levelManager, shipPrefab.transform.position);
+			//shipPrefab.gameObject.transform.position.lerp
 
 			GameObject rowBoat = _poolingObjectManager.Instantiate ("row_boat").gameObject;
 			rowBoat.GetComponent<RowBoatController> ().Initialize (_resolver);
@@ -149,13 +149,13 @@ namespace Assets.Code.States
 		public override void Update ()
 		{
 
-            float distCovered = (Time.time - startTime) * speed;
-            float fracJourney = distCovered / journeyLength;
-            shipPrefab.transform.position = Vector3.Lerp(shipPrefab.transform.position, new Vector3(-120, 15, -120), fracJourney);
+			float distCovered = (Time.time - startTime) * speed;
+			float fracJourney = distCovered / journeyLength;
+			shipPrefab.transform.position = Vector3.Lerp(shipPrefab.transform.position, new Vector3(-120, 15, -120), fracJourney);
 
 
-            _uiManager.Update ();
-            
+			_uiManager.Update ();
+			
 			// input controller update
 			_time += Time.deltaTime;
 			if (_time > 3) {
@@ -187,14 +187,14 @@ namespace Assets.Code.States
 					}
 
 					if (target.gameObject.tag != null && target.gameObject.tag == "Cube")
-                    {
-                        Vector3 fireBulletAtPos = new Vector3(hitInfo.point.x, 5.2f, hitInfo.point.z);
-                        shipPrefab.GetComponent<ShipBehaviour>().shoot(fireBulletAtPos);
-                        //damage building behaviour
-                        target.GetComponent<BuildingController>().Stats.CurrentHealth -= 50;
-                    }
+					{
+						Vector3 fireBulletAtPos = new Vector3(hitInfo.point.x, 5.2f, hitInfo.point.z);
+						shipPrefab.GetComponent<ShipBehaviour>().shoot(fireBulletAtPos);
+						//damage building behaviour
+						target.GetComponent<BuildingController>().Stats.CurrentHealth -= 50;
+					}
 
-                }
+				}
 			}
 			
 			if (Input.GetMouseButtonUp (0)) {

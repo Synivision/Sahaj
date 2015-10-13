@@ -75,7 +75,7 @@ namespace Assets.Code.Ui.CanvasControllers
 			
 			//ToDo Open Info Canvas
 			Debug.Log ("On Info Clicked");
-            _messager.Publish(new OpenBuildingInfoCanvas { });
+			_messager.Publish(new OpenBuildingInfoCanvas { });
 			
 		}
 		

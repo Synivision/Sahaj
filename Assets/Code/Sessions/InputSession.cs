@@ -18,5 +18,11 @@ public class InputSession : IResolvableItem  {
 		get{return _data.Name;}
 		set{_data.Name = value;}
 	}
+
+	public string CurrentlySelectedShipAttackName
+	{
+		get { return _data.ShipAttackName; }
+		set { _data.ShipAttackName = value; }
+	}
 	//	set{fire off event; data = value}
 }

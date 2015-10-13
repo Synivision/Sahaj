@@ -2,7 +2,6 @@
 using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
-using System.Collections;
 using Assets.Code.DataPipeline;
 using Assets.Code.DataPipeline.Providers;
 using Assets.Code.Messaging;
@@ -17,6 +16,7 @@ namespace Assets.Code.Ui.CanvasControllers
 
         private readonly Messager _messager;
         private GameObject _parentButtonObject;
+        private GameObject _parentShipAttackButtonObject;
         private Button _previouslyClickedTileButton;
 
 
@@ -48,6 +48,7 @@ namespace Assets.Code.Ui.CanvasControllers
         private UnityReferenceMaster _unityReference;
 
         private List<Button> _buttonList;
+        private List<Button> _shipAttackButtonList;
         private Dictionary<string, Text> _numberLabelDict;
         private PlayerManager _playerManager;
 
@@ -72,17 +73,8 @@ namespace Assets.Code.Ui.CanvasControllers
             ResolveElement(out _quitButton, "QuitButton");
 
             var shipAttackspanel = GetElement("ShipAttacksPanel");
-
-            shipBombAttackButton = shipAttackspanel.transform.GetChild(0).GetComponent<Button>();
-            shipGunAttackButton = shipAttackspanel.transform.GetChild(1).GetComponent<Button>();
-            shipFireAttackButton = shipAttackspanel.transform.GetChild(2).GetComponent<Button>();
-            shipGasAttackButton = shipAttackspanel.transform.GetChild(3).GetComponent<Button>();
-
-            shipBombAttackButton.onClick.AddListener(OnshipBombAttackButton);
-            shipGunAttackButton.onClick.AddListener(OnshipGunAttackButtonClicked);
-            shipFireAttackButton.onClick.AddListener(OnshipFireAttackButtonClicked);
-            shipGasAttackButton.onClick.AddListener(OnshipGasAttackButtoClicked);
-
+            var shipAttackContentPanel = shipAttackspanel.transform.GetChild(0).gameObject;
+            _parentShipAttackButtonObject = shipAttackContentPanel;
 
             var panel = GetElement("Scroll");
             var contentpanel = panel.transform.GetChild(0);
@@ -120,6 +112,8 @@ namespace Assets.Code.Ui.CanvasControllers
             _onUpdatePirateButtonNumberLabel = _messager.Subscribe<UpdatePirateNumber>(UpdatePirateButtonNumberLabel);
             _quitButton.onClick.AddListener(OnQuitButtonClicked);
             _buttonList = new List<Button>();
+            _shipAttackButtonList = new List<Button>();
+
             _numberLabelDict = new Dictionary<string, Text>();
 
             foreach (var item in _playerManager.Model.UnlockedPirates)
@@ -131,62 +125,15 @@ namespace Assets.Code.Ui.CanvasControllers
                 }
             }
 
+            //TODO get ship attack data from player model 
+            CreateShipAttackButton("GasButton");
+            CreateShipAttackButton("FireButton");
+            CreateShipAttackButton("BombButton");
+            CreateShipAttackButton("GunButton");
             _onWin = _messager.Subscribe<WinMessage>(OnWin);
 
             InitializePirateButtonNumberLabel();
 
-        }
-
-        public void OnshipBombAttackButton()
-        {
-            //send message
-            _messager.Publish(new SelectShipAttackMessage {
-                color = Color.black,
-                attackType = ShipBehaviour.ShipAttacktype.Bomb,
-                scale = 5,
-                isProjectile = true,
-                speed = 1
-                
-            });
-        }
-        public void OnshipGunAttackButtonClicked()
-        {
-            _messager.Publish(new SelectShipAttackMessage
-            {
-                color = Color.yellow,
-                attackType = ShipBehaviour.ShipAttacktype.Bomb,
-                scale = 5,
-                isProjectile = true,
-                speed = 1
-
-            });
-
-        }
-        public void OnshipFireAttackButtonClicked()
-        {
-            _messager.Publish(new SelectShipAttackMessage
-            {
-                color = Color.red,
-                attackType = ShipBehaviour.ShipAttacktype.Bomb,
-                scale = 5,
-                isProjectile = true,
-                speed = 1
-
-            });
-
-        }
-        public void OnshipGasAttackButtoClicked()
-        {
-
-            _messager.Publish(new SelectShipAttackMessage
-            {
-                color = Color.green,
-                attackType = ShipBehaviour.ShipAttacktype.Bomb,
-                scale = 5,
-                isProjectile = true,
-                speed = 1
-
-            });
         }
 
         public void ChangeStateToShipBase()
@@ -272,7 +219,36 @@ namespace Assets.Code.Ui.CanvasControllers
             return fab;
         }
 
+        public Button CreateShipAttackButton(string name) {
+
+            var fab = Object.Instantiate(_prefabProvider.GetPrefab("ship_attack_button").gameObject.GetComponent<Button>());
+            fab.gameObject.name = name;
+
+            //var buttonLabel = fab.transform.GetChild(0).GetComponent<Text>();
+            //buttonLabel.text = name;
+            //var buttonNumberLabel = fab.transform.GetChild(1).GetComponent<Text>();
+
+            fab.onClick.AddListener(() => OnShipAttackButtonClicked(fab, name));
+
+            fab.transform.SetParent(_parentShipAttackButtonObject.transform);
+
+            return fab;
+        }
+
         private void OnPirateButtonClicked(Button button, string name)
+        {
+            _inputSession.CurrentlySelectedPirateName = name;
+            if (_previouslyClickedTileButton == button) return;
+
+            if (_previouslyClickedTileButton != null)
+                _previouslyClickedTileButton.interactable = true;
+
+            button.interactable = false;
+            _previouslyClickedTileButton = button;
+
+        }
+
+        private void OnShipAttackButtonClicked(Button button, string name)
         {
             _inputSession.CurrentlySelectedPirateName = name;
             if (_previouslyClickedTileButton == button) return;
@@ -294,23 +270,7 @@ namespace Assets.Code.Ui.CanvasControllers
 
         }
 
-        void changeState(Button button, bool state)
-        {
-
-            if (_buttonList.Contains(button))
-            {
-                button.interactable = state;
-                _previouslyClickedTileButton = button;
-            }
-
-            _buttonList.Remove(button);
-
-            foreach (Button b in _buttonList)
-            {
-                b.interactable = !state;
-            }
-
-        }
+       
         public override void TearDown()
         {
             foreach (var button in _buttonList)

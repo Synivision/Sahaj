@@ -115,8 +115,6 @@ public class BuildingController : InitializeRequiredBehaviour {
         // you might here want to implement a tiered system, or a gradial one
         // where the amount of damage is related to the amount of blood/horrible screaming (Y)
 	
-
-
 		//TODO Calculate available gold
 		//TODO check if building is of type gold
 		if (Model.Type == BuildingModel.BuildingType.Gold_Locker){
