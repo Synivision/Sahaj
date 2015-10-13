@@ -52,6 +52,8 @@ namespace Assets.Code.States
         private float startTime;
         private float journeyLength;
         GameObject shipPrefab;
+		GameObject rowBoat;
+		RowBoatController boatController;
 
         private GameObject tile;
 		int pointerId = -1;
@@ -140,8 +142,10 @@ namespace Assets.Code.States
             shipPrefab.GetComponent<ShipBehaviour>().Initialize(_resolver,levelManager, shipPrefab.transform.position);
             //shipPrefab.gameObject.transform.position.lerp
 
-			GameObject rowBoat = _poolingObjectManager.Instantiate ("row_boat").gameObject;
-			rowBoat.GetComponent<RowBoatController> ().Initialize (_resolver);
+			rowBoat = _poolingObjectManager.Instantiate ("row_boat").gameObject;
+			rowBoat.transform.position = new Vector3(rowBoat.transform.position.x,11.5f,rowBoat.transform.position.y); 
+			boatController = rowBoat.GetComponent<RowBoatController> ();
+			boatController.Initialize (_resolver);
 		}
 
 
@@ -163,8 +167,7 @@ namespace Assets.Code.States
 					toggleValue = false
 				});
 			}
-			
-			
+
 			Touch[] touch = Input.touches;
 			if (Application.platform == RuntimePlatform.Android)
 				pointerId = touch[0].fingerId;
@@ -178,7 +181,7 @@ namespace Assets.Code.States
 				Ray ray;
 				ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 				if( UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject(pointerId)== false){
-					if(Physics.Raycast(ray,out hitInfo)&& target.gameObject.tag!="Cube" )
+					if(Physics.Raycast(ray,out hitInfo) && target.gameObject.tag!="Cube" )
 					{
 						Vector3 spawnPosition = new Vector3(hitInfo.point.x,5.2f,hitInfo.point.z);
 	
@@ -193,6 +196,12 @@ namespace Assets.Code.States
                         //damage building behaviour
                         target.GetComponent<BuildingController>().Stats.CurrentHealth -= 50;
                     }
+					if(hitInfo.collider.gameObject.tag == "water"){
+						boatController.destinationPosition = hitInfo.point+new Vector3(0,10,0);
+						boatController.journeyLength = Vector3.Distance(rowBoat.transform.position, boatController.destinationPosition);
+						boatController.startTime = Time.time;
+					}
+
 
                 }
 			}
@@ -318,6 +327,10 @@ namespace Assets.Code.States
 
 		public override void TearDown ()
 		{
+
+
+			Object.Destroy (rowBoat);
+			Object.Destroy (shipPrefab);
 			levelManager.TearDownLevel ();
 
 
