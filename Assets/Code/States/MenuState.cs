@@ -146,7 +146,7 @@ public class MenuState : BaseState{
 	}
 	public override void TearDown ()
 	{
-		_messager.CancelSubscription (_onStartGame);
+		_messager.CancelSubscription (_onStartGame,_onOpenShipBaseMessage);
 		_uiManager.TearDown ();
 		_poolingObjectManager.TearDown();
 

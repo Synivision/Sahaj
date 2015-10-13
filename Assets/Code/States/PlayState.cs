@@ -1,4 +1,6 @@
-﻿using Assets.Code.DataPipeline;
+﻿
+
+using Assets.Code.DataPipeline;
 using Assets.Code.Messaging;
 using Assets.Code.Ui;
 using UnityEngine;
@@ -47,11 +49,21 @@ namespace Assets.Code.States
 		private InputSession _inputSession;
 		private InputSessionData _inputSessionData;
 
+<<<<<<< HEAD
 		//ship lerp
 		public float speed = 1.0F;
 		private float startTime;
 		private float journeyLength;
 		GameObject shipPrefab;
+=======
+        //ship lerp
+        public float speed = 1.0F;
+        private float startTime;
+        private float journeyLength;
+        GameObject shipPrefab;
+		GameObject rowBoat;
+		RowBoatController boatController;
+>>>>>>> 5e81b5ee8bf7a8f767f50e404f93451a2046b262
 
 		private GameObject tile;
 		int pointerId = -1;
@@ -140,8 +152,10 @@ namespace Assets.Code.States
 			shipPrefab.GetComponent<ShipBehaviour>().Initialize(_resolver,levelManager, shipPrefab.transform.position);
 			//shipPrefab.gameObject.transform.position.lerp
 
-			GameObject rowBoat = _poolingObjectManager.Instantiate ("row_boat").gameObject;
-			rowBoat.GetComponent<RowBoatController> ().Initialize (_resolver);
+			rowBoat = _poolingObjectManager.Instantiate ("row_boat").gameObject;
+			rowBoat.transform.position = new Vector3(rowBoat.transform.position.x,11.5f,rowBoat.transform.position.y); 
+			boatController = rowBoat.GetComponent<RowBoatController> ();
+			boatController.Initialize (_resolver);
 		}
 
 
@@ -163,8 +177,7 @@ namespace Assets.Code.States
 					toggleValue = false
 				});
 			}
-			
-			
+
 			Touch[] touch = Input.touches;
 			if (Application.platform == RuntimePlatform.Android)
 				pointerId = touch[0].fingerId;
@@ -178,7 +191,7 @@ namespace Assets.Code.States
 				Ray ray;
 				ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 				if( UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject(pointerId)== false){
-					if(Physics.Raycast(ray,out hitInfo)&& target.gameObject.tag!="Cube" )
+					if(Physics.Raycast(ray,out hitInfo) && target.gameObject.tag!="Cube" )
 					{
 						Vector3 spawnPosition = new Vector3(hitInfo.point.x,5.2f,hitInfo.point.z);
 	
@@ -187,6 +200,7 @@ namespace Assets.Code.States
 					}
 
 					if (target.gameObject.tag != null && target.gameObject.tag == "Cube")
+<<<<<<< HEAD
 					{
 						Vector3 fireBulletAtPos = new Vector3(hitInfo.point.x, 5.2f, hitInfo.point.z);
 						shipPrefab.GetComponent<ShipBehaviour>().shoot(fireBulletAtPos);
@@ -195,6 +209,22 @@ namespace Assets.Code.States
 					}
 
 				}
+=======
+                    {
+                        Vector3 fireBulletAtPos = new Vector3(hitInfo.point.x, 5.2f, hitInfo.point.z);
+                        shipPrefab.GetComponent<ShipBehaviour>().shoot(fireBulletAtPos);
+                        //damage building behaviour
+                        target.GetComponent<BuildingController>().Stats.CurrentHealth -= 50;
+                    }
+					if(hitInfo.collider.gameObject.tag == "water"){
+						boatController.destinationPosition = hitInfo.point+new Vector3(0,10,0);
+						boatController.journeyLength = Vector3.Distance(rowBoat.transform.position, boatController.destinationPosition);
+						boatController.startTime = Time.time;
+					}
+
+
+                }
+>>>>>>> 5e81b5ee8bf7a8f767f50e404f93451a2046b262
 			}
 			
 			if (Input.GetMouseButtonUp (0)) {
@@ -318,12 +348,14 @@ namespace Assets.Code.States
 
 		public override void TearDown ()
 		{
+
+
+			Object.Destroy (rowBoat);
+			Object.Destroy (shipPrefab);
 			levelManager.TearDownLevel ();
 
 
 			_uiManager.TearDown ();
-
-		//	_poolingObjectManager.TearDown ();
 			_messager.CancelSubscription (_onQuitGame, _onTearDownLevel, _onPlayStateToShipBase);
 
 		}

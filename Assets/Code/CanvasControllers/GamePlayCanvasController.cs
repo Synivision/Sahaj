@@ -156,7 +156,7 @@ namespace Assets.Code.Ui.CanvasControllers
 
         private void OnWin(WinMessage message)
         {
-            _uiManager.RegisterUi(new WinCanvasController(_resolver, _canvasProvider.GetCanvas("WinCanvas")));
+			_uiManager.RegisterUi(new WinLooseCanvasController(_resolver, _canvasProvider.GetCanvas("WinCanvas")));
             TearDown();
 
         }
@@ -280,7 +280,7 @@ namespace Assets.Code.Ui.CanvasControllers
                 button.gameObject.SetActive(false);
 
             }
-
+			_messager.CancelSubscription (_onUpdateCanvasPanels,_onUpdatePirateButtonNumberLabel);
             _buttonList.Clear();
             _quitButton.onClick.RemoveAllListeners();
             base.TearDown();

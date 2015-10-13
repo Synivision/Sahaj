@@ -181,9 +181,11 @@ namespace Assets.Code.States
 		
 		public override void TearDown (){
 
+			_messager.CancelSubscription(_onBuildingInfoOpen,_onInventoryOpen,_onChangeStateToAttack);
 			_uiManager.TearDown();
 			Object.Destroy (tile.gameObject);
 			shipLevelManager.TearDown();
+
 		}
 
 		private bool isButton()
