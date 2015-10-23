@@ -17,7 +17,7 @@ public class LevelSelectCanvasController  : BaseCanvasController {
 		private readonly Button _level3Button;
 		private readonly Messager _messager;
 
-		public LevelSelectCanvasController (IoCResolver resolver, Canvas canvasView) : base(canvasView)
+		public LevelSelectCanvasController (IoCResolver resolver, Canvas canvasView) : base(resolver, canvasView)
 		{
 			
 			ResolveElement (out _level1Button, "level1_button");

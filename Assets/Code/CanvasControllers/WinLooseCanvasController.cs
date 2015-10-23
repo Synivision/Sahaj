@@ -21,8 +21,9 @@ namespace Assets.Code.Ui.CanvasControllers
 		private UiManager _uiManager;
 		private CanvasProvider _canvasProvider;
 		private Button _returnButton;
-		
-		public WinLooseCanvasController(IoCResolver resolver, Canvas canvasView) : base(canvasView)
+
+        public WinLooseCanvasController(IoCResolver resolver, Canvas canvasView)
+            : base(resolver, canvasView)
 		{
 			
 			_resolver = resolver;

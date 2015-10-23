@@ -12,6 +12,7 @@ using Assets.Code.States;
 using Assets.Code.Utilities;
 using UnityEditor;
 using UnityEngine;
+using Assets.Code.Logic.Logging;
 
 
 namespace Assets.Code.UnityBehaviours
@@ -24,6 +25,7 @@ namespace Assets.Code.UnityBehaviours
 		private GameDataProvider _gameDataProvider;
         /* PROPERTIES */
         private Messager _messager;
+        private Logger _logger;
         private IoCResolver _resolver;
 
         private BaseState _currentState;
@@ -48,6 +50,9 @@ namespace Assets.Code.UnityBehaviours
             // messager
             _messager = new Messager();
             _resolver.RegisterItem(_messager);
+
+            _logger = new Logger("info.log", false);
+            _resolver.RegisterItem(_logger);
 
             // unity reference master
             _unityReference = GetComponent<UnityReferenceMaster>();

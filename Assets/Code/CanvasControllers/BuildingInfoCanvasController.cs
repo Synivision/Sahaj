@@ -22,7 +22,8 @@ namespace Assets.Code.Ui.CanvasControllers
 		private Button _closeButton;
 		private MessagingToken _onFindInventoryItem;
 
-		public BuildingInfoCanvasController(IoCResolver resolver, Canvas canvasView) : base(canvasView)
+        public BuildingInfoCanvasController(IoCResolver resolver, Canvas canvasView)
+            : base(resolver, canvasView)
 		{
 
 			_resolver = resolver;

@@ -28,7 +28,8 @@ namespace Assets.Code.Ui.CanvasControllers
 
 		private UnityReferenceMaster _unityReference;
 
-		public MainCanvasController (IoCResolver resolver, Canvas canvasView) : base(canvasView)
+        public MainCanvasController(IoCResolver resolver, Canvas canvasView)
+            : base(resolver, canvasView)
 		{
 			resolver.Resolve (out _messager);
 			resolver.Resolve (out _unityReference);

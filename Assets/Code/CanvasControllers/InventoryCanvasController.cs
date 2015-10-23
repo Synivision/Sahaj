@@ -20,8 +20,9 @@ namespace Assets.Code.Ui.CanvasControllers{
 		private CanvasProvider _canvasProvider;
 		private Button _closeButton;
 		private MessagingToken _onFindInventoryItem;
-		
-		public InventoryCanvasController (IoCResolver resolver, Canvas canvasView) : base(canvasView)
+
+        public InventoryCanvasController(IoCResolver resolver, Canvas canvasView)
+            : base(resolver, canvasView)
 		{
 			
 			_resolver = resolver;

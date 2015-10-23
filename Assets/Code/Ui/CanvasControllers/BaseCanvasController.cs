@@ -1,31 +1,45 @@
 ﻿using System.Collections.Generic;
+using Assets.Code.DataPipeline;
+using Assets.Code.Logic.Logging;
 using UnityEngine;
 
 namespace Assets.Code.Ui.CanvasControllers
 {
     public abstract class BaseCanvasController
     {
+        private readonly Logger _logger;
         protected readonly Canvas _canvasView;
 
         private readonly Dictionary<string, GameObject> _elements;
+        private const string PathSeperator = "/";
 
-        protected BaseCanvasController(Canvas canvasView)
+        protected BaseCanvasController(IoCResolver resolver, Canvas canvasView)
         {
             _elements = new Dictionary<string, GameObject>();
+            resolver.Resolve(out _logger);
 
             _canvasView = canvasView;
 
             _canvasView.gameObject.SetActive(true);
 
-            for (var i = 0; i < canvasView.transform.childCount; i++)
+            CacheObject("", canvasView.gameObject);
+        }
+
+        private void CacheObject(string parentPath, GameObject subject)
+        {
+            for (var i = 0; i < subject.transform.childCount; i++)
             {
-                var child = canvasView.transform.GetChild(i);
-                if (_elements.ContainsKey(child.name))
+                var child = subject.transform.GetChild(i);
+                var transformPath = parentPath + child.name;
+
+                if (_elements.ContainsKey(transformPath))
                 {
-                    Debug.Log("WARNING! found duplicate child name : " + child.name + " in " + this + "!");
+                    _logger.Log("WARNING! found duplicate child name : " + transformPath + " in " + this + "!", true);
                     continue;
                 }
-                _elements.Add(child.name, child.gameObject);
+
+                _elements.Add(transformPath, child.gameObject);
+                CacheObject(transformPath + PathSeperator, child.gameObject);
             }
         }
 
@@ -40,7 +54,7 @@ namespace Assets.Code.Ui.CanvasControllers
         {
             if (!_elements.ContainsKey(name))
             {
-                Debug.Log("WARNING! canvas controller (" + GetType() + ") does not have element named " + name);
+                _logger.Log(string.Format("WARNING! canvas controller ({0}) does not have element named '{1}'", GetType(), name), true);
                 return null;
             }
 
@@ -51,7 +65,7 @@ namespace Assets.Code.Ui.CanvasControllers
         {
             if (!_elements.ContainsKey(name))
             {
-                Debug.Log("WARNING! canvas controller (" + GetType() + ") does not have element named " + name);
+                _logger.Log(string.Format("WARNING! canvas controller ({0}) does not have element named '{1}'", GetType(), name), true);
                 return null;
             }
 
@@ -62,7 +76,7 @@ namespace Assets.Code.Ui.CanvasControllers
         {
             if (!_elements.ContainsKey(name))
             {
-                Debug.Log("WARNING! canvas controller (" + GetType() + ") does not have element named " + name);
+                _logger.Log(string.Format("WARNING! canvas controller ({0}) does not have element named '{1}'", GetType(), name), true);
                 element = null;
                 return;
             }

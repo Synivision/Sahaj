@@ -18,8 +18,9 @@ namespace Assets.Code.Ui.CanvasControllers
 		private readonly Messager _messager;
 		private UiManager _uiManager;
 		private IoCResolver _resolver;
-		
-		public MenuCanvasController (IoCResolver resolver, Canvas canvasView) : base(canvasView)
+
+        public MenuCanvasController(IoCResolver resolver, Canvas canvasView)
+            : base(resolver, canvasView)
 		{
 			_resolver = resolver;
 			ResolveElement (out _shipBaseGameButton, "ship_base_button");

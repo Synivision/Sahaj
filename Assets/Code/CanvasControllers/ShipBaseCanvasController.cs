@@ -25,7 +25,8 @@ namespace Assets.Code.Ui.CanvasControllers
 
 
 
-		public ShipBaseCanvasController (IoCResolver resolver, Canvas canvasView) : base(canvasView)
+        public ShipBaseCanvasController(IoCResolver resolver, Canvas canvasView)
+            : base(resolver, canvasView)
 		{
 			_canvasView = canvasView;
 			_resolver = resolver;

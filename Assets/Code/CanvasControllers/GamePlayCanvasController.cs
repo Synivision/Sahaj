@@ -57,7 +57,8 @@ namespace Assets.Code.Ui.CanvasControllers
         private CanvasProvider _canvasProvider;
         private readonly MessagingToken _onWin;
 
-        public GamePlayCanvasController(IoCResolver resolver, Canvas canvasView, PlayerManager playerManager) : base(canvasView)
+        public GamePlayCanvasController(IoCResolver resolver, Canvas canvasView, PlayerManager playerManager)
+            : base(resolver, canvasView)
         {
             _canvas = canvasView;
             _playerManager = playerManager;

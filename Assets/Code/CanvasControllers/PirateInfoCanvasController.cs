@@ -29,7 +29,8 @@ namespace Assets.Code.Ui.CanvasControllers
 		private readonly MessagingToken _onPirateInspectionSelected;
 		private readonly MessagingToken _onToggleCanvas;
 
-		public PirateInfoCanvasController (IoCResolver resolver, Canvas canvasView) : base(canvasView)
+        public PirateInfoCanvasController(IoCResolver resolver, Canvas canvasView)
+            : base(resolver, canvasView)
 		{
 
 			resolver.Resolve (out _messager);
