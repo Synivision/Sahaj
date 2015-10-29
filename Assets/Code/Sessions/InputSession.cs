@@ -24,5 +24,11 @@ public class InputSession : IResolvableItem  {
 		get { return _data.ShipAttackName; }
 		set { _data.ShipAttackName = value; }
 	}
-	//	set{fire off event; data = value}
+
+    public int CurrentShipAttackCost
+    {
+        get { return _data.ShipAttackCost; }
+        set { _data.ShipAttackCost = value; }
+    }
+    //	set{fire off event; data = value}
 }
