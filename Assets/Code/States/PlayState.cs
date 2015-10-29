@@ -114,7 +114,7 @@ namespace Assets.Code.States
             _shipAttackCostDict.Add("Gas", 2);
             _shipAttackCostDict.Add("Fire", 3);
             _shipAttackCostDict.Add("Bomb", 4);
-            _shipAttackCostDict.Add("Gun", 5);
+            _shipAttackCostDict.Add("Gun", 11);
 
             _unlockedShipAttacks = new Dictionary<string, bool>();
             _unlockedShipAttacks.Add("Gas", true);
@@ -220,7 +220,8 @@ namespace Assets.Code.States
                     if ( target != null   &&   target.gameObject.tag != null )
                     {
                         Vector3 fireBulletAtPos = new Vector3(hitInfo.point.x, 5.2f, hitInfo.point.z);
-                        if (_playerManager.Model.ShipBulletsAvailable > 0 && _inputSession.CurrentShipAttackCost != 0)
+
+                        if (_playerManager.Model.ShipBulletsAvailable > 0 && _inputSession.CurrentShipAttackCost != 0 && _playerManager.Model.ShipBulletsAvailable >= _inputSession.CurrentShipAttackCost)
 
                         {
                             shipPrefab.GetComponent<ShipBehaviour>().shoot(fireBulletAtPos);
