@@ -74,6 +74,4 @@ public class BulletController : PoolingBehaviour
 
 		_lineRenderer.SetPosition(1, transform.position);
 	}
-
-
 }

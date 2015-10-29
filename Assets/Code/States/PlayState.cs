@@ -209,18 +209,22 @@ namespace Assets.Code.States
                         levelManager.CreatePirate(_inputSession.CurrentlySelectedPirateName, spawnPosition);
                     }
 
-                    if (target.gameObject.tag != null )
+                    if ( target != null   &&   target.gameObject.tag != null )
                     {
                         Vector3 fireBulletAtPos = new Vector3(hitInfo.point.x, 5.2f, hitInfo.point.z);
-                        if(_playerManager.Model.ShipBulletsAvailable> 0)
+                        if (_playerManager.Model.ShipBulletsAvailable > 0)
+                        {
                             shipPrefab.GetComponent<ShipBehaviour>().shoot(fireBulletAtPos);
+                            //TODO emit particle of atttack type
+                        }
                         //damage building behaviour
                         if (target.gameObject.tag == "Cube")
                         {
                             target.GetComponent<BuildingController>().Stats.CurrentHealth -= 50;
+                           
                         }
                     }
-                    if (hitInfo.collider.gameObject.tag == "water")
+                    if (hitInfo.collider != null && hitInfo.collider.gameObject.tag == "water")
                     {
                         boatController.destinationPosition = hitInfo.point + new Vector3(0, 10, 0);
                         boatController.journeyLength = Vector3.Distance(rowBoat.transform.position, boatController.destinationPosition);

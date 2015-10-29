@@ -164,7 +164,7 @@ namespace Assets.Code.Ui.CanvasControllers
 
         private void OnWin(WinMessage message)
         {
-			_uiManager.RegisterUi(new WinLooseCanvasController(_resolver, _canvasProvider.GetCanvas("WinCanvas")));
+            _uiManager.RegisterUi(new WinLooseCanvasController(_resolver, _canvasProvider.GetCanvas("WinCanvas")));
             TearDown();
 
         }
@@ -259,6 +259,7 @@ namespace Assets.Code.Ui.CanvasControllers
         private void OnShipAttackButtonClicked(Button button, string name)
         {
             _inputSession.CurrentlySelectedShipAttackName = name;
+            _inputSession.CurrentlySelectedPirateName = "";
             if (_previouslyClickedTileButton == button) return;
 
             if (_previouslyClickedTileButton != null)
@@ -294,7 +295,7 @@ namespace Assets.Code.Ui.CanvasControllers
                 button.onClick.RemoveAllListeners();
                 button.gameObject.SetActive(false);
             }
-			_messager.CancelSubscription (_onUpdateCanvasPanels,_onUpdatePirateButtonNumberLabel);
+            _messager.CancelSubscription (_onUpdateCanvasPanels,_onUpdatePirateButtonNumberLabel);
             _buttonList.Clear();
             _quitButton.onClick.RemoveAllListeners();
             base.TearDown();
