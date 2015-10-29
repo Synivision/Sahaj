@@ -9,6 +9,6 @@ public class BombModel : IGameDataModel
     public int damage { get; set; }
     public Vector3 startPos { get; set; }
     public Vector3 endPos { get; set; }
-    Color color { get; set; }
+    public Color color { get; set; }
 
 }
