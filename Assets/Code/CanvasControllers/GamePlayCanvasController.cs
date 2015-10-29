@@ -34,6 +34,7 @@ namespace Assets.Code.Ui.CanvasControllers
         private MessagingToken _onUpdateCanvasPanels;
         private MessagingToken _onUpdatePirateButtonNumberLabel;
         private MessagingToken _PirateDictToken;
+        private MessagingToken _onUpdateCurrentShipBulletsMessage;
 
         private readonly Text _fpsText;
         private Canvas _canvas;
@@ -113,6 +114,7 @@ namespace Assets.Code.Ui.CanvasControllers
             _onUpdateCanvasPanels = _messager.Subscribe<UpdateGamePlayUiMessage>(UpdateCanvasPanels);
             InitializeCanvasPanels(_playerManager);
             _onUpdatePirateButtonNumberLabel = _messager.Subscribe<UpdatePirateNumber>(UpdatePirateButtonNumberLabel);
+            _onUpdateCurrentShipBulletsMessage = _messager.Subscribe<UpdateCurrentShipBulletsMessage>(UpdateShipAttackLabel);
             _quitButton.onClick.AddListener(OnQuitButtonClicked);
             _buttonList = new List<Button>();
             _shipAttackButtonList = new List<Button>();
@@ -143,6 +145,11 @@ namespace Assets.Code.Ui.CanvasControllers
             _onWin = _messager.Subscribe<WinMessage>(OnWin);
 
             InitializePirateButtonNumberLabel();
+            _shipAttacksLabel.text = "Ship Attacks Left : " + _playerManager.Model.ShipBulletsAvailable.ToString();
+
+        }
+
+        private void UpdateShipAttackLabel(UpdateCurrentShipBulletsMessage message){
 
             _shipAttacksLabel.text = "Ship Attacks Left : " + _playerManager.Model.ShipBulletsAvailable.ToString();
 
