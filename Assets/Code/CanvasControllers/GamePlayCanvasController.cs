@@ -18,6 +18,7 @@ namespace Assets.Code.Ui.CanvasControllers
         private GameObject _parentButtonObject;
         private GameObject _parentShipAttackButtonObject;
         private Button _previouslyClickedTileButton;
+        private Text _shipAttacksLabel;
 
 
         private readonly PrefabProvider _prefabProvider;
@@ -75,6 +76,7 @@ namespace Assets.Code.Ui.CanvasControllers
 
             var shipAttackspanel = GetElement("ShipAttacksPanel");
             var shipAttackContentPanel = shipAttackspanel.transform.GetChild(0).gameObject;
+            _shipAttacksLabel = shipAttackspanel.transform.GetChild(1).GetComponent<Text>();
             _parentShipAttackButtonObject = shipAttackContentPanel;
 
             var panel = GetElement("Scroll");
@@ -141,6 +143,8 @@ namespace Assets.Code.Ui.CanvasControllers
             _onWin = _messager.Subscribe<WinMessage>(OnWin);
 
             InitializePirateButtonNumberLabel();
+
+            _shipAttacksLabel.text = "Ship Attacks Left : " + _playerManager.Model.ShipBulletsAvailable.ToString();
 
         }
 
@@ -260,6 +264,11 @@ namespace Assets.Code.Ui.CanvasControllers
         {
             _inputSession.CurrentlySelectedShipAttackName = name;
             _inputSession.CurrentlySelectedPirateName = "";
+
+            int value;
+            _playerManager.Model.ShipAttackCostDict.TryGetValue(name, out value);
+            _inputSession.CurrentShipAttackCost = value;
+
             if (_previouslyClickedTileButton == button) return;
 
             if (_previouslyClickedTileButton != null)

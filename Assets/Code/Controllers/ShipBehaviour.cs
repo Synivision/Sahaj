@@ -19,16 +19,9 @@ public class ShipBehaviour : MonoBehaviour {
 	private GameObject _pirateSpawnPoint;
 	private bool enablePirate;
 	private float _createPirateTime;
+    private InputSession _inputSession;
 	int maxenemyPirateCount = 5;
-
-	public enum ShipAttacktype {
-		Gun,
-		Bomb,
-		Gas,
-		Fire
-	}
-
-	public ShipAttacktype attackType;
+    
     private PlayerManager _playerManager;
 
     public void Initialize(IoCResolver resolver, LevelManager levelmanager, Vector3 pos, PlayerManager playerManager)
@@ -38,14 +31,12 @@ public class ShipBehaviour : MonoBehaviour {
 		_resolver = resolver;
 		enablePirate = true;
         _playerManager = playerManager;
-
-		//default attack type
-		attackType = ShipAttacktype.Gun;
-
+        
 		_resolver.Resolve(out _unityReference);
 		_resolver.Resolve(out _poolingObjectManager);
 		_resolver.Resolve(out _messager);
-		this.transform.position = pos;
+        _resolver.Resolve(out _inputSession);
+        this.transform.position = pos;
 		//get pirate spawn point
 		_pirateSpawnPoint = this.gameObject;
 
@@ -56,29 +47,19 @@ public class ShipBehaviour : MonoBehaviour {
 	private void OnAttackTypeButtonClicked(SelectShipAttackMessage message)
 	{
 		Debug.Log("Hello" + message.ToString());
-		attackType = message.attackType;
 
 	}
 
 	public void shoot(Vector3 firePos) {
 
-		switch (attackType) {
-
-			case ShipAttacktype.Gun:
-				break;
-			case ShipAttacktype.Bomb:
-				break;
-			case ShipAttacktype.Gas:
-				break;
-			case ShipAttacktype.Fire:
-				break;
-		}
 		var fab = _poolingObjectManager.Instantiate("bullet2_prefab");
 		var missDelta = new Vector3(Random.Range(1, 3), Random.Range(1, 3), Random.Range(1, 3));
 
 		fab.GetComponent<BulletController>().Initialize(_resolver,gameObject.transform.position + missDelta,
 														true, Color.green, firePos,"Ship");
-        _playerManager.Model.ShipBulletsAvailable -= 2;
+
+        Debug.Log("Current bullet cost is " + _inputSession.CurrentShipAttackCost.ToString());
+        _playerManager.Model.ShipBulletsAvailable -= _inputSession.CurrentShipAttackCost;
     }
 
 
@@ -95,7 +76,9 @@ public class ShipBehaviour : MonoBehaviour {
 			_createPirateTime = 0;
 		}*/
 	}
-	/*public override void TearDown ()
+
+    /*
+	public override void TearDown ()
 	{
 		_messager.CancelSubscription (OnAttackSelected);
 

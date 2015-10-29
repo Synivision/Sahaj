@@ -34,6 +34,7 @@ namespace Assets.Code.States
         private Dictionary<string, int> _pirateCountDict;
         private Dictionary<string, bool> _unlockedPirates;
         private Dictionary<string, int> _shipAttacksCountDict;
+        private Dictionary<string, int> _shipAttackCostDict;
         private Dictionary<string, bool> _unlockedShipAttacks;
 
         LevelManager levelManager;
@@ -109,6 +110,12 @@ namespace Assets.Code.States
             _shipAttacksCountDict.Add("Bomb", 2);
             _shipAttacksCountDict.Add("Gun", 2);
 
+            _shipAttackCostDict = new Dictionary<string, int>();
+            _shipAttackCostDict.Add("Gas", 2);
+            _shipAttackCostDict.Add("Fire", 3);
+            _shipAttackCostDict.Add("Bomb", 4);
+            _shipAttackCostDict.Add("Gun", 5);
+
             _unlockedShipAttacks = new Dictionary<string, bool>();
             _unlockedShipAttacks.Add("Gas", true);
             _unlockedShipAttacks.Add("Fire", true);
@@ -134,6 +141,7 @@ namespace Assets.Code.States
             playerModel.ShipBulletsAvailable = 10;
             playerModel.ShipAttacksCountDict = _shipAttacksCountDict;
             playerModel.UnlockedShipAttacks = _unlockedShipAttacks;
+            playerModel.ShipAttackCostDict = _shipAttackCostDict;
 
 
             _playerManager.Initialize(_resolver, playerModel, levelManager);
@@ -213,15 +221,15 @@ namespace Assets.Code.States
                     {
                         Vector3 fireBulletAtPos = new Vector3(hitInfo.point.x, 5.2f, hitInfo.point.z);
                         if (_playerManager.Model.ShipBulletsAvailable > 0)
+
                         {
                             shipPrefab.GetComponent<ShipBehaviour>().shoot(fireBulletAtPos);
-                            //TODO emit particle of atttack type
-                        }
-                        //damage building behaviour
-                        if (target.gameObject.tag == "Cube")
-                        {
-                            target.GetComponent<BuildingController>().Stats.CurrentHealth -= 50;
-                           
+                            //damage building behaviour
+                            if (target.gameObject.tag == "Cube")
+                            {
+                                target.GetComponent<BuildingController>().Stats.CurrentHealth -= 50;
+                            }
+
                         }
                     }
                     if (hitInfo.collider != null && hitInfo.collider.gameObject.tag == "water")

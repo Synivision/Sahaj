@@ -7,7 +7,6 @@ namespace Assets.Code.Messaging.Messages
     public class SelectShipAttackMessage : IMessage
     {
         public Color color;
-        public ShipBehaviour.ShipAttacktype attackType;
         public int scale;
         public int speed;
         public bool isProjectile;
