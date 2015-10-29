@@ -220,7 +220,7 @@ namespace Assets.Code.States
                     if ( target != null   &&   target.gameObject.tag != null )
                     {
                         Vector3 fireBulletAtPos = new Vector3(hitInfo.point.x, 5.2f, hitInfo.point.z);
-                        if (_playerManager.Model.ShipBulletsAvailable > 0)
+                        if (_playerManager.Model.ShipBulletsAvailable > 0 && _inputSession.CurrentShipAttackCost != 0)
 
                         {
                             shipPrefab.GetComponent<ShipBehaviour>().shoot(fireBulletAtPos);

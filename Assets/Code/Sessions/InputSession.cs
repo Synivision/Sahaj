@@ -11,6 +11,7 @@ public class InputSession : IResolvableItem  {
 	public void Initialize (InputSessionData data){
 
 		_data = data;
+        CurrentShipAttackCost = 0;
 	}
 
 

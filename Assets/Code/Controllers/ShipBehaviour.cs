@@ -60,6 +60,7 @@ public class ShipBehaviour : MonoBehaviour {
 
         Debug.Log("Current bullet cost is " + _inputSession.CurrentShipAttackCost.ToString());
         _playerManager.Model.ShipBulletsAvailable -= _inputSession.CurrentShipAttackCost;
+        _messager.Publish(new UpdateCurrentShipBulletsMessage { });
     }
 
 

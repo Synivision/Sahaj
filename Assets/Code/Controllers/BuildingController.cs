@@ -263,6 +263,7 @@ public class BuildingController : InitializeRequiredBehaviour {
         //TODO send message to GamePlayCanvas to update the value of ShipbulletsAvailable.
 
         _playerManager.Model.ShipBulletsAvailable += 3;
+        _messager.Publish(new UpdateCurrentShipBulletsMessage { });
     //    GameObject.Find("revolutionaryship(Clone)").transform.gameObject.GetComponent<ShipBehaviour>().BulletsAvailable += 3;
         Destroy(gameObject);
     }
