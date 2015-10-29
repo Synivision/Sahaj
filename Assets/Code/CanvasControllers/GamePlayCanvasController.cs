@@ -126,11 +126,18 @@ namespace Assets.Code.Ui.CanvasControllers
                 }
             }
 
-            //TODO get ship attack data from player model 
-            CreateShipAttackButton("GasButton");
-            CreateShipAttackButton("FireButton");
-            CreateShipAttackButton("BombButton");
-            CreateShipAttackButton("GunButton");
+
+            foreach (var item in _playerManager.Model.UnlockedShipAttacks)
+            {
+
+                if (item.Value == true)
+                {
+                    _shipAttackButtonList.Add(CreateShipAttackButton(item.Key));
+
+                }
+            }
+            
+           
             _onWin = _messager.Subscribe<WinMessage>(OnWin);
 
             InitializePirateButtonNumberLabel();
@@ -251,7 +258,7 @@ namespace Assets.Code.Ui.CanvasControllers
 
         private void OnShipAttackButtonClicked(Button button, string name)
         {
-            _inputSession.CurrentlySelectedPirateName = name;
+            _inputSession.CurrentlySelectedShipAttackName = name;
             if (_previouslyClickedTileButton == button) return;
 
             if (_previouslyClickedTileButton != null)
@@ -280,6 +287,12 @@ namespace Assets.Code.Ui.CanvasControllers
                 button.onClick.RemoveAllListeners();
                 button.gameObject.SetActive(false);
 
+            }
+
+            foreach (var button in _shipAttackButtonList) {
+
+                button.onClick.RemoveAllListeners();
+                button.gameObject.SetActive(false);
             }
 			_messager.CancelSubscription (_onUpdateCanvasPanels,_onUpdatePirateButtonNumberLabel);
             _buttonList.Clear();
