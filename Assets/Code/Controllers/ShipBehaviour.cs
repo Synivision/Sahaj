@@ -21,7 +21,7 @@ public class ShipBehaviour : MonoBehaviour {
 	private float _createPirateTime;
     private InputSession _inputSession;
 	int maxenemyPirateCount = 5;
-    
+    private PrefabProvider _prefabProvider;
     private PlayerManager _playerManager;
 
     public void Initialize(IoCResolver resolver, LevelManager levelmanager, Vector3 pos, PlayerManager playerManager)
@@ -36,9 +36,10 @@ public class ShipBehaviour : MonoBehaviour {
 		_resolver.Resolve(out _poolingObjectManager);
 		_resolver.Resolve(out _messager);
         _resolver.Resolve(out _inputSession);
-        this.transform.position = pos;
+        resolver.Resolve(out _prefabProvider);
+        //this.transform.position = pos;
 		//get pirate spawn point
-		_pirateSpawnPoint = this.gameObject;
+		//_pirateSpawnPoint = this.gameObject;
 
 		OnAttackSelected = _messager.Subscribe<SelectShipAttackMessage>(OnAttackTypeButtonClicked);
         
@@ -52,13 +53,30 @@ public class ShipBehaviour : MonoBehaviour {
 
 	public void shoot(Vector3 firePos) {
 
-		var fab = _poolingObjectManager.Instantiate("bullet2_prefab");
-		var missDelta = new Vector3(Random.Range(1, 3), Random.Range(1, 3), Random.Range(1, 3));
+        //var fab = _poolingObjectManager.Instantiate("bullet2_prefab");
+        //var missDelta = new Vector3(Random.Range(1, 3), Random.Range(1, 3), Random.Range(1, 3));
 
-		fab.GetComponent<BulletController>().Initialize(_resolver,gameObject.transform.position + missDelta,
-														true, Color.green, firePos,"Ship");
+        //fab.GetComponent<BulletController>().Initialize(_resolver, gameObject.transform.position + missDelta,
+        //                                                true, Color.green, firePos, "Ship");
 
-        Debug.Log("Current bullet cost is " + _inputSession.CurrentShipAttackCost.ToString());
+
+        var fab = _poolingObjectManager.Instantiate("bomb_prefab");
+        //var missDelta = new Vector3(Random.Range(1, 3), Random.Range(1, 3), Random.Range(1, 3));
+
+        BombModel model = new BombModel();
+        model.color = Color.green;
+        model.endPos = firePos;
+        model.startPos = gameObject.transform.position;
+
+        //depends on name of bullet ! maybe add it to input session
+        model.damage = 20;
+        model.Name = _inputSession.CurrentlySelectedShipAttackName;
+
+        model.ParticlePrefabName = "blood_prefab";
+
+        fab.GetComponent<BombBehaviour>().Initialize(_resolver, model);
+
+
         _playerManager.Model.ShipBulletsAvailable -= _inputSession.CurrentShipAttackCost;
         _messager.Publish(new UpdateCurrentShipBulletsMessage { });
     }
