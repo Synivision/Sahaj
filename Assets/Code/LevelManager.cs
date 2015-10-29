@@ -303,12 +303,12 @@ public class LevelManager
 			}
 		}
 	}
-
+    /*
 	public void GenerateShip(){
 		var fab = Object.Instantiate(_prefabProvider.GetPrefab("ship"));
 		var shipBehaviour = fab.GetComponent<ShipBehaviour>();
-		shipBehaviour.Initialize(_resolver, this, new Vector3(-180,40,-25));
-	}
+		shipBehaviour.Initialize(_resolver, this, new Vector3(-180,40,-25),_pla);
+	}*/
 
 	private void OnPirateKilled(PirateController pirate)
 	{

@@ -118,6 +118,7 @@ namespace Assets.Code.States
             playerModel.MaxGoldCapacity = 2000;
             playerModel.UnlockedPirates = _unlockedPirates;
             playerModel.PirateCountDict = _pirateCountDict;
+            playerModel.ShipBulletsAvailable = 10;
 
 
             _playerManager.Initialize(_resolver, playerModel, levelManager);
@@ -139,7 +140,7 @@ namespace Assets.Code.States
             startTime = Time.time;
             shipPrefab = _poolingObjectManager.Instantiate("revolutionaryship").gameObject;
             journeyLength = Vector3.Distance(shipPrefab.transform.position, new Vector3(-120, 15, -120));
-            shipPrefab.GetComponent<ShipBehaviour>().Initialize(_resolver, levelManager, shipPrefab.transform.position);
+            shipPrefab.GetComponent<ShipBehaviour>().Initialize(_resolver, levelManager, shipPrefab.transform.position,_playerManager);
             //shipPrefab.gameObject.transform.position.lerp
 
             rowBoat = _poolingObjectManager.Instantiate("row_boat").gameObject;
@@ -193,12 +194,16 @@ namespace Assets.Code.States
                         levelManager.CreatePirate(_inputSession.CurrentlySelectedPirateName, spawnPosition);
                     }
 
-                    if (target.gameObject.tag != null && target.gameObject.tag == "Cube")
+                    if (target.gameObject.tag != null )
                     {
                         Vector3 fireBulletAtPos = new Vector3(hitInfo.point.x, 5.2f, hitInfo.point.z);
-                        shipPrefab.GetComponent<ShipBehaviour>().shoot(fireBulletAtPos);
+                        if(_playerManager.Model.ShipBulletsAvailable> 0)
+                            shipPrefab.GetComponent<ShipBehaviour>().shoot(fireBulletAtPos);
                         //damage building behaviour
-                        target.GetComponent<BuildingController>().Stats.CurrentHealth -= 50;
+                        if (target.gameObject.tag == "Cube")
+                        {
+                            target.GetComponent<BuildingController>().Stats.CurrentHealth -= 50;
+                        }
                     }
                     if (hitInfo.collider.gameObject.tag == "water")
                     {

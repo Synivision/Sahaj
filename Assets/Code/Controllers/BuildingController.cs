@@ -260,7 +260,10 @@ public class BuildingController : InitializeRequiredBehaviour {
     {
         _levelManager.OnPirateCreatedEvent -= OnPirateCreated;
         Stats.OnCurrentHealthChangedEvent -= OnCurrentHealthChanged;
+        //TODO send message to GamePlayCanvas to update the value of ShipbulletsAvailable.
 
+        _playerManager.Model.ShipBulletsAvailable += 3;
+    //    GameObject.Find("revolutionaryship(Clone)").transform.gameObject.GetComponent<ShipBehaviour>().BulletsAvailable += 3;
         Destroy(gameObject);
     }
 }

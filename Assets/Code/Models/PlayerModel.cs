@@ -21,5 +21,5 @@ public class PlayerModel : IGameDataModel {
 	public int Wins{get;set;}
 	public int Gems{get;set;}
 	public Dictionary<string,int> PirateCountDict{ get; set;}
-	
+	public int ShipBulletsAvailable { get; set; }
 }

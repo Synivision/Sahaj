@@ -29,13 +29,15 @@ public class ShipBehaviour : MonoBehaviour {
 	}
 
 	public ShipAttacktype attackType;
+    private PlayerManager _playerManager;
 
-	public void Initialize (IoCResolver resolver,LevelManager levelmanager,Vector3 pos)
+    public void Initialize(IoCResolver resolver, LevelManager levelmanager, Vector3 pos, PlayerManager playerManager)
 	{
 	
 		_levelManager = levelmanager;
 		_resolver = resolver;
 		enablePirate = true;
+        _playerManager = playerManager;
 
 		//default attack type
 		attackType = ShipAttacktype.Gun;
@@ -48,9 +50,8 @@ public class ShipBehaviour : MonoBehaviour {
 		_pirateSpawnPoint = this.gameObject;
 
 		OnAttackSelected = _messager.Subscribe<SelectShipAttackMessage>(OnAttackTypeButtonClicked);
-
-
-	}
+        
+    }
 
 	private void OnAttackTypeButtonClicked(SelectShipAttackMessage message)
 	{
@@ -77,8 +78,8 @@ public class ShipBehaviour : MonoBehaviour {
 
 		fab.GetComponent<BulletController>().Initialize(_resolver,gameObject.transform.position + missDelta,
 														true, Color.green, firePos,"Ship");
-
-	}
+        _playerManager.Model.ShipBulletsAvailable -= 2;
+    }
 
 
 	void Update(){
