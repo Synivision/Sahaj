@@ -33,6 +33,8 @@ namespace Assets.Code.States
         //level Manager
         private Dictionary<string, int> _pirateCountDict;
         private Dictionary<string, bool> _unlockedPirates;
+        private Dictionary<string, int> _shipAttacksCountDict;
+        private Dictionary<string, bool> _unlockedShipAttacks;
 
         LevelManager levelManager;
         PlayerManager _playerManager;
@@ -101,10 +103,21 @@ namespace Assets.Code.States
             _pirateCountDict.Add("Pirate4", 1);
             _pirateCountDict.Add("EnemyPirate3", 10);
 
+            _shipAttacksCountDict = new Dictionary<string, int>();
+            _shipAttacksCountDict.Add("Gas",2);
+            _shipAttacksCountDict.Add("Fire", 2);
+            _shipAttacksCountDict.Add("Bomb", 2);
+            _shipAttacksCountDict.Add("Gun", 2);
+
+            _unlockedShipAttacks = new Dictionary<string, bool>();
+            _unlockedShipAttacks.Add("Gas", true);
+            _unlockedShipAttacks.Add("Fire", true);
+            _unlockedShipAttacks.Add("Bomb", true);
+            _unlockedShipAttacks.Add("Gun", true);
 
 
-            //Initialize level manager
-            levelManager = new LevelManager(_resolver, _mapLayout);
+        //Initialize level manager
+        levelManager = new LevelManager(_resolver, _mapLayout);
 
             PlayerModel playerModel = new PlayerModel();
             playerModel.Name = "User";
@@ -118,6 +131,8 @@ namespace Assets.Code.States
             playerModel.MaxGoldCapacity = 2000;
             playerModel.UnlockedPirates = _unlockedPirates;
             playerModel.PirateCountDict = _pirateCountDict;
+            playerModel.ShipAttacksCountDict = _shipAttacksCountDict;
+            playerModel.UnlockedShipAttacks = _unlockedShipAttacks;
 
 
             _playerManager.Initialize(_resolver, playerModel, levelManager);
