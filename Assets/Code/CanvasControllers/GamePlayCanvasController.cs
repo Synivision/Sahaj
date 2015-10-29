@@ -140,8 +140,9 @@ namespace Assets.Code.Ui.CanvasControllers
 
                 }
             }
-            
-           
+
+            HandleShipButtonVisibility();
+
             _onWin = _messager.Subscribe<WinMessage>(OnWin);
 
             InitializePirateButtonNumberLabel();
@@ -152,6 +153,31 @@ namespace Assets.Code.Ui.CanvasControllers
         private void UpdateShipAttackLabel(UpdateCurrentShipBulletsMessage message){
 
             _shipAttacksLabel.text = "Ship Attacks Left : " + _playerManager.Model.ShipBulletsAvailable.ToString();
+            //TODO check what buttons can be used for attack by ship
+
+            HandleShipButtonVisibility();
+
+        }
+
+        public void HandleShipButtonVisibility() {
+
+            foreach (var button in _shipAttackButtonList)
+            {
+
+                string name = button.gameObject.name;
+                int attackCost;
+                _playerManager.Model.ShipAttackCostDict.TryGetValue(name, out attackCost);
+
+                if (attackCost > _playerManager.Model.ShipBulletsAvailable)
+                {
+                    button.interactable = false;
+                }
+                else if (button != _previouslyClickedTileButton)
+                {
+                    button.interactable = true;
+                }
+
+            }
 
         }
 
@@ -234,6 +260,7 @@ namespace Assets.Code.Ui.CanvasControllers
             fab.onClick.AddListener(() => OnPirateButtonClicked(fab, name));
 
             fab.transform.SetParent(_parentButtonObject.transform);
+
             //fab.transform.localScale = Vector3.one;
             return fab;
         }
@@ -264,6 +291,7 @@ namespace Assets.Code.Ui.CanvasControllers
 
             button.interactable = false;
             _previouslyClickedTileButton = button;
+            HandleShipButtonVisibility();
 
         }
 
@@ -283,6 +311,7 @@ namespace Assets.Code.Ui.CanvasControllers
 
             button.interactable = false;
             _previouslyClickedTileButton = button;
+            HandleShipButtonVisibility();
 
         }
 
