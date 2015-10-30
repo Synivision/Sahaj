@@ -269,7 +269,9 @@ namespace Assets.Code.Ui.CanvasControllers
 
             var fab = Object.Instantiate(_prefabProvider.GetPrefab("ship_attack_button").gameObject.GetComponent<Button>());
             fab.gameObject.name = name;
-
+            int value;
+            _playerManager.Model.ShipAttackCostDict.TryGetValue(name, out value);
+            fab.transform.GetChild(0).GetComponent<Text>().text = value.ToString();
             //var buttonLabel = fab.transform.GetChild(0).GetComponent<Text>();
             //buttonLabel.text = name;
             //var buttonNumberLabel = fab.transform.GetChild(1).GetComponent<Text>();
