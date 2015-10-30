@@ -27,6 +27,7 @@ namespace Assets.Code.States
         private MessagingToken _onQuitGame;
         private MessagingToken _onTearDownLevel;
         private MessagingToken _onPlayStateToShipBase;
+        private MessagingToken _openShipBaseMessage;
 
         private PoolingObjectManager _poolingObjectManager;
 
@@ -366,7 +367,7 @@ namespace Assets.Code.States
                 mapItem.Name = "river";
                 mapItem.zGridCoord = 0;
                 map.mapItemSpawnList.Add(mapItem);
-            }
+            }   
             SwitchState(new ShipBaseState(_resolver, map));
 
         }

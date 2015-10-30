@@ -42,6 +42,8 @@ public class PirateController : AIPath
     public Text _stateText;
     public RectTransform Panel;
 
+    private MessagingToken _openShipBaseMessageToken;
+
     // data
     public PirateModel Model { get; private set; }
 
@@ -52,6 +54,7 @@ public class PirateController : AIPath
     private float _timeTillNextSearch;
 
 	private PirateState _currentState;
+    private bool isDead = false;
 
 	public void Initialize (IoCResolver resolver, PirateModel model, LevelManager levelManager)
 	{
@@ -85,6 +88,8 @@ public class PirateController : AIPath
         ChangeState(PirateState.Scanning);
 		_healthBar.maxValue = Stats.Block.MaximumHealth;
 	    _healthBar.value = Stats.CurrentHealth;
+
+        _openShipBaseMessageToken = _messager.Subscribe<OpenShipBaseMessage>(OnOpenShipBaseMessage);
 
         // NOTE: this should be replaced with an attack speed value from the model
 	    _timeTillNextShot = 1f;
@@ -280,13 +285,20 @@ public class PirateController : AIPath
 		_stateText.text = newState.ToString ();
 	}
 
+    private void OnOpenShipBaseMessage(OpenShipBaseMessage message) {
+        Delete();
+    }
+
     public void Delete()
     {
         _levelManager.OnPirateCreatedEvent -= OnPirateCreated;
         _levelManager.OnBuildingCreatedEvent -= OnBuildingCreated;
         Stats.OnCurrentHealthChangedEvent -= OnCurrentHealthChanged;
-
-        Destroy(gameObject);
+        if (!isDead)
+        {
+            Destroy(gameObject);
+            isDead = true;
+        }
     }
 }
 

@@ -54,6 +54,8 @@ public class LevelManager
 	private List<string> BuildingList;
 	private List<string> MapItemsList;
 
+    private MessagingToken _openShipBaseMessageToken;
+
 	public enum PassabilityType {
 		Impassible,
 		Passible
@@ -79,8 +81,10 @@ public class LevelManager
 		_knownBuildings = new List<BuildingController>();
 		
 		GenerateLevelMap();
-		// Debug.Log(GetTileAt(new Vector3(12,0,13)));
-	}
+
+        _openShipBaseMessageToken = _messager.Subscribe<OpenShipBaseMessage>(OpenShipBase);
+        // Debug.Log(GetTileAt(new Vector3(12,0,13)));
+    }
 	
 	public void GenerateLevelMap(){
 		
@@ -319,12 +323,20 @@ public class LevelManager
 		if (pirate != null)
 			pirate.Delete();
 	}
-	
-	public void TearDownLevel ()
+
+    private void OpenShipBase(OpenShipBaseMessage message) {
+
+        Debug.Log("Tearing Down Level");
+        TearDownLevel();
+
+    }
+
+    public void TearDownLevel ()
 	{
-		_unityReferenceMaster.AStarPlane.SetActive(false);
+        _unityReferenceMaster.AStarPlane.SetActive(false);
 		//Object.Destroy(_piratesParent);
 		Object.Destroy (_buildingsParent);
+        
 		//destroy ground covers
 		//Object.Destroy(_groundCoverParent);
 	}
