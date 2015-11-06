@@ -13,7 +13,7 @@ namespace Assets.Code.Ui.CanvasControllers
 {
     public class ShopCanvasController : BaseCanvasController
     {
-
+        private Canvas _canvas;
         private Button closeButton;
         private IoCResolver _resolver;
         private readonly Messager _messager;
@@ -26,9 +26,11 @@ namespace Assets.Code.Ui.CanvasControllers
         public ShopCanvasController(IoCResolver resolver, Canvas canvasView)
             : base(resolver, canvasView)
 		{
+            _canvas = canvasView;
             _resolver = resolver;
             _resolver.Resolve(out _messager);
             _resolver.Resolve(out _prefabProvider);
+            _canvas.enabled = true;
 
             ResolveElement(out closeButton, "MainPanel/CloseButton");
 
@@ -46,14 +48,14 @@ namespace Assets.Code.Ui.CanvasControllers
 
             for (int i = 0; i<5; i++) {
 
-                addBuildingButton("Building"+i);
+               addBuildingButton("Building");
             }
             
         }
 
         public void onCloseClicked() {
 
-            TearDown();
+            _canvas.enabled = false;
 
         }
 
@@ -76,9 +78,16 @@ namespace Assets.Code.Ui.CanvasControllers
 
         public void onBuildingButtonclicked(Button button, string name) {
 
-            //generate building in map
+            //generate building in map 
+            //send message to ship play state 
 
+            _messager.Publish(new CreateBuildingMessage {
+                
+                PirateName = name
 
+            });
+
+            _canvas.enabled = false;
         }
 
 

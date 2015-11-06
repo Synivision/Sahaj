@@ -20,10 +20,14 @@ namespace Assets.Code.States
 		private UiManager _uiManager;
 		ShipLevelManager shipLevelManager;
 		private readonly Messager _messager;
-		private MessagingToken _onChangeStateToAttack;
+        readonly GameDataProvider _gameDataProvider;
+        private readonly PrefabProvider _prefabProvider;
+        private SpriteProvider _spriteProvider;
+        private MessagingToken _onChangeStateToAttack;
 		private MessagingToken _onInventoryOpen;
         private MessagingToken _onBuildingInfoOpen;
         private MessagingToken _onOpenShopMessage;
+        private MessagingToken _onCreateBuildingMessage;
         MapLayout _map;
 		private float _time = 5;
 		private GameObject tile;
@@ -32,7 +36,7 @@ namespace Assets.Code.States
 		private GameObject target;
 		public Vector3 screenSpace;
 		public Vector3 offset;
-
+        public GameObject newBuilding;
 		private GameObject inventoryCanvas;
 
 		Vector3 curPosition;
@@ -45,8 +49,11 @@ namespace Assets.Code.States
 			_resolver.Resolve (out _canvasProvider);
 			_resolver.Resolve (out _messager);
 			_resolver.Resolve (out _poolingObjectManager);
+            _resolver.Resolve(out _gameDataProvider);
+            _resolver.Resolve(out _prefabProvider);
+            _resolver.Resolve(out _spriteProvider);
 
-			_map = map;
+            _map = map;
 		}
 		
 		public override void Initialize (){
@@ -60,6 +67,7 @@ namespace Assets.Code.States
 			_onInventoryOpen = _messager.Subscribe<OpenInventory>(OpenInventoryBuilding);
             _onBuildingInfoOpen = _messager.Subscribe<OpenBuildingInfoCanvas>(OnOpenBuildingInfoCanvas);
             _onOpenShopMessage = _messager.Subscribe<OpenShopMessage>(OnOpenShop);
+            _onCreateBuildingMessage = _messager.Subscribe<CreateBuildingMessage>(onCreateBuilding);
             //generate tile and disable it
             var tileo = _poolingObjectManager.Instantiate("tile");
 			tile = tileo.gameObject;
@@ -67,6 +75,38 @@ namespace Assets.Code.States
 		
 		}
 
+        public void onCreateBuilding(CreateBuildingMessage message) {
+
+            //generate a building and it should follow mouse
+            newBuilding =  CreateBuilding("gold_storage",new Vector3(0,11,0));
+            newBuilding.GetComponent<BuildingController>().movementIndicatorActive = true;
+        }
+
+        public GameObject CreateBuilding(string buildingName, Vector3 spawnPosition)
+        {
+            var model = _gameDataProvider.GetData<BuildingModel>(buildingName);
+            GameObject fab;
+            BuildingController buildingController;
+            fab = Object.Instantiate(_prefabProvider.GetPrefab("Building"));
+
+            fab.GetComponent<SpriteRenderer>().sprite = _spriteProvider.GetSprite(buildingName);
+
+            buildingController = fab.GetComponent<BuildingController>();
+            buildingController.Initialize(_resolver, model, shipLevelManager);
+            fab.name = buildingName;
+            fab.transform.position = spawnPosition;
+            //fab.transform.SetParent(_buildingsParent.transform);
+
+            //if (OnBuildingCreatedEvent != null){
+            //	OnBuildingCreatedEvent(buildingController);
+            //}
+
+            //buildingController.Stats.OnKilledEvent += () => OnBuildingKilled(buildingController);
+            //_knownBuildings.Add(buildingController);
+
+            return fab;
+
+        }
         public void OnOpenShop (OpenShopMessage message)
         {
             _uiManager.RegisterUi(new ShopCanvasController(_resolver, _canvasProvider.GetCanvas("ShopCanvas")));
@@ -93,7 +133,12 @@ namespace Assets.Code.States
 		public override void Update (){
 
 			_uiManager.Update ();
-		
+
+            //if (newBuilding) {
+
+            //    newBuilding.transform.position = Input.mousePosition;
+
+            //}
 
 			Touch[] touch = Input.touches;
 			if (Application.platform == RuntimePlatform.Android)
@@ -130,15 +175,26 @@ namespace Assets.Code.States
 				
 				if(_mouseState && shipLevelManager.GetCoordinatePassability(curPosition + new Vector3(125,0,125)) == ShipLevelManager.PassabilityType.Passible){
 					shipLevelManager.UpdateBlueprint(selectedgameObjectPosition + new Vector3(125,0,125),curPosition + new Vector3(125,0,125));
-				}
+
+                    if (newBuilding)
+                    {
+
+                        newBuilding.GetComponent<BuildingController>().movementIndicatorActive = false;
+                        //shipLevelManager.UpdateBlueprint(selectedgameObjectPosition + new Vector3(125, 0, 125), curPosition + new Vector3(125, 0, 125));
+                    }
+
+                }
 				else{
 					if(target!=null && target.gameObject.tag != "Plane"){
 						target.transform.position = selectedgameObjectPosition;
+
 					}
 				}
 
 				_mouseState = false;
 				tile.SetActive(false);
+
+               
 
 			}
 			
