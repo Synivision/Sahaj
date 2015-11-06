@@ -23,7 +23,8 @@ namespace Assets.Code.States
 		private MessagingToken _onChangeStateToAttack;
 		private MessagingToken _onInventoryOpen;
         private MessagingToken _onBuildingInfoOpen;
-		MapLayout _map;
+        private MessagingToken _onOpenShopMessage;
+        MapLayout _map;
 		private float _time = 5;
 		private GameObject tile;
 		int pointerId = -1;
@@ -58,12 +59,19 @@ namespace Assets.Code.States
 			_onChangeStateToAttack = _messager.Subscribe<StartGameMessage>(OnChangeStateToAttack);	
 			_onInventoryOpen = _messager.Subscribe<OpenInventory>(OpenInventoryBuilding);
             _onBuildingInfoOpen = _messager.Subscribe<OpenBuildingInfoCanvas>(OnOpenBuildingInfoCanvas);
+            _onOpenShopMessage = _messager.Subscribe<OpenShopMessage>(OnOpenShop);
             //generate tile and disable it
             var tileo = _poolingObjectManager.Instantiate("tile");
 			tile = tileo.gameObject;
 			tile.SetActive(false);
 		
 		}
+
+        public void OnOpenShop (OpenShopMessage message)
+        {
+            _uiManager.RegisterUi(new ShopCanvasController(_resolver, _canvasProvider.GetCanvas("ShopCanvas")));
+
+        }
 
         public void OnOpenBuildingInfoCanvas(OpenBuildingInfoCanvas message) {
 
