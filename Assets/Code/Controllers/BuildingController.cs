@@ -74,8 +74,13 @@ public class BuildingController : InitializeRequiredBehaviour {
 
         MarkAsInitialized();
 
+        var indicator = _poolingObjectManager.Instantiate("move_indicator");
+        movementIndicator = indicator.gameObject;
+        movementIndicator.transform.position = transform.position;
+        movementIndicator.SetActive(false);
 
-       
+
+
     }
 
     public void Initialize (IoCResolver resolver,BuildingModel model,ShipLevelManager shiplevelmanager)

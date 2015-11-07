@@ -23,6 +23,8 @@ namespace Assets.Code.Ui.CanvasControllers
         private  PrefabProvider _prefabProvider;
         private Button buildingButton;
 
+        private List<Button> buildingButtonList;
+
         public ShopCanvasController(IoCResolver resolver, Canvas canvasView)
             : base(resolver, canvasView)
 		{
@@ -30,16 +32,18 @@ namespace Assets.Code.Ui.CanvasControllers
             _resolver = resolver;
             _resolver.Resolve(out _messager);
             _resolver.Resolve(out _prefabProvider);
-            _canvas.enabled = true;
+            //_canvas.enabled = true;
 
+            buildingButtonList = new List<Button>();
             ResolveElement(out closeButton, "MainPanel/CloseButton");
 
             buttonPanel = GetElement("MainPanel/ButtonPanel");
 
             buildingButtonPanel = GetElement("MainPanel/BuildingButtonPanel");
             buildingButtonScrollPanel = buildingButtonPanel.transform.GetChild(0).gameObject;
-
             buildingButtonPanel.SetActive(false);
+            buttonPanel.SetActive(true);
+
 
             ResolveElement(out openBuildingPanelButton, "MainPanel/ButtonPanel/TreasureButton");
 
@@ -55,8 +59,8 @@ namespace Assets.Code.Ui.CanvasControllers
 
         public void onCloseClicked() {
 
-            _canvas.enabled = false;
-
+            // _canvas.enabled = false;
+            TearDown();
         }
 
         public void onBuildingPanelButtonClicked()
@@ -70,10 +74,12 @@ namespace Assets.Code.Ui.CanvasControllers
 
             var fab = Object.Instantiate(_prefabProvider.GetPrefab("buildings_button").gameObject.GetComponent<Button>());
             var buttonLabel = fab.transform.GetChild(0).GetComponent<Text>();
+            fab.name = name;
             buttonLabel.text = name;
 
             fab.onClick.AddListener(() => onBuildingButtonclicked(fab, name));
             fab.transform.SetParent(buildingButtonScrollPanel.transform);
+            buildingButtonList.Add(fab);
         }
 
         public void onBuildingButtonclicked(Button button, string name) {
@@ -87,10 +93,24 @@ namespace Assets.Code.Ui.CanvasControllers
 
             });
 
-            _canvas.enabled = false;
+            //_canvas.enabled = false;
+            TearDown();
         }
 
 
+        public override void TearDown()
+        {
+
+            foreach (var button in buildingButtonList)
+            {
+
+                button.onClick.RemoveAllListeners();
+                GameObject.Destroy(button.gameObject);
+            }
+
+            buildingButtonList.Clear();
+            base.TearDown();
+        }
     }
 
 }
