@@ -37,6 +37,7 @@ namespace Assets.Code.States
         private Dictionary<string, int> _shipAttacksCountDict;
         private Dictionary<string, int> _shipAttackCostDict;
         private Dictionary<string, bool> _unlockedShipAttacks;
+        
 
         LevelManager levelManager;
         PlayerManager _playerManager;
@@ -58,7 +59,7 @@ namespace Assets.Code.States
         GameObject shipPrefab;
         GameObject rowBoat;
         RowBoatController boatController;
-
+        private Dictionary<string, int> _rowBoatDict;
         private GameObject tile;
         int pointerId = -1;
 
@@ -124,8 +125,15 @@ namespace Assets.Code.States
             _unlockedShipAttacks.Add("Gun", true);
 
 
-        //Initialize level manager
-        levelManager = new LevelManager(_resolver, _mapLayout);
+            //add rowboat dict to playermanager
+            _rowBoatDict = new Dictionary<string, int>();
+            _rowBoatDict.Add("Boat1", 1);
+            _rowBoatDict.Add("Boat2", 2);
+            _rowBoatDict.Add("Boat3", 3);
+            _rowBoatDict.Add("Boat4", 4);
+
+            //Initialize level manager
+            levelManager = new LevelManager(_resolver, _mapLayout);
 
             PlayerModel playerModel = new PlayerModel();
             playerModel.Name = "User";
@@ -143,6 +151,7 @@ namespace Assets.Code.States
             playerModel.ShipAttacksCountDict = _shipAttacksCountDict;
             playerModel.UnlockedShipAttacks = _unlockedShipAttacks;
             playerModel.ShipAttackCostDict = _shipAttackCostDict;
+            playerModel.RowBoatCountDict = _rowBoatDict;
 
 
             _playerManager.Initialize(_resolver, playerModel, levelManager);

@@ -38,6 +38,8 @@ namespace Assets.Code.States
 		public Vector3 offset;
         public GameObject newBuilding;
 		private GameObject inventoryCanvas;
+        private GameObject _rowbBoatParent;
+        private PlayerManager _playerManager;
 
 		Vector3 curPosition;
 		Vector3 selectedgameObjectPosition = new Vector3(0,0,0);
@@ -52,6 +54,7 @@ namespace Assets.Code.States
             _resolver.Resolve(out _gameDataProvider);
             _resolver.Resolve(out _prefabProvider);
             _resolver.Resolve(out _spriteProvider);
+            _resolver.Resolve(out _playerManager);
 
             _map = map;
 		}
@@ -72,8 +75,31 @@ namespace Assets.Code.States
             var tileo = _poolingObjectManager.Instantiate("tile");
 			tile = tileo.gameObject;
 			tile.SetActive(false);
-		
-		}
+
+
+
+            if (_playerManager.Model != null) {
+
+
+                _rowbBoatParent = Object.Instantiate(_prefabProvider.GetPrefab("empty1"));
+                _rowbBoatParent.transform.position = new Vector3(0, 0, 0);
+                _rowbBoatParent.gameObject.name = "RowBoatParent";
+
+                //instantiate boats
+                foreach (var boat in _playerManager.Model.RowBoatCountDict) {
+
+                    var rowBoat = _poolingObjectManager.Instantiate("row_boat").gameObject;
+                    rowBoat.transform.position = new Vector3(-110, 11.5f, -25*boat.Value);
+                    var boatController = rowBoat.GetComponent<RowBoatController>();
+                    boatController.Initialize(_resolver);
+
+                    rowBoat.transform.SetParent(_rowbBoatParent.transform);
+                    Debug.Log(boat.Key);
+                } 
+
+            }
+            
+        }
 
         public void onCreateBuilding(CreateBuildingMessage message) {
 
@@ -249,6 +275,11 @@ namespace Assets.Code.States
 			_uiManager.TearDown();
 			Object.Destroy (tile.gameObject);
 			shipLevelManager.TearDown();
+            if (_rowbBoatParent !=null) {
+
+                Object.Destroy(_rowbBoatParent.gameObject);
+            }
+            
 
 		}
 
