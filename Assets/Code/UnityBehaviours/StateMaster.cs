@@ -10,7 +10,7 @@ using Assets.Code.Messaging.Messages;
 using Assets.Code.Models;
 using Assets.Code.States;
 using Assets.Code.Utilities;
-using UnityEditor;
+//using UnityEditor;
 using UnityEngine;
 using Assets.Code.Logic.Logging;
 
@@ -36,11 +36,11 @@ namespace Assets.Code.UnityBehaviours
         public void Start()
         {
             _resolver = new IoCResolver();
-			AssetDatabase.Refresh();
+			//AssetDatabase.Refresh();
 
             /* RESOURCE LIST CREATION */
 #if UNITY_EDITOR
-			AssetDatabase.Refresh();
+			//AssetDatabase.Refresh();
             FileServices.CreateResourcesList("Assets/Resources/resourceslist.txt");
 
 #endif
@@ -105,7 +105,6 @@ namespace Assets.Code.UnityBehaviours
 			//Player manager
 			var playerManager = new PlayerManager();
 			_resolver.RegisterItem(playerManager);
-
 
 			var inputSession  =  new InputSession();
 			_resolver.RegisterItem(inputSession);

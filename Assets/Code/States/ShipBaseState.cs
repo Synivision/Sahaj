@@ -185,6 +185,16 @@ namespace Assets.Code.States
 					//get position of object selected 
 					selectedgameObjectPosition = target.transform.position;		
 				}
+
+                if (target != null && (target.gameObject.tag == "RowBoat")) {
+                    //show RowBoat Canvas
+                    Debug.Log("Boatt");
+                    _uiManager.RegisterUi(new RowBoatCanvasController(_resolver, _canvasProvider.GetCanvas("RowBoatCanvas")));
+
+                }
+                if (target != null && (target.gameObject.tag == "water")) {
+                    target = null;
+                }
 			}
 			
 			if (Input.GetMouseButtonUp (0) ) {

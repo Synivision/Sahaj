@@ -5,6 +5,7 @@
 		arrow_down.png
 		goldcoin.png
 		icon.jpg
+		rowboat_canvas_bg.jpg
 		shipbomb.png
 		ship_fire.png
 		ship_gas.png

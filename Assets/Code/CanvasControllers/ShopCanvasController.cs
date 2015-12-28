@@ -19,7 +19,8 @@ namespace Assets.Code.Ui.CanvasControllers
         private readonly Messager _messager;
         private UiManager _uiManager;
         private Button openBuildingPanelButton;
-        private GameObject buttonPanel, buildingButtonPanel, buildingButtonScrollPanel;
+        private GameObject buttonPanel, buildingButtonListPanel;
+        private GameObject buildingButtonListContentPanel;
         private  PrefabProvider _prefabProvider;
         private Button buildingButton;
 
@@ -39,9 +40,9 @@ namespace Assets.Code.Ui.CanvasControllers
 
             buttonPanel = GetElement("MainPanel/ButtonPanel");
 
-            buildingButtonPanel = GetElement("MainPanel/BuildingButtonPanel");
-            buildingButtonScrollPanel = buildingButtonPanel.transform.GetChild(0).gameObject;
-            buildingButtonPanel.SetActive(false);
+            buildingButtonListPanel = GetElement("MainPanel/BuildingListPanel");
+            buildingButtonListContentPanel = GetElement("MainPanel/BuildingListPanel/Content");
+            buildingButtonListPanel.SetActive(false);
             buttonPanel.SetActive(true);
 
 
@@ -65,7 +66,7 @@ namespace Assets.Code.Ui.CanvasControllers
 
         public void onBuildingPanelButtonClicked()
         {
-            buildingButtonPanel.SetActive(true);
+            buildingButtonListPanel.SetActive(true);
             buttonPanel.SetActive(false);
 
         }
@@ -78,7 +79,7 @@ namespace Assets.Code.Ui.CanvasControllers
             buttonLabel.text = name;
 
             fab.onClick.AddListener(() => onBuildingButtonclicked(fab, name));
-            fab.transform.SetParent(buildingButtonScrollPanel.transform);
+            fab.transform.SetParent(buildingButtonListContentPanel.transform);
             buildingButtonList.Add(fab);
         }
 
@@ -96,7 +97,6 @@ namespace Assets.Code.Ui.CanvasControllers
             //_canvas.enabled = false;
             TearDown();
         }
-
 
         public override void TearDown()
         {
