@@ -326,7 +326,6 @@ public class LevelManager
 
     private void OpenShipBase(OpenShipBaseMessage message) {
 
-        Debug.Log("Tearing Down Level");
         TearDownLevel();
 
     }

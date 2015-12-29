@@ -30,15 +30,6 @@ namespace Assets.Code.States
         private MessagingToken _openShipBaseMessage;
 
         private PoolingObjectManager _poolingObjectManager;
-
-        //level Manager
-        private Dictionary<string, int> _pirateCountDict;
-        private Dictionary<string, bool> _unlockedPirates;
-        private Dictionary<string, int> _shipAttacksCountDict;
-        private Dictionary<string, int> _shipAttackCostDict;
-        private Dictionary<string, bool> _unlockedShipAttacks;
-        
-
         LevelManager levelManager;
         PlayerManager _playerManager;
         MapLayout _mapLayout;
@@ -57,17 +48,13 @@ namespace Assets.Code.States
         private float startTime;
         private float journeyLength;
         GameObject shipPrefab;
-
         List<GameObject> rowBoat;
-        private Dictionary<string, Dictionary<int, string>> _rowBoatDict;
-
         private GameObject tile;
         int pointerId = -1;
-
-		private int boatCount;  	//TODO: this should be taken from the base controller in future..
-		//add rowboat dict to playermanager
-		Dictionary < int,string> seatsDictionary;
-
+    
+		private int boatCount;  	
+        //TODO: this should be taken from the base controller in future..
+	
         Vector3 curPosition;
         Vector3 selectedgameObjectPosition = new Vector3(0, 0, 0);
         public PlayState(IoCResolver resolver, MapLayout mapLayout) : base(resolver)
@@ -89,121 +76,10 @@ namespace Assets.Code.States
             //_uiManager.RegisterUi (new MainCanvasController (_resolver, _canvasProvider.GetCanvas ("MainCanvas")));
             _uiManager.RegisterUi(new PirateInfoCanvasController(_resolver, _canvasProvider.GetCanvas("PirateInfoCanvas")));
 
-            _unlockedPirates = new Dictionary<string, bool>();
-            _unlockedPirates.Add("Captain", true);
-            _unlockedPirates.Add("Quarter Master", true);
-            _unlockedPirates.Add("Gunner", true);
-            _unlockedPirates.Add("Bomber", true);
-            _unlockedPirates.Add("Surgeon", true);
-            _unlockedPirates.Add("Carpenter", true);
-            _unlockedPirates.Add("Chef", false);
-            _unlockedPirates.Add("Pirate4", false);
-            _unlockedPirates.Add("EnemyPirate5", false);
-
-            _pirateCountDict = new Dictionary<string, int>();
-            _pirateCountDict.Add("Captain", 1);
-            _pirateCountDict.Add("Quarter Master", 2);
-            _pirateCountDict.Add("Gunner", 5);
-            _pirateCountDict.Add("Bomber", 3);
-            _pirateCountDict.Add("Surgeon", 4);
-            _pirateCountDict.Add("Carpenter", 2);
-            _pirateCountDict.Add("Chef", 2);
-            _pirateCountDict.Add("Pirate4", 1);
-            _pirateCountDict.Add("EnemyPirate3", 10);
-
-            _shipAttacksCountDict = new Dictionary<string, int>();
-            _shipAttacksCountDict.Add("Gas",2);
-            _shipAttacksCountDict.Add("Fire", 2);
-            _shipAttacksCountDict.Add("Bomb", 2);
-            _shipAttacksCountDict.Add("Gun", 2);
-
-            _shipAttackCostDict = new Dictionary<string, int>();
-            _shipAttackCostDict.Add("Gas", 2);
-            _shipAttackCostDict.Add("Fire", 3);
-            _shipAttackCostDict.Add("Bomb", 4);
-            _shipAttackCostDict.Add("Gun", 11);
-
-            _unlockedShipAttacks = new Dictionary<string, bool>();
-            _unlockedShipAttacks.Add("Gas", true);
-            _unlockedShipAttacks.Add("Fire", true);
-            _unlockedShipAttacks.Add("Bomb", true);
-            _unlockedShipAttacks.Add("Gun", true);
-
-
-            
-            
-            _rowBoatDict = new Dictionary<string, Dictionary<int, string>>();
-
-            //boat1
-            seatsDictionary = new Dictionary<int, string>();
-            seatsDictionary.Add(0, "Quarter Master");
-            seatsDictionary.Add(1,"Captain");
-            seatsDictionary.Add(2, "Gunner");
-            seatsDictionary.Add(3, "Bomber");
-            seatsDictionary.Add(4, "");
-            seatsDictionary.Add(5, "");
-
-            _rowBoatDict.Add("Boat1", seatsDictionary);
-
-            //boat2
-            seatsDictionary = new Dictionary<int, string>();
-            seatsDictionary.Add(0, "Quarter Master");
-            seatsDictionary.Add(1, "Captain");
-            seatsDictionary.Add(2, "Gunner");
-            seatsDictionary.Add(3, "Bomber");
-            seatsDictionary.Add(4, "Surgeon");
-            seatsDictionary.Add(5, "Gunner");
-
-
-            _rowBoatDict.Add("Boat2", seatsDictionary);
-
-            //boat 3
-            seatsDictionary = new Dictionary<int, string>();
-            seatsDictionary.Add(0, "Bomber");
-            seatsDictionary.Add(1, "Captain");
-            seatsDictionary.Add(2, "");
-            seatsDictionary.Add(3, "");
-            seatsDictionary.Add(4, "");
-            seatsDictionary.Add(5, "");
-
-            _rowBoatDict.Add("Boat3", seatsDictionary);
-
-            //boat4
-            seatsDictionary = new Dictionary<int, string>();
-            seatsDictionary.Add(0, "");
-            seatsDictionary.Add(1, "");
-            seatsDictionary.Add(2, "");
-            seatsDictionary.Add(3, "");
-            seatsDictionary.Add(4, "");
-            seatsDictionary.Add(5, "");
-            _rowBoatDict.Add("Boat4", seatsDictionary);
-
-			boatCount = _rowBoatDict.Count;
-			Debug.Log (boatCount);
+			boatCount = _playerManager.Model.RowBoatCountDict.Count;
             //Initialize level manager
             levelManager = new LevelManager(_resolver, _mapLayout);
-
-            PlayerModel playerModel = new PlayerModel();
-            playerModel.Name = "User";
-            playerModel.Email = "user@gmail.com";
-            playerModel.Gold = 0;
-            playerModel.ExperiencePoints = 0;
-            playerModel.UserLevel = 0;
-            playerModel.UserRank = 0;
-            playerModel.Wins = 0;
-            playerModel.Gems = 100;
-            playerModel.MaxGoldCapacity = 2000;
-            playerModel.UnlockedPirates = _unlockedPirates;
-            playerModel.PirateCountDict = _pirateCountDict;
-            playerModel.ShipBulletsAvailable = 10;
-            playerModel.ShipAttacksCountDict = _shipAttacksCountDict;
-            playerModel.UnlockedShipAttacks = _unlockedShipAttacks;
-            playerModel.ShipAttackCostDict = _shipAttackCostDict;
-            playerModel.RowBoatCountDict = _rowBoatDict;
-
-
-            _playerManager.Initialize(_resolver, playerModel, levelManager);
-            levelManager.PirateCountDict = _pirateCountDict;
+            levelManager.PirateCountDict = _playerManager.Model.PirateCountDict;
             _uiManager.RegisterUi(new GamePlayCanvasController(_resolver, _canvasProvider.GetCanvas("GamePlayCanvas"), _playerManager));
             //Debug.Log ("Play state initialized.");
 
@@ -211,11 +87,6 @@ namespace Assets.Code.States
             _onQuitGame = _messager.Subscribe<QuitGameMessage>(OnQuitGame);
             _onTearDownLevel = _messager.Subscribe<TearDownLevelMessage>(OnTearDownLevel);
             _onPlayStateToShipBase = _messager.Subscribe<OpenShipBaseMessage>(OnOpenShipBaseMessage);
-
-            _inputSessionData = new InputSessionData();
-            _inputSessionData.Name = "None";
-            _inputSession.Initialize(_inputSessionData);
-
 
             // ship  lerp into level
             startTime = Time.time;
@@ -343,7 +214,7 @@ namespace Assets.Code.States
 			boat.transform.position = spawn;
 			RowBoatController boatController = boat.GetComponent<RowBoatController>();
 			boatController.rowPrefab = boat;
-			boatController.Initialize(_resolver,true, seatsDictionary);
+			boatController.Initialize(_resolver,true, null);
 			
 			boatCount--;
 			
@@ -478,7 +349,7 @@ namespace Assets.Code.States
         {
 
 
-			for (int i=0; i < (_rowBoatDict.Count - boatCount); i++) {
+			for (int i=0; i < (_playerManager.Model.RowBoatCountDict.Count - boatCount); i++) {
 			
 				Object.Destroy(rowBoat[i]);
 

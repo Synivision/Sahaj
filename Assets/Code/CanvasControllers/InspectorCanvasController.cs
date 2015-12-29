@@ -85,7 +85,7 @@ namespace Assets.Code.Ui.CanvasControllers
 			Debug.Log ("On Action Clicked");
 			_messager.Publish(new OpenInventory{});
 
-
+           
 		}
 		
 		// Use this for initialization

@@ -20,7 +20,7 @@ public class PlayerManager  : IResolvableItem {
 	
 	public PlayerModel Model{ get; set;}
 	
-	public void Initialize (IoCResolver resolver, PlayerModel data, LevelManager levelManager)
+	public void Initialize (IoCResolver resolver, PlayerModel data)
 	{
 		//Get Resolver
 		_resolver = resolver;

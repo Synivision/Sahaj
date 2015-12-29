@@ -104,10 +104,18 @@ namespace Assets.Code.UnityBehaviours
 
 			//Player manager
 			var playerManager = new PlayerManager();
+            //initialize dummy player model
+            playerManager.Initialize(_resolver, InitializeDummyPlayerModel());
 			_resolver.RegisterItem(playerManager);
 
+
+            //input session
 			var inputSession  =  new InputSession();
-			_resolver.RegisterItem(inputSession);
+            InputSessionData data = new InputSessionData();
+            data.Name = "None";
+            inputSession.Initialize(data);
+            _resolver.RegisterItem(inputSession);
+
             #endregion
 
             // lock the resolver (stop any new items being registered)
@@ -369,5 +377,129 @@ namespace Assets.Code.UnityBehaviours
             _currentState.Update ();
             _currentState.HandleInput();
         }
+
+        public PlayerModel InitializeDummyPlayerModel() {
+
+            PlayerModel playerModel = new PlayerModel();
+
+            Dictionary<int, string> seatsDictionary;
+            //level Manager
+            Dictionary<string, int> _pirateCountDict;
+            Dictionary<string, bool> _unlockedPirates;
+            Dictionary<string, int> _shipAttacksCountDict;
+            Dictionary<string, int> _shipAttackCostDict;
+            Dictionary<string, bool> _unlockedShipAttacks;
+            Dictionary<string, Dictionary<int, string>> _rowBoatDict;
+
+        _unlockedPirates = new Dictionary<string, bool>();
+            _unlockedPirates.Add("Captain", true);
+            _unlockedPirates.Add("Quarter Master", true);
+            _unlockedPirates.Add("Gunner", true);
+            _unlockedPirates.Add("Bomber", true);
+            _unlockedPirates.Add("Surgeon", true);
+            _unlockedPirates.Add("Carpenter", false);
+            _unlockedPirates.Add("Chef", false);
+            _unlockedPirates.Add("Pirate4", false);
+            _unlockedPirates.Add("EnemyPirate5", false);
+
+            _pirateCountDict = new Dictionary<string, int>();
+            _pirateCountDict.Add("Captain", 1);
+            _pirateCountDict.Add("Quarter Master", 2);
+            _pirateCountDict.Add("Gunner", 5);
+            _pirateCountDict.Add("Bomber", 3);
+            _pirateCountDict.Add("Surgeon", 4);
+            _pirateCountDict.Add("Carpenter", 2);
+            _pirateCountDict.Add("Chef", 2);
+            _pirateCountDict.Add("Pirate4", 1);
+            _pirateCountDict.Add("EnemyPirate3", 10);
+
+            _shipAttacksCountDict = new Dictionary<string, int>();
+            _shipAttacksCountDict.Add("Gas", 2);
+            _shipAttacksCountDict.Add("Fire", 2);
+            _shipAttacksCountDict.Add("Bomb", 2);
+            _shipAttacksCountDict.Add("Gun", 2);
+
+            _shipAttackCostDict = new Dictionary<string, int>();
+            _shipAttackCostDict.Add("Gas", 2);
+            _shipAttackCostDict.Add("Fire", 3);
+            _shipAttackCostDict.Add("Bomb", 4);
+            _shipAttackCostDict.Add("Gun", 11);
+
+            _unlockedShipAttacks = new Dictionary<string, bool>();
+            _unlockedShipAttacks.Add("Gas", true);
+            _unlockedShipAttacks.Add("Fire", true);
+            _unlockedShipAttacks.Add("Bomb", true);
+            _unlockedShipAttacks.Add("Gun", true);
+
+
+            _rowBoatDict = new Dictionary<string, Dictionary<int, string>>();
+
+            //boat1
+            seatsDictionary = new Dictionary<int, string>();
+            seatsDictionary.Add(0, "Quarter Master");
+            seatsDictionary.Add(1, "Captain");
+            seatsDictionary.Add(2, "Gunner");
+            seatsDictionary.Add(3, "Bomber");
+            seatsDictionary.Add(4, "");
+            seatsDictionary.Add(5, "");
+
+            _rowBoatDict.Add("Boat1", seatsDictionary);
+
+            //boat2
+            seatsDictionary = new Dictionary<int, string>();
+            seatsDictionary.Add(0, "Quarter Master");
+            seatsDictionary.Add(1, "Captain");
+            seatsDictionary.Add(2, "Gunner");
+            seatsDictionary.Add(3, "Bomber");
+            seatsDictionary.Add(4, "Surgeon");
+            seatsDictionary.Add(5, "Gunner");
+
+
+            _rowBoatDict.Add("Boat2", seatsDictionary);
+
+            //boat 3
+            seatsDictionary = new Dictionary<int, string>();
+            seatsDictionary.Add(0, "Bomber");
+            seatsDictionary.Add(1, "Captain");
+            seatsDictionary.Add(2, "");
+            seatsDictionary.Add(3, "");
+            seatsDictionary.Add(4, "");
+            seatsDictionary.Add(5, "");
+
+            _rowBoatDict.Add("Boat3", seatsDictionary);
+
+            //boat4
+            seatsDictionary = new Dictionary<int, string>();
+            seatsDictionary.Add(0, "");
+            seatsDictionary.Add(1, "");
+            seatsDictionary.Add(2, "");
+            seatsDictionary.Add(3, "");
+            seatsDictionary.Add(4, "");
+            seatsDictionary.Add(5, "");
+            _rowBoatDict.Add("Boat4", seatsDictionary);
+
+            playerModel.Name = "User";
+            playerModel.Email = "user@gmail.com";
+            playerModel.Gold = 0;
+            playerModel.ExperiencePoints = 0;
+            playerModel.UserLevel = 0;
+            playerModel.UserRank = 0;
+            playerModel.Wins = 0;
+            playerModel.Gems = 100;
+            playerModel.MaxGoldCapacity = 2000;
+            playerModel.UnlockedPirates = _unlockedPirates;
+            playerModel.PirateCountDict = _pirateCountDict;
+            playerModel.ShipBulletsAvailable = 10;
+            playerModel.ShipAttacksCountDict = _shipAttacksCountDict;
+            playerModel.UnlockedShipAttacks = _unlockedShipAttacks;
+            playerModel.ShipAttackCostDict = _shipAttackCostDict;
+            playerModel.RowBoatCountDict = _rowBoatDict;
+
+            return playerModel;
+
+        }
+
+
+
     }
 }
