@@ -20,7 +20,7 @@ public class StatBlock
                 OnMaximumHealthChangedEvent(_maximumHealth, value, value - _maximumHealth);
         }
     }
-	public OnMaximumHealthChangedEventHandler OnMaximumHealthChangedEvent;
+    public OnMaximumHealthChangedEventHandler OnMaximumHealthChangedEvent;
 
     private float _maximumCourage;
     public float MaximumCourage
@@ -37,7 +37,7 @@ public class StatBlock
                 OnMaximumCourageChangedEvent(_maximumCourage, value, value - _maximumCourage);
         }
     }
-	public OnMaximumCourageChangedEventHandler OnMaximumCourageChangedEvent;
+    public OnMaximumCourageChangedEventHandler OnMaximumCourageChangedEvent;
 
     private float _maximumDamage;
     public float MaximumDamage
@@ -51,5 +51,5 @@ public class StatBlock
                 OnMaximumDamageChangedEvent(_maximumDamage, value, value - _maximumDamage);
         }
     }
-	public OnMaximumDamageChangedEventHandler OnMaximumDamageChangedEvent;
+    public OnMaximumDamageChangedEventHandler OnMaximumDamageChangedEvent;
 }

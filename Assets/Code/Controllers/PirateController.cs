@@ -53,11 +53,11 @@ public class PirateController : AIPath
     private float _timeTillNextShot;
     private float _timeTillNextSearch;
 
-	private PirateState _currentState;
+    private PirateState _currentState;
     private bool isDead = false;
 
-	public void Initialize (IoCResolver resolver, PirateModel model, LevelManager levelManager)
-	{
+    public void Initialize (IoCResolver resolver, PirateModel model, LevelManager levelManager)
+    {
         // resolve references
         _levelManager = levelManager;
         Model = model;
@@ -76,35 +76,35 @@ public class PirateController : AIPath
         _bulletOrigin = transform.FindChild("BulletSpawnPoint").gameObject;
 
         // initialize properties
-	    _levelManager.OnPirateCreatedEvent += OnPirateCreated;
-	    _levelManager.OnBuildingCreatedEvent += OnBuildingCreated;
+        _levelManager.OnPirateCreatedEvent += OnPirateCreated;
+        _levelManager.OnBuildingCreatedEvent += OnBuildingCreated;
 
         Stats.Initialize(Model.Stats);
-	    Stats.OnCurrentHealthChangedEvent += OnCurrentHealthChanged;
+        Stats.OnCurrentHealthChangedEvent += OnCurrentHealthChanged;
 
         gameObject.GetComponent<Renderer>().material.color = Model.PirateColor;
         Panel.sizeDelta = new Vector2(Model.PirateRange, Model.PirateRange);
 
         ChangeState(PirateState.Scanning);
-		_healthBar.maxValue = Stats.Block.MaximumHealth;
-	    _healthBar.value = Stats.CurrentHealth;
+        _healthBar.maxValue = Stats.Block.MaximumHealth;
+        _healthBar.value = Stats.CurrentHealth;
 
         _openShipBaseMessageToken = _messager.Subscribe<OpenShipBaseMessage>(OnOpenShipBaseMessage);
 
         // NOTE: this should be replaced with an attack speed value from the model
-	    _timeTillNextShot = 1f;
-	    _timeTillNextSearch = 2f;
-	}
+        _timeTillNextShot = 1f;
+        _timeTillNextSearch = 2f;
+    }
 
-	private void OnCurrentHealthChanged (float oldHealth, float newHealth, float delta)
-	{
-		_healthBar.value = Stats.CurrentHealth;
+    private void OnCurrentHealthChanged (float oldHealth, float newHealth, float delta)
+    {
+        _healthBar.value = Stats.CurrentHealth;
 
         // you might here want to implement a tiered system, or a gradial one
         // where the amount of damage is related to the amount of blood/horrible screaming (Y)
-		if (delta < 0)
-		    _poolingParticleManager.Emit ("blood_prefab", transform.position, Color.red, 100);
-	}
+        if (delta < 0)
+            _poolingParticleManager.Emit ("blood_prefab", transform.position, Color.red, 100);
+    }
 
     private void OnPirateCreated(PirateController newPirate)
     {
@@ -125,8 +125,8 @@ public class PirateController : AIPath
         }
     }
 
-	void Update ()
-	{
+    void Update ()
+    {
         HandleScanning();
 
         switch (_currentState)
@@ -145,7 +145,7 @@ public class PirateController : AIPath
             case PirateState.Idle:
                 break;
         }
-	}
+    }
 
     #region STATE HANDLING
     private void HandleChase()
@@ -272,18 +272,18 @@ public class PirateController : AIPath
         return Model.PirateRange - Vector3.Distance(potentialTarget.transform.position, transform.position);
     }
 
-	public void UpdateUiPanel ()
-	{
-		_messager.Publish (new PirateMessage{
-			model = Model
-		});
-	}
+    public void UpdateUiPanel ()
+    {
+        _messager.Publish (new PirateMessage{
+            model = Model
+        });
+    }
 
-	private void ChangeState (PirateState newState)
-	{
-		_currentState = newState;
-		_stateText.text = newState.ToString ();
-	}
+    private void ChangeState (PirateState newState)
+    {
+        _currentState = newState;
+        _stateText.text = newState.ToString ();
+    }
 
     private void OnOpenShipBaseMessage(OpenShipBaseMessage message) {
         Delete();

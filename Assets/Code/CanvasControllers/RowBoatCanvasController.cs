@@ -25,20 +25,20 @@ namespace Assets.Code.Ui.CanvasControllers
         private GameObject _seatPanel;
         private SpriteProvider _spriteProvider;
 
-        private Dictionary<int, string> _seatsDictionary;
+        Dictionary<int, string> _seatsDictionary;
+        string RowBoatName;
 
-        public RowBoatCanvasController(IoCResolver resolver, Canvas canvasView, Dictionary<int ,string> seatsDictionary)
+        public RowBoatCanvasController(IoCResolver resolver, Canvas canvasView,string rowBoatName)
             : base(resolver, canvasView)
-		{
+        {
             _resolver = resolver;
-            _seatsDictionary = seatsDictionary;
             _resolver.Resolve(out _messager);
             _resolver.Resolve(out _canvasProvider);
             _resolver.Resolve(out _playerManager);
             _resolver.Resolve(out _prefabProvider);
             _resolver.Resolve(out _spriteProvider);
             _uiManager = new UiManager();
-
+            RowBoatName = rowBoatName;
             ResolveElement(out _addNewPirateButton, "MainPanel/AddButton");
             ResolveElement(out _closeButton, "MainPanel/CloseButton");
             _mainPanel = GetElement("MainPanel");
@@ -48,7 +48,7 @@ namespace Assets.Code.Ui.CanvasControllers
             _closeButton.onClick.AddListener(onCloseButtonClicked);
             _addNewPirateButton.onClick.AddListener(onAddPirateButtonClicked);
 
-
+            _playerManager.Model.RowBoatCountDict.TryGetValue(rowBoatName,out _seatsDictionary);
             //draw pirate images according to rowboat dict
                 for (int i =0; i< _seatsDictionary.Count; i++) {
 
@@ -71,7 +71,7 @@ namespace Assets.Code.Ui.CanvasControllers
 
         void onAddPirateButtonClicked()
         {
-            _uiManager.RegisterUi(new InventoryCanvasController(_resolver, _canvasProvider.GetCanvas("InventoryCanvas")));
+            _uiManager.RegisterUi(new InventoryCanvasController(_resolver, _canvasProvider.GetCanvas("InventoryCanvas"), RowBoatName));
             TearDown();
         }
 

@@ -199,7 +199,8 @@ namespace Assets.Code.UnityBehaviours
                 PirateName = "Captain" + UnityEngine.Random.Range (0, 100),
                 PirateNature = PirateNature.Player,
                 PirateRange = (int)PirateModel.Range.Gunner3,
-                PirateColor = Color.blue
+                PirateColor = Color.blue,
+                TrainingCost = 2000
             });
 
             _gameDataProvider.AddData(new PirateModel
@@ -215,7 +216,8 @@ namespace Assets.Code.UnityBehaviours
                 PirateName = "Quarter Master" + UnityEngine.Random.Range (0, 100),
                 PirateNature = (int)PirateNature.Player ,
                 PirateRange = (int)PirateModel.Range.Gunner3,
-                PirateColor = Color.green
+                PirateColor = Color.green,
+                TrainingCost = 1000
             });
             _gameDataProvider.AddData(new PirateModel
             {
@@ -230,7 +232,8 @@ namespace Assets.Code.UnityBehaviours
                 PirateName = "Gunner" + UnityEngine.Random.Range (0, 100),
                 PirateRange = (int)PirateModel.Range.Gunner2,
                 PirateNature = PirateNature.Player,
-                PirateColor = Color.yellow
+                PirateColor = Color.yellow,
+                TrainingCost = 500
             });
 
 			_gameDataProvider.AddData(new PirateModel
@@ -246,8 +249,9 @@ namespace Assets.Code.UnityBehaviours
 				PirateName = "Bomber" + UnityEngine.Random.Range (0, 100),
 				PirateRange = (int)PirateModel.Range.Gunner2,
 				PirateNature = PirateNature.Player,
-				PirateColor = Color.white
-			});
+				PirateColor = Color.white,
+                TrainingCost = 1000
+            });
 
 			_gameDataProvider.AddData(new PirateModel
 			                          {
@@ -262,8 +266,9 @@ namespace Assets.Code.UnityBehaviours
 				PirateName = "Surgeon" + UnityEngine.Random.Range (0, 100),
 				PirateRange = (int)PirateModel.Range.Gunner2,
 				PirateNature = PirateNature.Player,
-				PirateColor = Color.magenta
-			});
+				PirateColor = Color.magenta,
+                TrainingCost = 500
+            });
 		
 			_gameDataProvider.AddData(new PirateModel
 			                          {
@@ -278,8 +283,9 @@ namespace Assets.Code.UnityBehaviours
 				PirateName = "Carpenter" + UnityEngine.Random.Range (0, 100),
 				PirateRange = (int)PirateModel.Range.Gunner2,
 				PirateNature = PirateNature.Player,
-				PirateColor = Color.yellow
-			});
+				PirateColor = Color.yellow,
+                TrainingCost = 3000
+            });
 			_gameDataProvider.AddData(new PirateModel
 			                          {
 				Name = "Chef",
@@ -293,8 +299,9 @@ namespace Assets.Code.UnityBehaviours
 				PirateName = "Chef" + UnityEngine.Random.Range (0, 100),
 				PirateRange = (int)PirateModel.Range.Gunner2,
 				PirateNature = PirateNature.Player,
-				PirateColor = Color.yellow
-			});
+				PirateColor = Color.yellow,
+                TrainingCost = 1000
+            });
 
             /* ENEMY PIRATES */
             _gameDataProvider.AddData(new PirateModel
