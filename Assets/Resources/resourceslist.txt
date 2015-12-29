@@ -64,13 +64,18 @@
 	}
 	Textures
 	{
+		Bomber.png
+		Captain.png
 		gold_storage.png
 		GridEmissive.png
+		Gunner.png
 		gunner_tower.png
 		platoons.png
+		Quarter Master.png
 		residence.png
 		row_boat.png
 		shipp.png
+		Surgeon.png
 		SwatchMauveAlbedo.png
 		SwatchNavyAlbedo.png
 		SwatchNavyDarkAlbedo.png

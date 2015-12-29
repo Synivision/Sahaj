@@ -3,6 +3,8 @@ using System.Collections;
 using Assets.Code.DataPipeline;
 using Assets.Code.Logic.Pooling;
 using Assets.Code.UnityBehaviours;
+using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class RowBoatController : MonoBehaviour
 {
@@ -17,14 +19,24 @@ public class RowBoatController : MonoBehaviour
 	bool isInitialised = false;
 	bool hasReachedDestination = false;
 	public Vector3 destinationPosition;
+    private bool attackModeBool;
+    private GameObject _statusCanvas;
 
-	// Use this for initialization
-	public void Initialize (IoCResolver resolver)
+    public Dictionary<int, string> _seatsDictionary;
+
+    // Use this for initialization
+    public void Initialize (IoCResolver resolver,bool attackMode, Dictionary<int, string> seatsDict)
 	{
 		_resolver = resolver;
 		_resolver.Resolve(out _unityReference);
 		isInitialised = true;
-	}
+        attackModeBool = attackMode;
+        _statusCanvas = transform.GetChild(0).gameObject;
+        _seatsDictionary = seatsDict;
+
+    }
+
+   
 
 	void Start(){
 		startTime = Time.time;
@@ -35,13 +47,49 @@ public class RowBoatController : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
 	{
-		if (isInitialised) {
-			transform.LookAt (_unityReference.Sun.transform, -Vector3.down);
-		}
 
-		float distCovered = (Time.time - startTime) * speed;
-		float fracJourney = distCovered / journeyLength;
-		rowPrefab.transform.position = Vector3.Lerp(rowPrefab.transform.position, destinationPosition, fracJourney);
-	}
+        if (isInitialised)
+        {
+            transform.LookAt(_unityReference.Sun.transform, -Vector3.down);
+        }
+
+
+        if (attackModeBool)
+        {
+            float distCovered = (Time.time - startTime) * speed;
+            float fracJourney = distCovered / journeyLength;
+            rowPrefab.transform.position = Vector3.Lerp(rowPrefab.transform.position, destinationPosition, fracJourney);
+            _statusCanvas.SetActive(false);
+
+        }
+        else {
+            //show canvas about seat details
+            //calculate seats left
+
+            int count = 0;
+            
+            foreach (var seat in _seatsDictionary) {
+                count++;
+                if (seat.Value.Equals("")) {
+                    count--;
+                }
+            }
+            _statusCanvas.SetActive(true);
+            var panel = _statusCanvas.transform.GetChild(0);
+            var textView = panel.transform.GetChild(0).GetComponent<Text>();
+
+            if (count == 6)
+            {
+                textView.text = "Seats Full";
+            }
+            else if (count == 0) {
+                textView.text = "Seats Empty";
+            }
+            else {
+                textView.text = (6 - count) + " Seats Left";
+            }
+            count = 0;
+        }
+    }
 }
 

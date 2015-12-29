@@ -59,7 +59,7 @@ namespace Assets.Code.States
         GameObject shipPrefab;
         GameObject rowBoat;
         RowBoatController boatController;
-        private Dictionary<string, int> _rowBoatDict;
+        private Dictionary<string, Dictionary<int, string>> _rowBoatDict;
         private GameObject tile;
         int pointerId = -1;
 
@@ -90,7 +90,7 @@ namespace Assets.Code.States
             _unlockedPirates.Add("Gunner", true);
             _unlockedPirates.Add("Bomber", true);
             _unlockedPirates.Add("Surgeon", true);
-            _unlockedPirates.Add("Carpenter", false);
+            _unlockedPirates.Add("Carpenter", true);
             _unlockedPirates.Add("Chef", false);
             _unlockedPirates.Add("Pirate4", false);
             _unlockedPirates.Add("EnemyPirate5", false);
@@ -126,11 +126,53 @@ namespace Assets.Code.States
 
 
             //add rowboat dict to playermanager
-            _rowBoatDict = new Dictionary<string, int>();
-            _rowBoatDict.Add("Boat1", 1);
-            _rowBoatDict.Add("Boat2", 2);
-            _rowBoatDict.Add("Boat3", 3);
-            _rowBoatDict.Add("Boat4", 4);
+            Dictionary < int,string> seatsDictionary;
+            
+            _rowBoatDict = new Dictionary<string, Dictionary<int, string>>();
+
+            //boat1
+            seatsDictionary = new Dictionary<int, string>();
+            seatsDictionary.Add(0, "Quarter Master");
+            seatsDictionary.Add(1,"Captain");
+            seatsDictionary.Add(2, "Gunner");
+            seatsDictionary.Add(3, "Bomber");
+            seatsDictionary.Add(4, "");
+            seatsDictionary.Add(5, "");
+
+            _rowBoatDict.Add("Boat1", seatsDictionary);
+
+            //boat2
+            seatsDictionary = new Dictionary<int, string>();
+            seatsDictionary.Add(0, "Quarter Master");
+            seatsDictionary.Add(1, "Captain");
+            seatsDictionary.Add(2, "Gunner");
+            seatsDictionary.Add(3, "Bomber");
+            seatsDictionary.Add(4, "Surgeon");
+            seatsDictionary.Add(5, "Gunner");
+
+
+            _rowBoatDict.Add("Boat2", seatsDictionary);
+
+            //boat 3
+            seatsDictionary = new Dictionary<int, string>();
+            seatsDictionary.Add(0, "Bomber");
+            seatsDictionary.Add(1, "Captain");
+            seatsDictionary.Add(2, "");
+            seatsDictionary.Add(3, "");
+            seatsDictionary.Add(4, "");
+            seatsDictionary.Add(5, "");
+
+            _rowBoatDict.Add("Boat3", seatsDictionary);
+
+            //boat4
+            seatsDictionary = new Dictionary<int, string>();
+            seatsDictionary.Add(0, "");
+            seatsDictionary.Add(1, "");
+            seatsDictionary.Add(2, "");
+            seatsDictionary.Add(3, "");
+            seatsDictionary.Add(4, "");
+            seatsDictionary.Add(5, "");
+            _rowBoatDict.Add("Boat4", seatsDictionary);
 
             //Initialize level manager
             levelManager = new LevelManager(_resolver, _mapLayout);
@@ -179,7 +221,7 @@ namespace Assets.Code.States
             rowBoat = _poolingObjectManager.Instantiate("row_boat").gameObject;
             rowBoat.transform.position = new Vector3(rowBoat.transform.position.x, 11.5f, rowBoat.transform.position.y);
             boatController = rowBoat.GetComponent<RowBoatController>();
-            boatController.Initialize(_resolver);
+            boatController.Initialize(_resolver,true, seatsDictionary);
         }
 
 
