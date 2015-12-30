@@ -10,7 +10,7 @@ public class RowBoatController : MonoBehaviour
 	public float speed = 1.0F;
 	public float startTime;
 	public float journeyLength;
-	GameObject rowPrefab ;
+	public GameObject rowPrefab ;
 	private PoolingObjectManager _poolingObjectManager;
 	private IoCResolver _resolver;
 	private UnityReferenceMaster _unityReference;
@@ -28,7 +28,7 @@ public class RowBoatController : MonoBehaviour
 
 	void Start(){
 		startTime = Time.time;
-		rowPrefab = this.gameObject;
+		//rowPrefab = this.gameObject;
 		destinationPosition = transform.position;	
 	}
 

@@ -215,6 +215,8 @@ namespace Assets.Code.States
                     if (newBuilding)
                     {
 
+						//TODO: make indicator active on first click then allow movement from second click.
+
                         newBuilding.GetComponent<BuildingController>().movementIndicatorActive = false;
                         //shipLevelManager.UpdateBlueprint(selectedgameObjectPosition + new Vector3(125, 0, 125), curPosition + new Vector3(125, 0, 125));
                     }

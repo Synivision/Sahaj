@@ -57,11 +57,12 @@ namespace Assets.Code.States
         private float startTime;
         private float journeyLength;
         GameObject shipPrefab;
-        GameObject rowBoat;
-        RowBoatController boatController;
+        List<GameObject> rowBoat;
         private Dictionary<string, int> _rowBoatDict;
         private GameObject tile;
         int pointerId = -1;
+
+		private int boatCount;  	//TODO: this should be taken from the base controller in future..
 
         Vector3 curPosition;
         Vector3 selectedgameObjectPosition = new Vector3(0, 0, 0);
@@ -132,6 +133,8 @@ namespace Assets.Code.States
             _rowBoatDict.Add("Boat3", 3);
             _rowBoatDict.Add("Boat4", 4);
 
+			boatCount = _rowBoatDict.Count;
+			Debug.Log (boatCount);
             //Initialize level manager
             levelManager = new LevelManager(_resolver, _mapLayout);
 
@@ -176,10 +179,8 @@ namespace Assets.Code.States
             shipPrefab.GetComponent<ShipBehaviour>().Initialize(_resolver, levelManager, shipPrefab.transform.position,_playerManager);
             //shipPrefab.gameObject.transform.position.lerp
 
-            rowBoat = _poolingObjectManager.Instantiate("row_boat").gameObject;
-            rowBoat.transform.position = new Vector3(rowBoat.transform.position.x, 11.5f, rowBoat.transform.position.y);
-            boatController = rowBoat.GetComponent<RowBoatController>();
-            boatController.Initialize(_resolver);
+			rowBoat = new List<GameObject>();
+            
         }
 
 
@@ -243,11 +244,35 @@ namespace Assets.Code.States
 
                         }
                     }
-                    if (hitInfo.collider != null && hitInfo.collider.gameObject.tag == "water")
+                    if (hitInfo.collider != null && boatCount > 0 && hitInfo.collider.gameObject.tag == "water")
                     {
+						//Now Generating the row boat only on click.
+						//Max row boats created = rowBoat count that should depend on the boats that the user have
+
+						Vector3 boatSpawnPoint = new Vector3();
+
+						//Get tile position to decide boat spawn point
+						Vector2 tilePosition = GetTileAt(hitInfo.point + new Vector3(125,0,125));
+						int x = (int) tilePosition.x;
+						int y = (int) tilePosition.y;
+
+						if(x == 0 || x == 1){
+							boatSpawnPoint = new Vector3(-240,11.5f,25);
+						}
+
+						//Initialize row boat and controller
+						GameObject boat = _poolingObjectManager.Instantiate("row_boat").gameObject;
+						boat.transform.position = boatSpawnPoint;
+						RowBoatController boatController = boat.GetComponent<RowBoatController>();
+						boatController.Initialize(_resolver);
+
+						boatCount--;
+
+						boatController.rowPrefab = boat;
                         boatController.destinationPosition = hitInfo.point + new Vector3(0, 10, 0);
-                        boatController.journeyLength = Vector3.Distance(rowBoat.transform.position, boatController.destinationPosition);
+						boatController.journeyLength = Vector3.Distance(boat.transform.position, boatController.destinationPosition);
                         boatController.startTime = Time.time;
+						rowBoat.Add(boat);
                     }
 
 
@@ -385,7 +410,12 @@ namespace Assets.Code.States
         {
 
 
-            Object.Destroy(rowBoat);
+			for (int i=0; i < (_rowBoatDict.Count - boatCount); i++) {
+			
+				Object.Destroy(rowBoat[i]);
+
+			}
+            
             Object.Destroy(shipPrefab);
             levelManager.TearDownLevel();
 
@@ -396,5 +426,24 @@ namespace Assets.Code.States
             _messager.CancelSubscription(_onQuitGame, _onTearDownLevel, _onPlayStateToShipBase);
 
         }
+
+		// Return tile position of current point
+		public Vector2 GetTileAt(Vector3 point){
+
+			Vector2 result = new Vector2(26,26);
+
+			//TODO : 10 = Gridsize and should be taken from LevelManager
+			int x = (int)(point.x/10);
+			int z = (int)(point.z/10);
+
+			//Debug.Log(z);
+			if( (x >= 0 && x < 25) && (z >= 0 && z < 25) ){
+
+				result = new Vector2(x,z);
+
+			}
+			//Debug.Log("Tilename = " +tileName);
+			return result;
+		}
     }
 }
