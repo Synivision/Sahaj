@@ -37,17 +37,16 @@ namespace Assets.Code.States
 		public Vector3 screenSpace;
 		public Vector3 offset;
 		public GameObject newBuilding;
-		private GameObject inventoryCanvas;
+		private GameObject inspectorCanvas;
 		private GameObject _rowbBoatParent;
 		private PlayerManager _playerManager;
-
+		
 		Vector3 curPosition;
 		Vector3 selectedgameObjectPosition = new Vector3(0,0,0);
-
-
+		
 		public ShipBaseState (IoCResolver resolver, MapLayout map) : base(resolver){
-
-
+			
+			
 			_resolver.Resolve (out _canvasProvider);
 			_resolver.Resolve (out _messager);
 			_resolver.Resolve (out _poolingObjectManager);
@@ -55,16 +54,16 @@ namespace Assets.Code.States
 			_resolver.Resolve(out _prefabProvider);
 			_resolver.Resolve(out _spriteProvider);
 			_resolver.Resolve(out _playerManager);
-
+			
 			_map = map;
 		}
 		
 		public override void Initialize (){
-
+			
 			_uiManager = new UiManager ();
 			_uiManager.RegisterUi(new ShipBaseCanvasController(_resolver,_canvasProvider.GetCanvas("ShipBaseCanvas")));
-		
-
+			
+			
 			shipLevelManager = new ShipLevelManager(_resolver,_map);
 			_onChangeStateToAttack = _messager.Subscribe<StartGameMessage>(OnChangeStateToAttack);	
 			_onInventoryOpen = _messager.Subscribe<OpenInventory>(OpenInventoryBuilding);
@@ -75,16 +74,14 @@ namespace Assets.Code.States
 			var tileo = _poolingObjectManager.Instantiate("tile");
 			tile = tileo.gameObject;
 			tile.SetActive(false);
-
-
-
+			
 			if (_playerManager.Model != null) {
-
-
+				
+				
 				_rowbBoatParent = Object.Instantiate(_prefabProvider.GetPrefab("empty1"));
 				_rowbBoatParent.transform.position = new Vector3(0, 0, 0);
 				_rowbBoatParent.gameObject.name = "RowBoatParent";
-
+				
 				//instantiate boats
 				int x = 0;
 				foreach (var boat in _playerManager.Model.RowBoatCountDict) {
@@ -93,7 +90,7 @@ namespace Assets.Code.States
 					rowBoat.transform.position = new Vector3(-110, 11.5f, -25*x);
 					var boatController = rowBoat.GetComponent<RowBoatController>();
 					boatController.Initialize(_resolver,false,boat.Key);
-
+					
 					rowBoat.transform.SetParent(_rowbBoatParent.transform);
 					
 				}
@@ -101,72 +98,72 @@ namespace Assets.Code.States
 			}
 			
 		}
-
+		
 		public void onCreateBuilding(CreateBuildingMessage message) {
-
+			
 			//generate a building and it should follow mouse
 			newBuilding =  CreateBuilding("gold_storage",new Vector3(0,11,0));
 			newBuilding.GetComponent<BuildingController>().movementIndicatorActive = true;
 		}
-
+		
 		public GameObject CreateBuilding(string buildingName, Vector3 spawnPosition)
 		{
 			var model = _gameDataProvider.GetData<BuildingModel>(buildingName);
 			GameObject fab;
 			BuildingController buildingController;
 			fab = Object.Instantiate(_prefabProvider.GetPrefab("Building"));
-
+			
 			fab.GetComponent<SpriteRenderer>().sprite = _spriteProvider.GetSprite(buildingName);
-
+			
 			buildingController = fab.GetComponent<BuildingController>();
 			buildingController.Initialize(_resolver, model, shipLevelManager);
 			fab.name = buildingName;
 			fab.transform.position = spawnPosition;
 			//fab.transform.SetParent(_buildingsParent.transform);
-
+			
 			//if (OnBuildingCreatedEvent != null){
 			//	OnBuildingCreatedEvent(buildingController);
 			//}
-
+			
 			//buildingController.Stats.OnKilledEvent += () => OnBuildingKilled(buildingController);
 			//_knownBuildings.Add(buildingController);
-
+			
 			return fab;
-
+			
 		}
 		public void OnOpenShop (OpenShopMessage message)
 		{
 			_uiManager.RegisterUi(new ShopCanvasController(_resolver, _canvasProvider.GetCanvas("ShopCanvas")));
-
+			
 		}
-
+		
 		public void OnOpenBuildingInfoCanvas(OpenBuildingInfoCanvas message) {
-
+			
 			_uiManager.RegisterUi(new BuildingInfoCanvasController(_resolver, _canvasProvider.GetCanvas("BuildingInfoCanvas")));
 		}
-
+		
 		public void OpenInventoryBuilding(OpenInventory message){
 			
 			_uiManager.RegisterUi (new InventoryCanvasController (_resolver, _canvasProvider.GetCanvas ("InventoryCanvas")));
 			
 		}
-
+		
 		public void OnChangeStateToAttack(StartGameMessage message){
-
+			
 			SwitchState (new PlayState(_resolver,message.MapLayout));
-
+			
 		}
-
+		
 		public override void Update (){
-
+			
 			_uiManager.Update ();
-
+			
 			//if (newBuilding) {
-
+			
 			//    newBuilding.transform.position = Input.mousePosition;
-
+			
 			//}
-
+			
 			Touch[] touch = Input.touches;
 			if (Application.platform == RuntimePlatform.Android)
 				pointerId = touch[0].fingerId;
@@ -175,27 +172,31 @@ namespace Assets.Code.States
 			if (Input.GetMouseButtonDown (0)  && !isButton()) {
 				RaycastHit hitInfo;
 				target = GetClickedObject (out hitInfo);
-
+				
 				//turn off any inspector canvas visible on clicking any place other than that canvas button
-				if(inventoryCanvas != null){
-					inventoryCanvas.SetActive(false);
+				if(inspectorCanvas != null){
+					inspectorCanvas.SetActive(false);
 				}
-
+				
 				if (target != null && (target.gameObject.tag == "Cube" )) {
 					_mouseState = true;
 					//get position of object selected 
-					selectedgameObjectPosition = target.transform.position;		
+					selectedgameObjectPosition = target.transform.position;
 				}
-
+				
 				if (target != null && (target.gameObject.tag == "RowBoat")) {
 					//show RowBoat Canvas
 					var rowBoatName = target.GetComponent<RowBoatController>().RowBoatName;
 					_uiManager.RegisterUi(new RowBoatCanvasController(_resolver, _canvasProvider.GetCanvas("RowBoatCanvas"), rowBoatName));
 					target = null;
-
+					
 				}
 				if (target != null && (target.gameObject.tag == "water")) {
 					target = null;
+				}
+				
+				if(target != null && target.gameObject.tag != "Cube"){
+					tile.SetActive(false);
 				}
 			}
 			
@@ -204,38 +205,34 @@ namespace Assets.Code.States
 				//show inspector if selected and current tilename and objectname is same espectively.
 				if( _mouseState && shipLevelManager.GetTileAt(curPosition + new Vector3(125,0,125)) == target.gameObject.name){
 
-					inventoryCanvas = target.transform.GetChild(0).gameObject;
-					inventoryCanvas.SetActive(true);
-
+						inspectorCanvas = target.transform.GetChild(0).gameObject;
+						inspectorCanvas.SetActive(true);
+					
 				}
-
+				
 				//update the grid tile of moved object if grid tile is empty
 				
 				if(_mouseState && shipLevelManager.GetCoordinatePassability(curPosition + new Vector3(125,0,125)) == ShipLevelManager.PassabilityType.Passible){
 					shipLevelManager.UpdateBlueprint(selectedgameObjectPosition + new Vector3(125,0,125),curPosition + new Vector3(125,0,125));
-
+					
 					if (newBuilding)
 					{
-
+						
 						//TODO: make indicator active on first click then allow movement from second click.
-
+						
 						//newBuilding.GetComponent<BuildingController>().movementIndicatorActive = false;
 						//shipLevelManager.UpdateBlueprint(selectedgameObjectPosition + new Vector3(125, 0, 125), curPosition + new Vector3(125, 0, 125));
 					}
-
 				}
 				else{
 					if(target!=null && target.gameObject.tag != "Plane"){
-						target.transform.position = selectedgameObjectPosition;
-
+						target.transform.position = selectedgameObjectPosition;						
 					}
 				}
 
+
 				_mouseState = false;
-				tile.SetActive(false);
-
-			   
-
+				
 			}
 			
 			if (_mouseState) {
@@ -243,18 +240,23 @@ namespace Assets.Code.States
 				var curScreenSpace = new Vector3 (Input.mousePosition.x, Input.mousePosition.y, screenSpace.z);
 				curPosition = Camera.main.ScreenToWorldPoint (curScreenSpace) + offset;
 				curPosition.y = target.transform.position.y;
-				target.transform.position = curPosition;
+
+				//move the building to where the mouse is
+
+					target.transform.position = curPosition;
+					Debug.Log("Moving Image");
+
 
 				//Get grid on curposition
 				//instantiate red or green according to grid
 				tile.SetActive(true);
 				tile.transform.position = curPosition+new Vector3(0,-10,0);
-
-
+				
+				
 				if(shipLevelManager.GetCoordinatePassability(curPosition + new Vector3(125,0,125)) == ShipLevelManager.PassabilityType.Passible){
 					tile.GetComponent<Renderer>().material.color = Color.green;
 				}else{
-
+					
 					//if the position is clicked and not moved.. then also for that object the tile is available
 					if(shipLevelManager.GetTileAt(curPosition + new Vector3(125,0,125)) == target.gameObject.name){
 						tile.GetComponent<Renderer>().material.color = Color.green;
@@ -264,11 +266,16 @@ namespace Assets.Code.States
 					}
 				}
 			}
-
-
+			else if (tile.GetComponent<Renderer> ().material.color == Color.red) {
+				
+				tile.transform.position = new Vector3 (1000, -10, 0);
+				
+			}
+			
+			
 			
 		}
-
+		
 		public GameObject GetClickedObject (out RaycastHit hit)
 		{
 			GameObject target = null;
@@ -284,19 +291,19 @@ namespace Assets.Code.States
 		}
 		
 		public override void TearDown (){
-
+			
 			_messager.CancelSubscription(_onBuildingInfoOpen,_onInventoryOpen,_onChangeStateToAttack);
 			_uiManager.TearDown();
 			Object.Destroy (tile.gameObject);
 			shipLevelManager.TearDown();
 			if (_rowbBoatParent !=null) {
-
+				
 				Object.Destroy(_rowbBoatParent.gameObject);
 			}
 			
-
+			
 		}
-
+		
 		private bool isButton()
 		{
 			bool result = true;

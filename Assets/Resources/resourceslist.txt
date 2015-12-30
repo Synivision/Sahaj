@@ -14,9 +14,11 @@
 	}
 	Materials
 	{
+		arrow.png
 		Fairy Dust.mat
 		FlameA.mat
 		gridm.mat
+		indicator_tile_material.mat
 		NavyGrid.mat
 		NavySmooth.mat
 		PinkGrid.mat
