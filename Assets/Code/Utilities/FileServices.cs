@@ -7,10 +7,11 @@ using UnityEngine;
 
 namespace Assets.Code.Utilities
 {
-    public class FileServices {
+    public class FileServices
+    {
 
         // 
-        private static string [] _resourcesList;
+        private static string[] _resourcesList;
 
         public static void CreateResourcesList(string saveToPath)
         {
@@ -23,6 +24,7 @@ namespace Assets.Code.Utilities
             }
 
             resourceListText += "}";
+            _resourcesList = resourceListText.Split('\n');
 
             File.WriteAllText(saveToPath, resourceListText);
         }
@@ -43,7 +45,7 @@ namespace Assets.Code.Utilities
             * */
 
             var folders = GetDirectoryNamesFromFolder(folder.FullName);
-            var files = GetFileNamesFromFolder(folder.FullName, ".png", ".json", ".jpg", ".ttf", ".ogg", ".mp3", ".wav", ".flac",".mat");
+            var files = GetFileNamesFromFolder(folder.FullName, ".png", ".json", ".jpg", ".ttf", ".ogg", ".mp3", ".wav", ".flac", ".mat");
 
             for (var i = 0; i < tabCount; i++)
                 list += "\t";
@@ -117,15 +119,17 @@ namespace Assets.Code.Utilities
             return info.GetDirectories().ToList();
         }
 
-        public static List<string> GetFileNamesFromFolder(string targetFolder, params string[] extensions){
+        public static List<string> GetFileNamesFromFolder(string targetFolder, params string[] extensions)
+        {
             var fileNames = new List<string>();
 
             var info = new DirectoryInfo(targetFolder);
             var fileInfo = info.GetFiles();
-            foreach(var file in fileInfo){
-                if(extensions == null || extensions.Length == 0)
+            foreach (var file in fileInfo)
+            {
+                if (extensions == null || extensions.Length == 0)
                     fileNames.Add(file.Name);
-                else if(extensions.Contains(file.Extension))
+                else if (extensions.Contains(file.Extension))
                     fileNames.Add(file.Name);
             }
 
@@ -142,17 +146,17 @@ namespace Assets.Code.Utilities
             return directoryList;
         }
 
-        private static List<string> GetNestedResourcesFolders(string targetFolder, int line =1)
+        private static List<string> GetNestedResourcesFolders(string targetFolder, int line = 1)
         {
             List<string> NestedFolders = new List<string>();
-            string [] splitPath = targetFolder.Split('/');
+            string[] splitPath = targetFolder.Split('/');
             var nestLevel = 0;
 
             string currentLine = "";
             do
             {
                 currentLine = _resourcesList[line++];
-                currentLine = currentLine.Trim(new char[] {'\r', '\n', '\t'});
+                currentLine = currentLine.Trim(new char[] { '\r', '\n', '\t' });
                 if (currentLine == "{")
                 {
                     nestLevel++;
@@ -177,9 +181,9 @@ namespace Assets.Code.Utilities
                 else if (currentLine == splitPath[0])
                 {
                     if (splitPath.Count() > 1)
-                        NestedFolders = GetNestedResourcesFolders(targetFolder.Substring(targetFolder.IndexOf('/')+1), line+1);
+                        NestedFolders = GetNestedResourcesFolders(targetFolder.Substring(targetFolder.IndexOf('/') + 1), line + 1);
                     else
-                        NestedFolders = GetNestedResourcesFolders("", line+1);
+                        NestedFolders = GetNestedResourcesFolders("", line + 1);
 
                     break;
                 }
@@ -189,7 +193,7 @@ namespace Assets.Code.Utilities
             return NestedFolders;
         }
 
-        public static List<string>  GetResourceFiles(string targetFolder, params string[] extensions)
+        public static List<string> GetResourceFiles(string targetFolder, params string[] extensions)
         {
             var directoryList = GetNestedResourcesFiles(targetFolder, 1, extensions);
 
@@ -202,17 +206,17 @@ namespace Assets.Code.Utilities
             return directoryList;
         }
 
-        private static List<string> GetNestedResourcesFiles(string targetFolder, int line =1, params string[] extensions)
+        private static List<string> GetNestedResourcesFiles(string targetFolder, int line = 1, params string[] extensions)
         {
             List<string> NestedFolders = new List<string>();
-            string [] splitPath = targetFolder.Split('/');
+            string[] splitPath = targetFolder.Split('/');
             var nestLevel = 0;
 
             string currentLine = "";
             do
             {
                 currentLine = _resourcesList[line++];
-                currentLine = currentLine.Trim(new char[] {'\r', '\n', '\t'});
+                currentLine = currentLine.Trim(new char[] { '\r', '\n', '\t' });
                 if (currentLine == "{")
                 {
                     nestLevel++;
@@ -242,9 +246,9 @@ namespace Assets.Code.Utilities
                 else if (currentLine == splitPath[0])
                 {
                     if (splitPath.Count() > 1)
-                        NestedFolders = GetNestedResourcesFolders(targetFolder.Substring(targetFolder.IndexOf('/')+1), line+1);
+                        NestedFolders = GetNestedResourcesFolders(targetFolder.Substring(targetFolder.IndexOf('/') + 1), line + 1);
                     else
-                        NestedFolders = GetNestedResourcesFolders("", line+1);
+                        NestedFolders = GetNestedResourcesFolders("", line + 1);
 
                     break;
                 }
@@ -259,7 +263,7 @@ namespace Assets.Code.Utilities
             if (resourceFolderPath.Last() == '\\')
                 resourceFolderPath = resourceFolderPath.Substring(0, resourceFolderPath.Length - 1);
 
-            return resourceFolderPath.Substring(resourceFolderPath.LastIndexOf('/')+1);
+            return resourceFolderPath.Substring(resourceFolderPath.LastIndexOf('/') + 1);
         }
 
         public static string GetEndOfPersistentDataPath(string resourceFolderPath)
@@ -272,8 +276,9 @@ namespace Assets.Code.Utilities
             return resourceFolderPath.Substring(resourceFolderPath.LastIndexOf(Application.persistentDataPath) + Application.persistentDataPath.Length + 1);
         }
 
-        public static void ClearFile(string targetFile){
-            if(targetFile == null)
+        public static void ClearPersistentDataFile(string targetFile)
+        {
+            if (targetFile == null)
                 return;
 
             var fileName = Application.persistentDataPath + "/" + targetFile;
@@ -288,32 +293,68 @@ namespace Assets.Code.Utilities
             //File.CreateText(targetFile);
         }
 
-        public static void OverwriteFile(string targetFile, string data){
-            if(targetFile == null)
+        public static void OverwritePersistentDataFile(string targetFile, string data)
+        {
+            if (targetFile == null)
                 return;
 
-            ClearFile(targetFile);
+            ClearPersistentDataFile(targetFile);
             var fileName = Application.persistentDataPath + "/" + targetFile;
             var file = new StreamWriter(fileName, false);
             file.Write(data);
-		
+
             file.Close();
         }
 
-        public static void AppendToFile(string targetFile, string data){
-            if(targetFile == null)
+        public static void ClearResourceDataFile(string targetFile)
+        {
+#if UNITY_EDITOR
+            if (targetFile == null)
+                return;
+
+            //Debug.Log("clear file at " + Environment.CurrentDirectory + "/Assets/Resources/" + targetFile);
+
+            var fileName = Environment.CurrentDirectory + "/Assets/Resources/" + targetFile;
+            var directoryName = fileName.Substring(0, fileName.LastIndexOf('/'));
+            if (!Directory.Exists(directoryName))
+                Directory.CreateDirectory(directoryName);
+
+            File.WriteAllText(fileName, string.Empty);
+#endif
+        }
+
+        public static void OverwriteResourceDataFile(string targetFile, string data)
+        {
+#if UNITY_EDITOR
+            if (targetFile == null)
+                return;
+
+            //Debug.Log("overwriting file at " + Environment.CurrentDirectory + "/Assets/Resources/" + targetFile);
+
+            ClearResourceDataFile(targetFile);
+            var fileName = Environment.CurrentDirectory + "/Assets/Resources/" + targetFile;
+            var file = new StreamWriter(fileName, false);
+            file.Write(data);
+
+            file.Close();
+#endif
+        }
+
+        public static void AppendToFile(string targetFile, string data)
+        {
+            if (targetFile == null)
                 return;
 
             var fileName = Application.persistentDataPath + "/" + targetFile;
             if (!File.Exists(fileName))
             {
-                OverwriteFile(targetFile, data);
+                OverwritePersistentDataFile(targetFile, data);
                 return;
             }
             var file = new StreamWriter(fileName, true);
             file.Write(data);
 
-            file.Close ();
+            file.Close();
         }
 
         public static List<string> GetDirectoriesAtPersistentDataPathLocation(string targetLocation)
@@ -343,7 +384,7 @@ namespace Assets.Code.Utilities
             if (File.Exists(properLocation))
                 File.Delete(properLocation);
 
-            if(Directory.Exists(properLocation))
+            if (Directory.Exists(properLocation))
                 Directory.Delete(properLocation, true);
         }
 
@@ -378,7 +419,7 @@ namespace Assets.Code.Utilities
         {
             var resourcePath = targetResource;
 
-            var textFile = Resources.Load(resourcePath, typeof (TextAsset)) as TextAsset;
+            var textFile = Resources.Load(resourcePath, typeof(TextAsset)) as TextAsset;
             if (!textFile)
                 return null;
 
@@ -389,9 +430,9 @@ namespace Assets.Code.Utilities
         {
             string resourcePath = targetMaterial;
 
-            var material = Resources.Load(resourcePath, typeof (Material)) as Material;
+            var material = Resources.Load(resourcePath, typeof(Material)) as Material;
 
-            if(!material)
+            if (!material)
                 return null;
 
             material.name = GetEndOfResourcePath(resourcePath);
@@ -403,7 +444,7 @@ namespace Assets.Code.Utilities
         {
             var resourcePath = targetResource;
 
-            var texture = Resources.Load(resourcePath, typeof (Texture2D)) as Texture2D;
+            var texture = Resources.Load(resourcePath, typeof(Texture2D)) as Texture2D;
             if (!texture)
                 return null;
 
@@ -419,7 +460,7 @@ namespace Assets.Code.Utilities
         {
             var resourcePath = targetResource;
 
-            var sound = Resources.Load(resourcePath, typeof (AudioClip)) as AudioClip;
+            var sound = Resources.Load(resourcePath, typeof(AudioClip)) as AudioClip;
             if (!sound)
                 return null;
 

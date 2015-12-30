@@ -1,30 +1,37 @@
 ﻿using System.Collections.Generic;
+using Assets.Code.Logic.Logging;
 using UnityEngine;
 
 namespace Assets.Code.DataPipeline.Providers
 {
-	public class PrefabProvider : IResolvableItem
-	{
-		private readonly Dictionary<string, GameObject> _prefabs;
+    public class PrefabProvider : IResolvableItem
+    {
+        private readonly Logger _logger;
+        private readonly Dictionary<string, GameObject> _prefabs;
 
-		public PrefabProvider ()
-		{
-			_prefabs = new Dictionary<string, GameObject> ();
-		}
+        public PrefabProvider(Logger logger)
+        {
+            _logger = logger;
+            _prefabs = new Dictionary<string, GameObject>();
+        }
 
-		public void AddPrefab (GameObject newPrefab)
-		{
-			_prefabs.Add (newPrefab.name, newPrefab);
-		}
+        public void AddPrefab(GameObject newPrefab)
+        {
+            _prefabs.Add(newPrefab.name, newPrefab);
+        }
 
-		public GameObject GetPrefab (string name)
-		{
-			if (!_prefabs.ContainsKey (name)) {
-				Debug.Log ("WARNING! prefab " + name + " does not exist");
-				return null;
-			}
+        public GameObject GetPrefab(string name, bool expectingToFindItem = true)
+        {
+            if (string.IsNullOrEmpty(name)) return null;
 
-			return _prefabs [name];
-		}
-	}
+            if (!_prefabs.ContainsKey(name))
+            {
+                _logger.Log("WARNING! prefab " + name + " does not exist", expectingToFindItem);
+
+                return null;
+            }
+
+            return _prefabs[name];
+        }
+    }
 }

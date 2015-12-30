@@ -2,17 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Assets.Code.Extensions;
+using Assets.Code.Logic.Logging;
 using Assets.Code.Models;
-using UnityEngine;
 
 namespace Assets.Code.DataPipeline.Providers
 {
     public class GameDataProvider : IResolvableItem
     {
+        private readonly Logger _logger;
         private readonly Dictionary<Type, Dictionary<string, IGameDataModel>> _data;
 
-        public GameDataProvider()
+        public GameDataProvider(Logger logger)
         {
+            _logger = logger;
             _data = new Dictionary<Type, Dictionary<string, IGameDataModel>>();
         }
 
@@ -22,30 +24,39 @@ namespace Assets.Code.DataPipeline.Providers
 
             if (data == null)
             {
-                Debug.Log("WARNING! attempted to add null object of type " + targetType + " to GameDataProvider!");
+                _logger.Log("WARNING! attempted to add null object of type " + targetType + " to GameDataProvider!", true);
                 return;
             }
 
             if (!_data.ContainsKey(targetType))
                 _data.Add(targetType, new Dictionary<string, IGameDataModel>());
 
-            if(_data[targetType].ContainsKey(data.Name))
-                Debug.Log("WARNING! duplicate name (" + data.Name + ") of type " + targetType + " added to GameDataProvider!");
-			_data[targetType].Add(data.Name, data);
+            if (_data[targetType].ContainsKey(data.Name))
+            {
+                _logger.Log(
+                    "WARNING! duplicate name (" + data.Name + ") of type " + targetType + " added to GameDataProvider!",
+                    true);
+                _data[targetType][data.Name] = data;
+            }
+            else
+                _data[targetType].Add(data.Name, data);
         }
 
-        public T GetData<T>(string name) where T : class, IGameDataModel
+        public T GetData<T>(string name, bool expectingToFindItem = true) where T : class, IGameDataModel
         {
-            var requestedType = typeof (T);
+            if (string.IsNullOrEmpty(name)) return null;
+
+            var requestedType = typeof(T);
 
             if (!_data.ContainsKey(requestedType))
             {
-                Debug.Log("WARNING! no models of type " + requestedType + " does not exist");
+                _logger.Log("WARNING! no models of type " + requestedType + " exist", expectingToFindItem);
                 return null;
             }
 
-            if (!_data[requestedType].ContainsKey(name)) {
-                Debug.Log("WARNING! model of type " + requestedType + " with name " + name + " does not exist");
+            if (!_data[requestedType].ContainsKey(name))
+            {
+                _logger.Log("WARNING! model of type " + requestedType + " with name " + name + " does not exist", expectingToFindItem);
                 return null;
             }
 
@@ -58,7 +69,7 @@ namespace Assets.Code.DataPipeline.Providers
 
             if (!_data.ContainsKey(requestedType))
             {
-                Debug.Log("WARNING! no models of type " + requestedType + " does not exist");
+                _logger.Log("WARNING! no models of type " + requestedType + " does not exist", true);
                 return null;
             }
 
@@ -67,15 +78,15 @@ namespace Assets.Code.DataPipeline.Providers
 
         public List<T> GetAllData<T>() where T : class
         {
-            var requestedType = typeof (T);
+            var requestedType = typeof(T);
 
             if (!_data.ContainsKey(requestedType))
             {
-                Debug.Log("WARNING! no models of type " + requestedType + " does not exist");
-                return null;
+                _logger.Log("WARNING! no models of type " + requestedType + " does not exist", true);
+                return new List<T>();
             }
 
             return _data[requestedType].Select(item => item.Value as T).ToList();
-        } 
+        }
     }
 }

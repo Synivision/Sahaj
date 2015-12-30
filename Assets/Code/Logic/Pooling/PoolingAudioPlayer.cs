@@ -1,4 +1,9 @@
-﻿using Assets.Code.DataPipeline;
+﻿using System.Linq;
+using Assets.Code.DataPipeline;
+using Assets.Code.Logic.Logging;
+using Assets.Code.Models.Pooling;
+using Assets.Code.UnityBehaviours;
+using Assets.Code.UnityBehaviours.Pooling;
 using UnityEngine;
 
 namespace Assets.Code.Logic.Pooling
@@ -6,100 +11,66 @@ namespace Assets.Code.Logic.Pooling
     public class PoolingAudioPlayer : IResolvableItem
     {
         /* CONSTANTS */
-        private const int NumberOfSources = 16;
+        private const int NumberOfSources = 32;
+
+        /* REFERENCES */
+        private readonly Logger _logger;
 
         /* PROPERTIES */
-        private readonly AudioSource[] _sources;
+        private readonly PooledAudioSource[] _sources;
         private readonly GameObject _sourceParent;
 
-        public PoolingAudioPlayer(GameObject audioSourcePrefab)
+        public PoolingAudioPlayer(Logger logger, UnityReferenceMaster unityReferenceMaster, GameObject audioSourcePrefab)
         {
+            _logger = logger;
+
             _sourceParent = Object.Instantiate(new GameObject());
             _sourceParent.name = "audio_source_parent";
 
-            _sources = new AudioSource[NumberOfSources];
+            _sources = new PooledAudioSource[NumberOfSources];
 
             for (var i = 0; i < NumberOfSources; i++)
             {
-                _sources[i] = Object.Instantiate(audioSourcePrefab).GetComponent<AudioSource>();
+                _sources[i] = Object.Instantiate(audioSourcePrefab).GetComponent<PooledAudioSource>();
                 _sources[i].transform.SetParent(_sourceParent.transform);
+                _sources[i].Initialize(unityReferenceMaster);
             }
         }
 
-        public void PlaySound(Vector3 position, AudioClip sound, float volume = 1f)
+        public void PingStatus()
         {
-            for (var i = 0; i < NumberOfSources; i++)
-                if (!_sources[i].isPlaying)
-                {
-                    _sources[i].transform.position = position;
-                    _sources[i].PlayOneShot(sound, volume);
-                    return;
-                }
-
-            Debug.Log("NOTE! ran out of audio sources in pool!");
+            var activeSources = _sources.Where(source => source.IsActive).ToList();
+            _logger.Log(string.Format("{0} of {1} sources are active", activeSources.Count, _sources.Length), true);
+            foreach (var source in activeSources)
+            {
+                var audioData = source.GetComponent<AudioSource>();
+                _logger.Log(string.Format("{0} sound playing {1}", audioData.clip.name, audioData.loop ? "on loop" : "one shot"), true);
+            }
         }
 
-        public AudioLoopToken LoopSound(Vector3 position, AudioClip sound, float volume = 1f)
+        public AudioToken PlaySound(PooledAudioRequest request)
         {
             for (var i = 0; i < NumberOfSources; i++)
-                if (!_sources[i].isPlaying)
+                if (!_sources[i].IsActive)
                 {
                     var source = _sources[i];
-
-                    source.transform.position = position;
-                    source.clip = sound;
-                    source.loop = true;
-                    source.volume = volume;
-                    source.Play();
-
-                    return new AudioLoopToken
-                    {
-                        Replace = (replacementPosition, replacement, replacementVolume)
-                                => ReplaceLoop(source, replacementPosition, replacement, replacementVolume),
-                        End = () => EndLoop(source)
-                    };
+                    return source.PlaySound(request);
                 }
 
-            Debug.Log("NOTE! ran out of audio sources in pool!");
-            return new AudioLoopToken
+            _logger.Log("NOTE! ran out of audio sources in pool!", true);
+            return new AudioToken
             {
-                Replace = (i, j, k) => ReplaceLoop(null, Vector3.zero, null, 0f),
-                End = () => EndLoop(null)
+                IsCurrentlyActive = false,
+
+                Replace = newRequest => PlaySound(newRequest),
+                End = () => { },
+                TrailOff = time => { }
             };
-        }
-
-        private void ReplaceLoop(AudioSource source, Vector3 position, AudioClip replacement, float volume = 1f)
-        {
-            if (source != null)
-            {
-                source.Stop();
-
-                if (replacement != null)
-                {
-                    source.transform.position = position;
-                    source.clip = replacement;
-                    source.loop = true;
-                    source.volume = volume;
-
-                    source.Play();
-                }
-                else
-                    source.loop = false;
-            }
-        }
-
-        private void EndLoop(AudioSource source)
-        {
-            if (source != null)
-            {
-                source.Stop();
-                source.loop = false;
-            }
         }
 
         public void KillAllSounds()
         {
-            foreach(var source in _sources)
+            foreach (var source in _sources)
                 source.Stop();
         }
     }

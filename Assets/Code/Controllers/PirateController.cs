@@ -7,6 +7,7 @@ using Assets.Code.DataPipeline;
 using Assets.Code.UnityBehaviours;
 using Assets.Code.Logic.Pooling;
 using Assets.Code.DataPipeline.Providers;
+using Assets.Code.Models.Pooling;
 
 enum PirateState
 {
@@ -215,21 +216,31 @@ public class PirateController : AIPath
         // hit target		
         if (8 > Random.Range(0, 10))
         {
-            _unityReference.FireDelayed(() =>
+            _unityReference.Delay(() =>
             {
                 shootingTarget.CurrentHealth -= Model.Stats.MaximumDamage;
             }, 0.1f);
 
             CreateBullet(shootingTarget.transform.position, true);
             _unityReference.Camera.ApplyShake(1f);
-            _poolingAudioPlayer.PlaySound(transform.position, _soundProvider.GetSound("lazer_shoot1"), 0.3f);
+            _poolingAudioPlayer.PlaySound(new PooledAudioRequest
+            {
+                Sound = _soundProvider.GetSound("lazer_shoot1"),
+                Target = transform.position,
+                Volume = 0.3f
+            });
         }
         // miss
         else
         {
             CreateBullet(shootingTarget.transform.position, false);
             _unityReference.Camera.ApplyShake(1f);
-            _poolingAudioPlayer.PlaySound(transform.position, _soundProvider.GetSound("lazer_shoot_miss"), 0.3f);
+            _poolingAudioPlayer.PlaySound(new PooledAudioRequest
+            {
+                Sound = _soundProvider.GetSound("lazer_shoot_miss"),
+                Target = transform.position,
+                Volume = 0.3f
+            });
         }
     }
 

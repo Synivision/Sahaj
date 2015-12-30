@@ -14,13 +14,14 @@ namespace Assets.Code.UnityBehaviours
     {
         /* REFERENCES */
         public CameraController Camera;
-		public GameObject Sun;
-		public GameObject AStarPlane;
+        public GameObject Sun;
+        public GameObject AStarPlane;
+
         /* PROPERTIES */
         private List<DelayedAction> _delayedActions;
 
-        // use this instead of calculating sin inside of many scripts
-        public double CurrentSinValue { get; private set; }
+        public static double CurrentStaticSinValue;
+        public double CurrentSinValue { get { return CurrentStaticSinValue; } }
 
         private bool _debugModeActive;
         public bool DebugModeActive
@@ -42,14 +43,14 @@ namespace Assets.Code.UnityBehaviours
         public void Awake()
         {
             _delayedActions = new List<DelayedAction>();
-			AStarPlane.SetActive(false);
+            AStarPlane.gameObject.SetActive(false);
         }
 
         public void PauseGame()
         {
             IsPaused = true;
 
-            if(OnGamePausedChangedEvent != null)
+            if (OnGamePausedChangedEvent != null)
                 OnGamePausedChangedEvent(IsPaused);
         }
         public void ResumeGame()
@@ -60,20 +61,21 @@ namespace Assets.Code.UnityBehaviours
                 OnGamePausedChangedEvent(IsPaused);
         }
 
-        public void FireDelayed(Action action, float delayTime)
+        public void VibrateDevice()
+        {
+#if UNITY_ANDROID
+                Handheld.Vibrate();
+#endif
+        }
+
+        public void Delay(Action action, float delayTime = 0f, bool ignorePaused = false)
         {
             _delayedActions.Add(new DelayedAction
             {
                 Payload = action,
-                RemainingTime = delayTime
+                RemainingTime = delayTime,
+                IgnorePaused = ignorePaused
             });
-        }
-
-        public void VibrateDevice()
-        {
-            #if UNITY_ANDROID
-                Handheld.Vibrate();
-            #endif
         }
 
         public void LoadCanvases(CanvasProvider canvasProvider)
@@ -92,26 +94,50 @@ namespace Assets.Code.UnityBehaviours
 
         public void FixedUpdate()
         {
-            CurrentSinValue = Math.Sin(Time.timeSinceLevelLoad);
+            CurrentStaticSinValue = Math.Sin(Time.timeSinceLevelLoad / 3f);
 
-            if(!IsPaused)
-                for (var i = 0; i < _delayedActions.Count; i++)
+            for (var i = 0; i < _delayedActions.Count; i++)
+            {
+                if (IsPaused && !_delayedActions[i].IgnorePaused) return;
+                _delayedActions[i].RemainingTime -= Time.deltaTime;
+
+                if (_delayedActions[i].RemainingTime <= 0)
                 {
-                    _delayedActions[i].RemainingTime -= Time.deltaTime;
+                    _delayedActions[i].Payload();
+                    _delayedActions.RemoveAt(i);
 
-                    if (_delayedActions[i].RemainingTime <= 0)
-                    {
-                        _delayedActions[i].Payload();
-                        _delayedActions.RemoveAt(i);
-
-                        i--;
-                    }
+                    i--;
                 }
+            }
         }
 
         public void ResetDelayedActions()
         {
-            _delayedActions.Clear();
+            if (_delayedActions != null)
+                _delayedActions.Clear();
         }
+
+#if UNITY_EDITOR_WIN
+        /// DOES NOT COMPILE OUTSIDE OF EDITOR - FOR DEBUGGING USE ONLY
+        public void EDITOR_Time(Action function, string label = "unlabelled function")
+        {
+            var start = DateTime.UtcNow;
+            function();
+            var end = DateTime.UtcNow;
+
+            Debug.Log(string.Format("timed function '{0}' took {1} time", label, (end - start)));
+        }
+
+        /// DOES NOT COMPILE OUTSIDE OF EDITOR - FOR DEBUGGING USE ONLY
+        public T EDITOR_Time<T>(Func<T> function, string label = "unlabelled function")
+        {
+            var start = DateTime.UtcNow;
+            var result = function();
+            var end = DateTime.UtcNow;
+
+            Debug.Log(string.Format("timed function '{0}' took {1} time", label, (end - start)));
+            return result;
+        }
+#endif
     }
 }

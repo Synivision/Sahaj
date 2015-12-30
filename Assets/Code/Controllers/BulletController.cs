@@ -43,14 +43,14 @@ public class BulletController : PoolingBehaviour
 
 		_resolver.Resolve (out _unityReference);
         if (sender.Equals("Ship")) {
-            _unityReference.FireDelayed(() => { Delete(); }, 1f);
+            _unityReference.Delay(() => Delete(), 1f);
         }
         else if (sender.Equals("Player")) {
 
-            _unityReference.FireDelayed(() => { Delete(); }, .15f);
+            _unityReference.Delay(() => Delete(), .15f);
         }
 		
-		_unityReference.FireDelayed (() => {
+		_unityReference.Delay(() => {
 				muzzleFlash.enabled = false;
 				}, muzzleFlashTime);
 

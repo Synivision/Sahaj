@@ -1,16 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Assets.Code.Extensions;
+using Assets.Code.Logic.Logging;
 using UnityEngine;
 
 namespace Assets.Code.DataPipeline.Providers
 {
     public class SpriteProvider : IResolvableItem
     {
+        private readonly Logger _logger;
         private readonly Dictionary<string, Sprite> _sprites;
 
-        public SpriteProvider()
+        public SpriteProvider(Logger logger)
         {
+            _logger = logger;
             _sprites = new Dictionary<string, Sprite>();
         }
 
@@ -18,18 +21,23 @@ namespace Assets.Code.DataPipeline.Providers
         {
             if (sprite == null)
             {
-                Debug.Log("WARNING! null sprite detected");
+                _logger.Log("WARNING! null sprite detected", true);
                 return;
             }
 
             _sprites.Add(sprite.name, sprite);
         }
 
-        public Sprite GetSprite(string name)
+        public List<Sprite> GetAllSprites()
         {
-            if (!_sprites.ContainsKey(name))
+            return _sprites.Values.ToList();
+        }
+
+        public Sprite GetSprite(string name, bool expectingToFindItem = true)
+        {
+            if (string.IsNullOrEmpty(name) || !_sprites.ContainsKey(name))
             {
-                Debug.Log("WARNING! sprite " + name + " does not exist");
+                _logger.Log("WARNING! sprite " + name + " does not exist", expectingToFindItem);
                 return null;
             }
 
@@ -40,7 +48,7 @@ namespace Assets.Code.DataPipeline.Providers
         {
             var lowerCasePrefix = prefix.ToFormalString().ToLower();
 
-            return _sprites.Where (sprite => sprite.Key.ToLower().StartsWith(lowerCasePrefix))
+            return _sprites.Where(sprite => sprite.Key.ToLower().StartsWith(lowerCasePrefix))
                            .Select(sprite => sprite.Value)
                            .ToList();
         }

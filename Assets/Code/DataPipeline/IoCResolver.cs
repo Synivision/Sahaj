@@ -1,29 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
+using Assets.Code.Logic.Logging;
 
 namespace Assets.Code.DataPipeline
 {
     public class IoCResolver
     {
+        private static IoCResolver _instance;
+        private readonly Logger _logger;
         private readonly Dictionary<Type, object> _items;
         private bool _isLocked;
 
-        public IoCResolver()
+        /// FOR ISOLATED BEHAVIOURS ONLY!
+        public static IoCResolver Get() { return _instance; }
+        /// FOR ISOLATED BEHAVIOURS ONLY!
+        public static void QuickResolve<T>(out T subject) where T : class, IResolvableItem
         {
+            _instance.Resolve(out subject);
+        }
+
+        public IoCResolver(Logger logger)
+        {
+            _logger = logger;
             _items = new Dictionary<Type, object>();
             _isLocked = false;
+
+            if (_instance != null)
+                _logger.Log("WARNING! multiple iocResolvers exist!", true);
+            _instance = this;
         }
 
         public void RegisterItem<T>(T item) where T : class, IResolvableItem
         {
             if (_isLocked)
             {
-                Debug.Log("WARNING! RegisterItem called on a locked IoCResolver!");
+                _logger.Log("WARNING! RegisterItem called on a locked IoCResolver!");
                 return;
             }
 
-            var registerType = typeof (T);
+            var registerType = typeof(T);
 
             if (_items.ContainsKey(registerType))
                 return;
@@ -33,7 +48,7 @@ namespace Assets.Code.DataPipeline
 
         public T Resolve<T>() where T : class, IResolvableItem
         {
-            var targetType = typeof (T);
+            var targetType = typeof(T);
 
             if (_items.ContainsKey(targetType))
                 return _items[targetType] as T;

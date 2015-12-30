@@ -32,7 +32,7 @@ public class BombBehaviour : PoolingBehaviour{
 
         journeyLength = Vector3.Distance(_startPos, _target);
        
-        _unityReference.FireDelayed(() => { Delete(); }, 2f);
+        _unityReference.Delay(() => Delete(), 2f);
 
     }
 

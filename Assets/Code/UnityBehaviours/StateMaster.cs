@@ -1,18 +1,16 @@
-using System;
 using System.Collections.Generic;
 using Assets.Code.DataPipeline;
 using Assets.Code.DataPipeline.Loading;
 using Assets.Code.DataPipeline.Providers;
-using Assets.Code.Extensions;
 using Assets.Code.Logic.Pooling;
 using Assets.Code.Messaging;
 using Assets.Code.Messaging.Messages;
 using Assets.Code.Models;
 using Assets.Code.States;
 using Assets.Code.Utilities;
-//using UnityEditor;
 using UnityEngine;
 using Assets.Code.Logic.Logging;
+using UnityEditor;
 
 
 namespace Assets.Code.UnityBehaviours
@@ -35,23 +33,22 @@ namespace Assets.Code.UnityBehaviours
 
         public void Start()
         {
-            _resolver = new IoCResolver();
-			//AssetDatabase.Refresh();
-
             /* RESOURCE LIST CREATION */
 #if UNITY_EDITOR
-			//AssetDatabase.Refresh();
+            AssetDatabase.Refresh();
             FileServices.CreateResourcesList("Assets/Resources/resourceslist.txt");
-
-#endif
+#else
             FileServices.LoadResourcesList("resourceslist");
+#endif
+            
+            _logger = new Logger("info.log", false);
+            _resolver = new IoCResolver(_logger);
 
             #region LOAD RESOURCES
             // messager
             _messager = new Messager();
             _resolver.RegisterItem(_messager);
 
-            _logger = new Logger("info.log", false);
             _resolver.RegisterItem(_logger);
 
             // unity reference master
@@ -65,20 +62,20 @@ namespace Assets.Code.UnityBehaviours
             _resolver.RegisterItem(materialProvider);
 
             // texture provider
-            var textureProvider = new TextureProvider();
-            var spriteProvider = new SpriteProvider();
+            var textureProvider = new TextureProvider(_logger);
+            var spriteProvider = new SpriteProvider(_logger);
 
             TextureLoader.LoadTextures(textureProvider, spriteProvider, "Textures");
             _resolver.RegisterItem(textureProvider);
             _resolver.RegisterItem(spriteProvider);
 
             // sound provider
-            var soundProvider = new SoundProvider();
+            var soundProvider = new SoundProvider(_logger);
             SoundLoader.LoadSounds(soundProvider, "Sounds");
             _resolver.RegisterItem(soundProvider);
 
             // prefab provider
-            var prefabProvider = new PrefabProvider();
+            var prefabProvider = new PrefabProvider(_logger);
             PrefabLoader.LoadPrefabs(prefabProvider);
             _resolver.RegisterItem(prefabProvider);
 
@@ -86,14 +83,14 @@ namespace Assets.Code.UnityBehaviours
             var poolingObjectManager = new PoolingObjectManager(prefabProvider);
             _resolver.RegisterItem(poolingObjectManager);
 
-            var soundPoolManager = new PoolingAudioPlayer(prefabProvider.GetPrefab("sound_source_prefab"));
+            var soundPoolManager = new PoolingAudioPlayer(_logger, _unityReference, prefabProvider.GetPrefab("sound_source_prefab"));
             _resolver.RegisterItem(soundPoolManager);
 
             var particlePoolManager = new PoolingParticleManager(_resolver);
             _resolver.RegisterItem(particlePoolManager);
 
             // data provider
-            var gameDataProvider = new GameDataProvider();
+            var gameDataProvider = new GameDataProvider(_logger);
             _resolver.RegisterItem(gameDataProvider);
 
             // canvas provider
