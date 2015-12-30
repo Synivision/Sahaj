@@ -29,7 +29,7 @@ public class RowBoatController : MonoBehaviour
 	void Start(){
 		startTime = Time.time;
 		//rowPrefab = this.gameObject;
-		destinationPosition = transform.position;	
+		//destinationPosition = transform.position;	
 	}
 
 	// Update is called once per frame

@@ -256,23 +256,31 @@ namespace Assets.Code.States
 						int x = (int) tilePosition.x;
 						int y = (int) tilePosition.y;
 
-						if(x == 0 || x == 1){
-							boatSpawnPoint = new Vector3(-240,11.5f,25);
+						if(x != 26 && y!= 26){
+
+							if(x == 0 || x == 1){
+								boatSpawnPoint = new Vector3(-240,11.5f,25);
+								SpawnBoatAt(boatSpawnPoint,hitInfo.point );
+							}
+
+							else if(x != 0 && x != 1 && x != 23 && x != 24 && (y == 0 || y == 1 )){
+								boatSpawnPoint = new Vector3(-60,11.5f,-220);
+								SpawnBoatAt(boatSpawnPoint,hitInfo.point );
+							}
+
+							else if( x == 23 || x == 24 ){
+								boatSpawnPoint = new Vector3(200,11.5f,0);
+								SpawnBoatAt(boatSpawnPoint,hitInfo.point );
+							}
+
+							else if(x != 0 && x != 1 && x != 23 && x != 24 && (y == 23 || y == 24)){
+								boatSpawnPoint = new Vector3(-30,11.5f,250);
+								SpawnBoatAt(boatSpawnPoint,hitInfo.point );
+							}
+							
+
 						}
-
-						//Initialize row boat and controller
-						GameObject boat = _poolingObjectManager.Instantiate("row_boat").gameObject;
-						boat.transform.position = boatSpawnPoint;
-						RowBoatController boatController = boat.GetComponent<RowBoatController>();
-						boatController.Initialize(_resolver);
-
-						boatCount--;
-
-						boatController.rowPrefab = boat;
-                        boatController.destinationPosition = hitInfo.point + new Vector3(0, 10, 0);
-						boatController.journeyLength = Vector3.Distance(boat.transform.position, boatController.destinationPosition);
-                        boatController.startTime = Time.time;
-						rowBoat.Add(boat);
+					    
                     }
 
 
@@ -285,6 +293,23 @@ namespace Assets.Code.States
             }
         }
 
+		public void SpawnBoatAt(Vector3 spawn,Vector3 point){
+		
+			//Initialize row boat and controller
+			GameObject boat = _poolingObjectManager.Instantiate("row_boat").gameObject;
+			boat.transform.position = spawn;
+			RowBoatController boatController = boat.GetComponent<RowBoatController>();
+			boatController.rowPrefab = boat;
+			boatController.Initialize(_resolver);
+			
+			boatCount--;
+			
+			boatController.destinationPosition = point + new Vector3(0, 10, 0);
+			boatController.journeyLength = Vector3.Distance(boat.transform.position, boatController.destinationPosition);
+			boatController.startTime = Time.time;
+			rowBoat.Add(boat);
+		
+		}
 
         public GameObject GetClickedObject(out RaycastHit hit)
         {
