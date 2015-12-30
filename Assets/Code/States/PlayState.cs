@@ -57,12 +57,16 @@ namespace Assets.Code.States
         private float startTime;
         private float journeyLength;
         GameObject shipPrefab;
+
         List<GameObject> rowBoat;
-        private Dictionary<string, int> _rowBoatDict;
+        private Dictionary<string, Dictionary<int, string>> _rowBoatDict;
+
         private GameObject tile;
         int pointerId = -1;
 
 		private int boatCount;  	//TODO: this should be taken from the base controller in future..
+		//add rowboat dict to playermanager
+		Dictionary < int,string> seatsDictionary;
 
         Vector3 curPosition;
         Vector3 selectedgameObjectPosition = new Vector3(0, 0, 0);
@@ -91,7 +95,7 @@ namespace Assets.Code.States
             _unlockedPirates.Add("Gunner", true);
             _unlockedPirates.Add("Bomber", true);
             _unlockedPirates.Add("Surgeon", true);
-            _unlockedPirates.Add("Carpenter", false);
+            _unlockedPirates.Add("Carpenter", true);
             _unlockedPirates.Add("Chef", false);
             _unlockedPirates.Add("Pirate4", false);
             _unlockedPirates.Add("EnemyPirate5", false);
@@ -126,12 +130,53 @@ namespace Assets.Code.States
             _unlockedShipAttacks.Add("Gun", true);
 
 
-            //add rowboat dict to playermanager
-            _rowBoatDict = new Dictionary<string, int>();
-            _rowBoatDict.Add("Boat1", 1);
-            _rowBoatDict.Add("Boat2", 2);
-            _rowBoatDict.Add("Boat3", 3);
-            _rowBoatDict.Add("Boat4", 4);
+            
+            
+            _rowBoatDict = new Dictionary<string, Dictionary<int, string>>();
+
+            //boat1
+            seatsDictionary = new Dictionary<int, string>();
+            seatsDictionary.Add(0, "Quarter Master");
+            seatsDictionary.Add(1,"Captain");
+            seatsDictionary.Add(2, "Gunner");
+            seatsDictionary.Add(3, "Bomber");
+            seatsDictionary.Add(4, "");
+            seatsDictionary.Add(5, "");
+
+            _rowBoatDict.Add("Boat1", seatsDictionary);
+
+            //boat2
+            seatsDictionary = new Dictionary<int, string>();
+            seatsDictionary.Add(0, "Quarter Master");
+            seatsDictionary.Add(1, "Captain");
+            seatsDictionary.Add(2, "Gunner");
+            seatsDictionary.Add(3, "Bomber");
+            seatsDictionary.Add(4, "Surgeon");
+            seatsDictionary.Add(5, "Gunner");
+
+
+            _rowBoatDict.Add("Boat2", seatsDictionary);
+
+            //boat 3
+            seatsDictionary = new Dictionary<int, string>();
+            seatsDictionary.Add(0, "Bomber");
+            seatsDictionary.Add(1, "Captain");
+            seatsDictionary.Add(2, "");
+            seatsDictionary.Add(3, "");
+            seatsDictionary.Add(4, "");
+            seatsDictionary.Add(5, "");
+
+            _rowBoatDict.Add("Boat3", seatsDictionary);
+
+            //boat4
+            seatsDictionary = new Dictionary<int, string>();
+            seatsDictionary.Add(0, "");
+            seatsDictionary.Add(1, "");
+            seatsDictionary.Add(2, "");
+            seatsDictionary.Add(3, "");
+            seatsDictionary.Add(4, "");
+            seatsDictionary.Add(5, "");
+            _rowBoatDict.Add("Boat4", seatsDictionary);
 
 			boatCount = _rowBoatDict.Count;
 			Debug.Log (boatCount);
@@ -178,9 +223,7 @@ namespace Assets.Code.States
             journeyLength = Vector3.Distance(shipPrefab.transform.position, new Vector3(-120, 15, -120));
             shipPrefab.GetComponent<ShipBehaviour>().Initialize(_resolver, levelManager, shipPrefab.transform.position,_playerManager);
             //shipPrefab.gameObject.transform.position.lerp
-
 			rowBoat = new List<GameObject>();
-            
         }
 
 
@@ -300,7 +343,7 @@ namespace Assets.Code.States
 			boat.transform.position = spawn;
 			RowBoatController boatController = boat.GetComponent<RowBoatController>();
 			boatController.rowPrefab = boat;
-			boatController.Initialize(_resolver);
+			boatController.Initialize(_resolver,true, seatsDictionary);
 			
 			boatCount--;
 			

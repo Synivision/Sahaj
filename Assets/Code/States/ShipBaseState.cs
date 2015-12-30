@@ -86,17 +86,18 @@ namespace Assets.Code.States
                 _rowbBoatParent.gameObject.name = "RowBoatParent";
 
                 //instantiate boats
+                int x = 0;
                 foreach (var boat in _playerManager.Model.RowBoatCountDict) {
-
+                    x++;
                     var rowBoat = _poolingObjectManager.Instantiate("row_boat").gameObject;
-                    rowBoat.transform.position = new Vector3(-110, 11.5f, -25*boat.Value);
+                    rowBoat.transform.position = new Vector3(-110, 11.5f, -25*x);
                     var boatController = rowBoat.GetComponent<RowBoatController>();
-                    boatController.Initialize(_resolver);
+                    boatController.Initialize(_resolver,false,boat.Value);
 
                     rowBoat.transform.SetParent(_rowbBoatParent.transform);
-                    Debug.Log(boat.Key);
-                } 
-
+                    
+                }
+                x = 0;
             }
             
         }
@@ -189,7 +190,9 @@ namespace Assets.Code.States
                 if (target != null && (target.gameObject.tag == "RowBoat")) {
                     //show RowBoat Canvas
                     Debug.Log("Boatt");
-                    _uiManager.RegisterUi(new RowBoatCanvasController(_resolver, _canvasProvider.GetCanvas("RowBoatCanvas")));
+                    var seatsDict = target.GetComponent<RowBoatController>()._seatsDictionary;
+                    _uiManager.RegisterUi(new RowBoatCanvasController(_resolver, _canvasProvider.GetCanvas("RowBoatCanvas"), seatsDict));
+                    target = null;
 
                 }
                 if (target != null && (target.gameObject.tag == "water")) {
