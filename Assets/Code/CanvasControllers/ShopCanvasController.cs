@@ -45,28 +45,22 @@ namespace Assets.Code.Ui.CanvasControllers
             buildingButtonListPanel.SetActive(false);
             buttonPanel.SetActive(true);
 
-
             ResolveElement(out openBuildingPanelButton, "MainPanel/ButtonPanel/TreasureButton");
-
             closeButton.onClick.AddListener(onCloseClicked);
             openBuildingPanelButton.onClick.AddListener(onBuildingPanelButtonClicked);
-
-            for (int i = 0; i<5; i++) {
-
-               addBuildingButton("Building");
-            }
-            
+           
         }
 
         public void onCloseClicked() {
 
-            // _canvas.enabled = false;
             TearDown();
         }
 
         public void onBuildingPanelButtonClicked()
         {
+            
             buildingButtonListPanel.SetActive(true);
+            addBuildingButton("gold_storage");
             buttonPanel.SetActive(false);
 
         }
@@ -78,37 +72,41 @@ namespace Assets.Code.Ui.CanvasControllers
             fab.name = name;
             buttonLabel.text = name;
 
-            fab.onClick.AddListener(() => onBuildingButtonclicked(fab, name));
+            fab.onClick.AddListener(() => onBuildingButtonclicked(name));
             fab.transform.SetParent(buildingButtonListContentPanel.transform);
             buildingButtonList.Add(fab);
         }
 
-        public void onBuildingButtonclicked(Button button, string name) {
+        public void onBuildingButtonclicked(string name) {
 
             //generate building in map 
             //send message to ship play state 
 
             _messager.Publish(new CreateBuildingMessage {
                 
-                PirateName = name
+                BuildingName = name
 
             });
 
-            //_canvas.enabled = false;
             TearDown();
         }
 
         public override void TearDown()
         {
-
             foreach (var button in buildingButtonList)
             {
 
                 button.onClick.RemoveAllListeners();
+                Debug.Log("Destroy button");
                 GameObject.Destroy(button.gameObject);
             }
 
+            openBuildingPanelButton.onClick.RemoveAllListeners();
+            closeButton.onClick.RemoveAllListeners();
             buildingButtonList.Clear();
+
+            Debug.Log("Count of list "+ buildingButtonList.Count);
+
             base.TearDown();
         }
     }

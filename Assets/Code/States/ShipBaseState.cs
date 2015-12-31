@@ -102,35 +102,10 @@ namespace Assets.Code.States
 		public void onCreateBuilding(CreateBuildingMessage message) {
 			
 			//generate a building and it should follow mouse
-			newBuilding =  CreateBuilding("gold_storage",new Vector3(0,11,0));
+			newBuilding =   shipLevelManager.CreateBuilding(message.BuildingName,new Vector3(0,11,0));
 			newBuilding.GetComponent<BuildingController>().movementIndicatorActive = true;
 		}
 		
-		public GameObject CreateBuilding(string buildingName, Vector3 spawnPosition)
-		{
-			var model = _gameDataProvider.GetData<BuildingModel>(buildingName);
-			GameObject fab;
-			BuildingController buildingController;
-			fab = Object.Instantiate(_prefabProvider.GetPrefab("Building"));
-			
-			fab.GetComponent<SpriteRenderer>().sprite = _spriteProvider.GetSprite(buildingName);
-			
-			buildingController = fab.GetComponent<BuildingController>();
-			buildingController.Initialize(_resolver, model, shipLevelManager);
-			fab.name = buildingName;
-			fab.transform.position = spawnPosition;
-			//fab.transform.SetParent(_buildingsParent.transform);
-			
-			//if (OnBuildingCreatedEvent != null){
-			//	OnBuildingCreatedEvent(buildingController);
-			//}
-			
-			//buildingController.Stats.OnKilledEvent += () => OnBuildingKilled(buildingController);
-			//_knownBuildings.Add(buildingController);
-			
-			return fab;
-			
-		}
 		public void OnOpenShop (OpenShopMessage message)
 		{
 			_uiManager.RegisterUi(new ShopCanvasController(_resolver, _canvasProvider.GetCanvas("ShopCanvas")));
@@ -242,11 +217,7 @@ namespace Assets.Code.States
 				curPosition.y = target.transform.position.y;
 
 				//move the building to where the mouse is
-
 					target.transform.position = curPosition;
-					Debug.Log("Moving Image");
-
-
 				//Get grid on curposition
 				//instantiate red or green according to grid
 				tile.SetActive(true);
@@ -291,8 +262,9 @@ namespace Assets.Code.States
 		}
 		
 		public override void TearDown (){
-			
-			_messager.CancelSubscription(_onBuildingInfoOpen,_onInventoryOpen,_onChangeStateToAttack);
+
+            _messager.CancelSubscription(_onBuildingInfoOpen,_onInventoryOpen,
+                _onChangeStateToAttack, _onOpenShopMessage, _onCreateBuildingMessage);
 			_uiManager.TearDown();
 			Object.Destroy (tile.gameObject);
 			shipLevelManager.TearDown();

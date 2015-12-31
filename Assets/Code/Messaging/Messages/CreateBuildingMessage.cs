@@ -6,7 +6,7 @@ namespace Assets.Code.Messaging.Messages
 {
     public class CreateBuildingMessage : IMessage
     {
-        public string PirateName;
+        public string BuildingName;
         public Vector3 SpawnPosition;
 
     }

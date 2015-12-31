@@ -79,9 +79,6 @@ public class BuildingController : InitializeRequiredBehaviour {
         movementIndicator = indicator.gameObject;
         movementIndicator.transform.position = transform.position;
         movementIndicator.SetActive(false);
-
-
-
     }
 
     public void Initialize (IoCResolver resolver,BuildingModel model,ShipLevelManager shiplevelmanager)
