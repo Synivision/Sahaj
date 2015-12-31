@@ -89,7 +89,7 @@ namespace Assets.Code.States
 					var rowBoat = _poolingObjectManager.Instantiate("row_boat").gameObject;
 					rowBoat.transform.position = new Vector3(-110, 11.5f, -25*x);
 					var boatController = rowBoat.GetComponent<RowBoatController>();
-					boatController.Initialize(_resolver,false,boat.Key);
+					boatController.Initialize(_resolver,false,boat.Key,null);
 					
 					rowBoat.transform.SetParent(_rowbBoatParent.transform);
 					

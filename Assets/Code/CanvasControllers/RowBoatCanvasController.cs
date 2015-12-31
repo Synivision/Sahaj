@@ -18,7 +18,6 @@ namespace Assets.Code.Ui.CanvasControllers
         private IoCResolver _resolver;
         private UiManager _uiManager;
         private CanvasProvider _canvasProvider;
-        private Button _addNewPirateButton;
         private Button _closeButton;
         private PlayerManager _playerManager;
         private GameObject _mainPanel;
@@ -39,14 +38,12 @@ namespace Assets.Code.Ui.CanvasControllers
             _resolver.Resolve(out _spriteProvider);
             _uiManager = new UiManager();
             RowBoatName = rowBoatName;
-            ResolveElement(out _addNewPirateButton, "MainPanel/AddButton");
             ResolveElement(out _closeButton, "MainPanel/CloseButton");
             _mainPanel = GetElement("MainPanel");
             _seatPanel = GetElement("MainPanel/SeatPanel");
             _canvasView.gameObject.SetActive(true);
 
             _closeButton.onClick.AddListener(onCloseButtonClicked);
-            _addNewPirateButton.onClick.AddListener(onAddPirateButtonClicked);
 
             _playerManager.Model.RowBoatCountDict.TryGetValue(rowBoatName,out _seatsDictionary);
             //draw pirate images according to rowboat dict
@@ -58,8 +55,12 @@ namespace Assets.Code.Ui.CanvasControllers
 
                     if (buttonName.Equals(""))
                     {
-                        button.interactable = false;
-                    }
+                    // if seat empty then make button add pirate button
+                    //button.interactable = false;
+                    button.GetComponent<Image>().sprite = _spriteProvider.GetSprite("add_sprite");
+                    button.transform.GetChild(0).GetComponent<Text>().text = "Add Pirate ";
+                    button.onClick.AddListener(onAddPirateButtonClicked);
+                }
                     else {
 
                         button.GetComponent<Image>().sprite = _spriteProvider.GetSprite(buttonName);
@@ -83,7 +84,6 @@ namespace Assets.Code.Ui.CanvasControllers
 
         public override void TearDown()
         {
-            _addNewPirateButton.onClick.RemoveAllListeners();
             _closeButton.onClick.RemoveAllListeners();
 
             //reset seats buttons
@@ -91,6 +91,7 @@ namespace Assets.Code.Ui.CanvasControllers
                 var button = _seatPanel.transform.GetChild(i).gameObject.GetComponent<Button>();
                 button.GetComponent<Image>().sprite = _spriteProvider.GetSprite("SwatchWhiteAlbedo");
                 button.transform.GetChild(0).GetComponent<Text>().text = "Empty";
+                button.onClick.RemoveAllListeners();
                 button.interactable = true;
 
             }

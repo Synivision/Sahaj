@@ -66,6 +66,7 @@
 	}
 	Textures
 	{
+		add_sprite.png
 		Bomber.png
 		Captain.png
 		gold_storage.png
