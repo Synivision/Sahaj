@@ -18,8 +18,13 @@ public class LevelSelectCanvasController  : BaseCanvasController {
 
 		private readonly Messager _messager;
 
-		private readonly Button AttackButton;
-		private readonly Button ScoutButton;
+		private readonly Button attackButton;
+		private readonly Button scoutButton;
+
+		private readonly Image mapImage1, mapImage2, mapImage3;
+
+		private int SelectedLevel;
+		private SpriteProvider _spriteProvider;
 
 		public LevelSelectCanvasController (IoCResolver resolver, Canvas canvasView) : base(resolver, canvasView)
 		{
@@ -35,39 +40,72 @@ public class LevelSelectCanvasController  : BaseCanvasController {
 			
 				Button currentButton;
 				ResolveElement(out currentButton,"level"+(i+1)+"_button");
+				AddListenerToButton(ref currentButton,i+1);
 				leveleSelectButtons.Add(currentButton);
-				SetListenerToButton(i+1);
 
 			}
 
-			ResolveElement (out AttackButton,"Attack");
-			ResolveElement (out ScoutButton,"Scout");
+			ResolveElement (out attackButton,"Attack");
+			ResolveElement (out scoutButton,"Scout");
+			ResolveElement (out mapImage1, "map_image_1");
+			ResolveElement (out mapImage2,"map_image_2");
+			ResolveElement (out mapImage3,"map_image_3");
 
 
+			attackButton.onClick.AddListener (PerformAttack);
 
 			resolver.Resolve(out _messager);
+			resolver.Resolve(out _spriteProvider);
+			ChangeLevelSelected (1);
 			
 		}
 
-		//For each Level just add the method to be called here for respective case!
-		private void SetListenerToButton(int buttonNumber){
+		public void AddListenerToButton(ref Button button, int level){
 		
-			switch (buttonNumber) {
-			
-				case 1 : leveleSelectButtons[buttonNumber-1].onClick.AddListener(StartLevel1);
-						break;
-			
-				case 2 : leveleSelectButtons[buttonNumber-1].onClick.AddListener(StartLevel2);
-						break;
+			button.onClick.AddListener(() => ChangeLevelSelected(level));
+		
+		}
+	
+		public void ChangeLevelSelected(int level){
+		
+			SelectedLevel = level-1;
 
-				case 3 : leveleSelectButtons[buttonNumber-1].onClick.AddListener(StartLevel3);
-						break;
+			//Change Images for each button
+			mapImage1.color = Color.blue;
+			mapImage2.color = Color.cyan;
+			mapImage3.color = Color.red;
 
-				case 4 : leveleSelectButtons[buttonNumber-1].onClick.AddListener(StartLevel4);
-						break;
+			for (int i = 0; i < numberOfButtons; i++) {
+			
+				leveleSelectButtons[i].GetComponent<Image>().sprite = _spriteProvider.GetSprite("dot");
+
 			}
+
+			Debug.Log ("Selected Level " + SelectedLevel);
+
+			leveleSelectButtons[SelectedLevel].GetComponent<Image>().sprite = _spriteProvider.GetSprite("dot_selected");
 		
 		}
+
+		public void PerformAttack(){
+
+			switch (SelectedLevel) {
+				
+			case 0 : StartLevel1();
+				break;
+				
+			case 1 : StartLevel2();
+				break;
+				
+			case 2 : StartLevel3();
+				break;
+				
+			case 3 : StartLevel4();
+				break;
+			}
+
+		}
+
 
 		public void StartLevel1(){
 

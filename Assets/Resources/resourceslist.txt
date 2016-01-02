@@ -73,6 +73,7 @@
 		Captain.png
 		dot.png
 		dot_bullet.png
+		dot_selected.png
 		frame.png
 		frame_map_image.png
 		gold_storage.png
