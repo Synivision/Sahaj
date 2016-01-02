@@ -88,6 +88,7 @@
 		Quarter Master.png
 		residence.png
 		row_boat.png
+		row_boat_mini.png
 		shipp.png
 		Surgeon.png
 		SwatchMauveAlbedo.png

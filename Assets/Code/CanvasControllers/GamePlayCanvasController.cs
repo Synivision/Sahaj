@@ -32,9 +32,11 @@ namespace Assets.Code.Ui.CanvasControllers
 
         //message tokens
         private MessagingToken _onUpdateCanvasPanels;
-        private MessagingToken _onUpdatePirateButtonNumberLabel;
+        //private MessagingToken _onUpdatePirateButtonNumberLabel;
+        private MessagingToken _onUpdateRowBoatButtonNumberLabel;
         private MessagingToken _PirateDictToken;
         private MessagingToken _onUpdateCurrentShipBulletsMessage;
+        private MessagingToken _onRowBoatSentToAttackMessageToken;
 
         private readonly Text _fpsText;
         private Canvas _canvas;
@@ -59,6 +61,8 @@ namespace Assets.Code.Ui.CanvasControllers
         private CanvasProvider _canvasProvider;
         private readonly MessagingToken _onWin;
 
+        private SpriteProvider _spriteProvider;
+
         public GamePlayCanvasController(IoCResolver resolver, Canvas canvasView, PlayerManager playerManager)
             : base(resolver, canvasView)
         {
@@ -69,6 +73,9 @@ namespace Assets.Code.Ui.CanvasControllers
             resolver.Resolve(out _messager);
             resolver.Resolve(out _unityReference);
             resolver.Resolve(out _inputSession);
+            resolver.Resolve(out _spriteProvider);
+
+
             _uiManager = new UiManager();
             _resolver.Resolve(out _canvasProvider);
 
@@ -113,7 +120,9 @@ namespace Assets.Code.Ui.CanvasControllers
             //subsscribe messages
             _onUpdateCanvasPanels = _messager.Subscribe<UpdateGamePlayUiMessage>(UpdateCanvasPanels);
             InitializeCanvasPanels(_playerManager);
-            _onUpdatePirateButtonNumberLabel = _messager.Subscribe<UpdatePirateNumber>(UpdatePirateButtonNumberLabel);
+            //_onUpdatePirateButtonNumberLabel = _messager.Subscribe<UpdatePirateNumber>(UpdatePirateButtonNumberLabel);
+            _onUpdateRowBoatButtonNumberLabel = _messager.Subscribe<UpdateRowBoatPirateNumberMessage>(UpdateRowBoatButtonNumberLabel);
+            _onRowBoatSentToAttackMessageToken = _messager.Subscribe<RowBoatSentToAttackMessage>(OnRowBoatSentToAttack);
             _onUpdateCurrentShipBulletsMessage = _messager.Subscribe<UpdateCurrentShipBulletsMessage>(UpdateShipAttackLabel);
             _quitButton.onClick.AddListener(OnQuitButtonClicked);
             _buttonList = new List<Button>();
@@ -121,13 +130,12 @@ namespace Assets.Code.Ui.CanvasControllers
 
             _numberLabelDict = new Dictionary<string, Text>();
 
-            foreach (var item in _playerManager.Model.UnlockedPirates)
-            {
 
-                if (item.Value == true)
-                {
-                    _buttonList.Add(CreatePirateButton(item.Key));
-                }
+            //add boats to main list not pirates
+
+            foreach (var item in _playerManager.Model.RowBoatCountDict)
+            { 
+              _buttonList.Add(CreateRowBoatButton(item.Key));
             }
 
 
@@ -145,8 +153,26 @@ namespace Assets.Code.Ui.CanvasControllers
 
             _onWin = _messager.Subscribe<WinMessage>(OnWin);
 
-            InitializePirateButtonNumberLabel();
+            //InitializePirateButtonNumberLabel();
+           // InitializeRowBoatButtonNumberLabel();
             _shipAttacksLabel.text = "Ship Attacks Left : " + _playerManager.Model.ShipBulletsAvailable.ToString();
+
+        }
+
+        public void OnRowBoatSentToAttack(RowBoatSentToAttackMessage message) {
+
+            foreach (var button in _buttonList) {
+                if (button.name == message.BoatName) {
+
+                    button.gameObject.SetActive(false);
+                }
+            }
+        }
+
+        public void UpdateRowBoatButtonNumberLabel(UpdateRowBoatPirateNumberMessage message)
+        {
+            var text = _numberLabelDict[message.BoatName];
+            text.text = message.PirateNumber.ToString();
 
         }
 
@@ -158,6 +184,76 @@ namespace Assets.Code.Ui.CanvasControllers
             HandleShipButtonVisibility();
 
         }
+
+        public Button CreateRowBoatButton(string name)
+        {
+            var fab = Object.Instantiate(_prefabProvider.GetPrefab("pirate_button")).gameObject.GetComponent<Button>();
+
+            fab.gameObject.name = name;
+
+            fab.name = name;
+
+            fab.GetComponent<Image>().sprite = _spriteProvider.GetSprite("row_boat_mini");
+
+            var buttonLabel = fab.transform.GetChild(0).GetComponent<Text>();
+            buttonLabel.text = name;
+            var buttonNumberLabel = fab.transform.GetChild(1).GetComponent<Text>();
+
+            buttonNumberLabel.text = calculateOccupiedSeatsOfRowBoat(name).ToString();
+
+           _numberLabelDict.Add(name, buttonNumberLabel);
+
+            fab.onClick.AddListener(() => OnRowBoatButtonClicked(fab, name));
+
+            fab.transform.SetParent(_parentButtonObject.transform);
+
+            return fab;
+        }
+
+        private int calculateOccupiedSeatsOfRowBoat(string rowBoatName) {
+
+            Dictionary<int, string> seatsDictionary;
+            _playerManager.Model.RowBoatCountDict.TryGetValue(rowBoatName, out seatsDictionary);
+            int count = 0;
+
+            foreach (var seat in seatsDictionary) {
+
+                count++;
+                if (seat.Value.Equals("")) {
+                    count--;
+                }
+
+            }
+            return count;
+        }
+
+        private void OnRowBoatButtonClicked(Button button, string name)
+        {
+            _inputSession.CurrentlySelectedRowBoatName = name;
+            if (_previouslyClickedTileButton == button) return;
+
+            if (_previouslyClickedTileButton != null)
+                _previouslyClickedTileButton.interactable = true;
+
+            button.interactable = false;
+            _previouslyClickedTileButton = button;
+            HandleShipButtonVisibility();
+
+            //display canvas to edit seats of selected rowboat
+            _uiManager.RegisterUi(new RowBoatCanvasController(_resolver,_canvasProvider.GetCanvas("RowBoatCanvas"),name));
+
+        }
+
+        //public void InitializeRowBoatButtonNumberLabel()
+        //{
+
+        //    foreach (var entry in _playerManager.Model.RowBoatCountDict)
+        //    {
+        //            var text = _numberLabelDict[entry.Key];
+        //            text.text = entry.Value.ToString();
+        //    }
+
+        //}
 
         public void HandleShipButtonVisibility() {
 
@@ -342,7 +438,7 @@ namespace Assets.Code.Ui.CanvasControllers
                 button.onClick.RemoveAllListeners();
                 button.gameObject.SetActive(false);
             }
-            _messager.CancelSubscription (_onUpdateCanvasPanels,_onUpdatePirateButtonNumberLabel);
+            _messager.CancelSubscription (_onUpdateCanvasPanels,_onUpdateRowBoatButtonNumberLabel, _onUpdateCurrentShipBulletsMessage);
             _buttonList.Clear();
             _quitButton.onClick.RemoveAllListeners();
             base.TearDown();

@@ -20,7 +20,13 @@ public class InputSession : IResolvableItem  {
 		set{_data.Name = value;}
 	}
 
-	public string CurrentlySelectedShipAttackName
+    public string CurrentlySelectedRowBoatName
+    {
+        get { return _data.RowBoatName; }
+        set { _data.RowBoatName = value; }
+    }
+
+    public string CurrentlySelectedShipAttackName
 	{
 		get { return _data.ShipAttackName; }
 		set { _data.ShipAttackName = value; }

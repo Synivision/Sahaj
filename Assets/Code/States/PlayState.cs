@@ -53,9 +53,10 @@ namespace Assets.Code.States
         private GameObject tile;
         int pointerId = -1;
         
-        private int rowBoatCount;  	
+        private int rowBoatCount;
+        public Dictionary<string, Dictionary<int, string>> _tempRowBoatCountDict;
         //TODO: this should be taken from the base controller in future..
-        
+
         Vector3 curPosition;
         Vector3 selectedgameObjectPosition = new Vector3(0, 0, 0);
         public PlayState(IoCResolver resolver, MapLayout mapLayout) : base(resolver)
@@ -78,6 +79,8 @@ namespace Assets.Code.States
             _uiManager.RegisterUi(new PirateInfoCanvasController(_resolver, _canvasProvider.GetCanvas("PirateInfoCanvas")));
             
             rowBoatCount = _playerManager.Model.RowBoatCountDict.Count;
+            _tempRowBoatCountDict = _playerManager.Model.RowBoatCountDict.ToDictionary(entry => entry.Key,
+                                               entry => entry.Value);
             //Initialize level manager
             levelManager = new LevelManager(_resolver, _mapLayout);
             levelManager.PirateCountDict = _playerManager.Model.PirateCountDict;
@@ -136,9 +139,9 @@ namespace Assets.Code.States
                     if (Physics.Raycast(ray, out hitInfo) && target.gameObject.tag != "Cube")
                     {
                         Vector3 spawnPosition = new Vector3(hitInfo.point.x, 5.2f, hitInfo.point.z);
-                        
+
                         //Debug.Log ("Spawn Point from Input Controller = " + spawnPosition.ToString()
-                        levelManager.CreatePirate(_inputSession.CurrentlySelectedPirateName, spawnPosition);
+                        //levelManager.CreatePirate(_inputSession.CurrentlySelectedPirateName, spawnPosition);
                     }
                     
                     if ( target != null   &&   target.gameObject.tag != null )
@@ -207,26 +210,40 @@ namespace Assets.Code.States
         }
         
         public void SpawnBoatAt(Vector3 spawn,Vector3 point){
-            
+
             //Initialize row boat and controller
-            GameObject boat = _poolingObjectManager.Instantiate("row_boat").gameObject;
-            boat.transform.position = spawn;
-            RowBoatController boatController = boat.GetComponent<RowBoatController>();
-            //get name of rowboat from player manager
-            var boatName = _playerManager.Model.RowBoatCountDict.Keys.ElementAt(rowBoatCount-1);
-            
-            boatController.Initialize(_resolver,true, boatName,levelManager);
-            
-            rowBoatCount--;
-            
-            boatController.destinationPosition = point + new Vector3(0, 10, 0);
-            boatController.journeyLength = Vector3.Distance(boat.transform.position, boatController.destinationPosition);
-            boatController.startTime = Time.time;
-            rowBoatList.Add(boat);
-            
+            if (_inputSession.CurrentlySelectedRowBoatName!=null && !_inputSession.CurrentlySelectedRowBoatName.Equals("")
+                && _tempRowBoatCountDict.ContainsKey(_inputSession.CurrentlySelectedRowBoatName))
+            {
+                string boatName = _inputSession.CurrentlySelectedRowBoatName;
+
+                GameObject boat = _poolingObjectManager.Instantiate("row_boat").gameObject;
+                boat.transform.position = spawn;
+                RowBoatController boatController = boat.GetComponent<RowBoatController>();
+                //get name of rowboat from player manager
+                //var boatName = _playerManager.Model.RowBoatCountDict.Keys.ElementAt(rowBoatCount - 1);
+
+                boatController.Initialize(_resolver, true, boatName, levelManager);
+
+                rowBoatCount--;
+
+                boatController.destinationPosition = point + new Vector3(0, 10, 0);
+                boatController.journeyLength = Vector3.Distance(boat.transform.position, boatController.destinationPosition);
+                boatController.startTime = Time.time;
+                rowBoatList.Add(boat);
+
+                _tempRowBoatCountDict.Remove(boatName);
+
+                //send message to gameplaycanvas about rowboat sent to attack to disable rowboat button
+                _messager.Publish(new RowBoatSentToAttackMessage {
+                    BoatName = boatName
+
+                });
+
+            }
+
         }
 
-        
         public GameObject GetClickedObject(out RaycastHit hit)
         {
             GameObject target = null;
@@ -351,7 +368,7 @@ namespace Assets.Code.States
         {
             
             
-            for (int i=0; i < (_playerManager.Model.RowBoatCountDict.Count - rowBoatCount); i++) {
+            for (int i=0; i < rowBoatList.Count; i++) {
                 
                 Object.Destroy(rowBoatList[i]);
                 

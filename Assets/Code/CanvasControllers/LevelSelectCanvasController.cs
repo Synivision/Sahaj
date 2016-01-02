@@ -80,9 +80,6 @@ public class LevelSelectCanvasController  : BaseCanvasController {
 				leveleSelectButtons[i].GetComponent<Image>().sprite = _spriteProvider.GetSprite("dot");
 
 			}
-
-			Debug.Log ("Selected Level " + SelectedLevel);
-
 			leveleSelectButtons[SelectedLevel].GetComponent<Image>().sprite = _spriteProvider.GetSprite("dot_selected");
 		
 		}

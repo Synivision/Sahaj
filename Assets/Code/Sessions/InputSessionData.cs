@@ -8,4 +8,5 @@ public class InputSessionData : IGameDataModel{
 	//public string CurrentPirateData{get;set;}
 	public string ShipAttackName { get; set; }
     public int ShipAttackCost { get; set; }
+    public string RowBoatName { get; set; }
 }

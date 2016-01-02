@@ -47,26 +47,33 @@ namespace Assets.Code.Ui.CanvasControllers
 
             _playerManager.Model.RowBoatCountDict.TryGetValue(rowBoatName,out _seatsDictionary);
             //draw pirate images according to rowboat dict
-                for (int i =0; i< _seatsDictionary.Count; i++) {
+
+            if (_seatsDictionary!=null) {
+
+                for (int i = 0; i < _seatsDictionary.Count; i++)
+                {
 
                     var button = _seatPanel.transform.GetChild(i).gameObject.GetComponent<Button>();
                     string buttonName = "";
-                     _seatsDictionary.TryGetValue(i,out buttonName);
+                    _seatsDictionary.TryGetValue(i, out buttonName);
 
                     if (buttonName.Equals(""))
                     {
-                    // if seat empty then make button add pirate button
-                    //button.interactable = false;
-                    button.GetComponent<Image>().sprite = _spriteProvider.GetSprite("add_sprite");
-                    button.transform.GetChild(0).GetComponent<Text>().text = "Add Pirate ";
-                    button.onClick.AddListener(onAddPirateButtonClicked);
-                }
-                    else {
+                        // if seat empty then make button add pirate button
+                        //button.interactable = false;
+                        button.GetComponent<Image>().sprite = _spriteProvider.GetSprite("add_sprite");
+                        button.transform.GetChild(0).GetComponent<Text>().text = "Add Pirate ";
+                        button.onClick.AddListener(onAddPirateButtonClicked);
+                    }
+                    else
+                    {
 
                         button.GetComponent<Image>().sprite = _spriteProvider.GetSprite(buttonName);
                         button.transform.GetChild(0).GetComponent<Text>().text = buttonName;
                     }
-                }  
+                }
+            }
+               
             
         }
 
@@ -74,6 +81,8 @@ namespace Assets.Code.Ui.CanvasControllers
         {
             _uiManager.RegisterUi(new InventoryCanvasController(_resolver, _canvasProvider.GetCanvas("InventoryCanvas"), RowBoatName));
             TearDown();
+
+            
         }
 
         void onCloseButtonClicked()

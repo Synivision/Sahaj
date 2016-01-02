@@ -151,6 +151,16 @@ namespace Assets.Code.Ui.CanvasControllers{
                     }
 
                 }
+
+
+                _messager.Publish(new UpdateRowBoatPirateNumberMessage {
+
+                    BoatName = _rowBoatName,
+                    PirateNumber = calculateOccupiedSeatsOfRowBoat(seatsDictionary)
+
+                });
+
+
                 TearDown();
 
             }
@@ -166,6 +176,23 @@ namespace Assets.Code.Ui.CanvasControllers{
             
         }
 
+        private int calculateOccupiedSeatsOfRowBoat(Dictionary<int, string> seatsDictionary)
+        {
+            int count = 0;
+
+            foreach (var seat in seatsDictionary)
+            {
+
+                count++;
+                if (seat.Value.Equals(""))
+                {
+                    count--;
+                }
+
+            }
+            return count;
+        }
+
         void onCloseClicked(){
 
             TearDown();
@@ -179,6 +206,7 @@ namespace Assets.Code.Ui.CanvasControllers{
 
         public Button CreatePirateButton(string name)
         {
+           
             var fab = Object.Instantiate(_prefabProvider.GetPrefab("pirate_button")).gameObject.GetComponent<Button>();
 
             fab.gameObject.name = name;
