@@ -12,23 +12,61 @@ namespace Assets.Code.Ui.CanvasControllers
 
 public class LevelSelectCanvasController  : BaseCanvasController {
 
-		private readonly Button _level1Button;
-		private readonly Button _level2Button;
-		private readonly Button _level3Button;
+		private readonly List<Button> leveleSelectButtons;
+
+		private int numberOfButtons;
+
 		private readonly Messager _messager;
+
+		private readonly Button AttackButton;
+		private readonly Button ScoutButton;
 
 		public LevelSelectCanvasController (IoCResolver resolver, Canvas canvasView) : base(resolver, canvasView)
 		{
+			//List of Buttons i.e. Level1, Level2, Level3 ...
+			leveleSelectButtons = new List<Button> ();
+
+			//Since 6 elements are fixed in this canvas so number of buttons is found this way
+			numberOfButtons = canvasView.transform.childCount - 6;
+
+
+			//Initialize Buttons + there listeners and add them to the list
+			for (int i = 0; i < numberOfButtons; i++) {
 			
-			ResolveElement (out _level1Button, "level1_button");
-			ResolveElement (out _level2Button, "level2_button");
-			ResolveElement (out _level3Button, "level3_button");
+				Button currentButton;
+				ResolveElement(out currentButton,"level"+(i+1)+"_button");
+				leveleSelectButtons.Add(currentButton);
+				SetListenerToButton(i+1);
+
+			}
+
+			ResolveElement (out AttackButton,"Attack");
+			ResolveElement (out ScoutButton,"Scout");
+
+
 
 			resolver.Resolve(out _messager);
-			_level1Button.onClick.AddListener (StartLevel1);
-			_level2Button.onClick.AddListener (StartLevel2);
-			_level3Button.onClick.AddListener (StartLevel3);
 			
+		}
+
+		//For each Level just add the method to be called here for respective case!
+		private void SetListenerToButton(int buttonNumber){
+		
+			switch (buttonNumber) {
+			
+				case 1 : leveleSelectButtons[buttonNumber-1].onClick.AddListener(StartLevel1);
+						break;
+			
+				case 2 : leveleSelectButtons[buttonNumber-1].onClick.AddListener(StartLevel2);
+						break;
+
+				case 3 : leveleSelectButtons[buttonNumber-1].onClick.AddListener(StartLevel3);
+						break;
+
+				case 4 : leveleSelectButtons[buttonNumber-1].onClick.AddListener(StartLevel4);
+						break;
+			}
+		
 		}
 
 		public void StartLevel1(){
@@ -173,13 +211,44 @@ public class LevelSelectCanvasController  : BaseCanvasController {
 			TearDown();
 		}
 
+		public void StartLevel4(){
+
+				MapLayout map = new MapLayout();
+				BuildingSpawn goldbuilding = new BuildingSpawn();
+				goldbuilding.Name = "gold_storage";
+				goldbuilding.xGridCoord = 20;
+				goldbuilding.zGridCoord = 20;
+				
+				BuildingSpawn goldbuilding2 = new BuildingSpawn();
+				goldbuilding2.Name = "gold_storage";
+				goldbuilding2.xGridCoord = 15;
+				goldbuilding2.zGridCoord = 15;
+				
+				map.buildingSpawnList.Add(goldbuilding);
+				map.buildingSpawnList.Add(goldbuilding2);
+				
+				_messager.Publish(new StartGameMessage{
+					LevelName = "level2",
+					MapLayout = map
+				});
+				TearDown();
+
+		}
+
 		public override void TearDown()
 		{	
 			
 			//Remove Listeners
-			_level1Button.onClick.RemoveAllListeners();
+			/*_level1Button.onClick.RemoveAllListeners();
 			_level2Button.onClick.RemoveAllListeners();
-			_level3Button.onClick.RemoveAllListeners();
+			_level3Button.onClick.RemoveAllListeners();*/
+
+			for (int i = 0; i < numberOfButtons; i++) {
+			
+				leveleSelectButtons[i].onClick.RemoveAllListeners();
+			
+			}
+
 			base.TearDown();
 		}
 	}
