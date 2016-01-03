@@ -45,10 +45,10 @@ public class CameraController : MonoBehaviour {
 		
 		_camera = GetComponent<Camera>();
 		originalPos = _camera.transform.localPosition;
-		_maxBoundX = this.transform.position.x + 30;
-		_minBoundX = this.transform.position.x - 30;
-		_maxBoundZ = this.transform.position.z + 30;
-		_minBoundZ = this.transform.position.z - 30;
+		_maxBoundX = this.transform.position.x + 80;
+		_minBoundX = this.transform.position.x - 80;
+		_maxBoundZ = this.transform.position.z + 80;
+		_minBoundZ = this.transform.position.z - 80;
 		_maxBoundY = this.transform.position.y;
 		_minBoundY = this.transform.position.y;
 		

@@ -12,9 +12,7 @@ namespace Assets.Code.Ui.CanvasControllers
 
 public class LevelSelectCanvasController  : BaseCanvasController {
 
-		private readonly List<Button> leveleSelectButtons;
-
-		private int numberOfButtons;
+		private readonly List<Button> levelSelectButtons;
 
 		private readonly Messager _messager;
 
@@ -29,20 +27,21 @@ public class LevelSelectCanvasController  : BaseCanvasController {
 		public LevelSelectCanvasController (IoCResolver resolver, Canvas canvasView) : base(resolver, canvasView)
 		{
 			//List of Buttons i.e. Level1, Level2, Level3 ...
-			leveleSelectButtons = new List<Button> ();
-
-			//Since 6 elements are fixed in this canvas so number of buttons is found this way
-			numberOfButtons = canvasView.transform.childCount - 6;
-
+			levelSelectButtons = new List<Button> ();
+			int flag = 0;
 
 			//Initialize Buttons + there listeners and add them to the list
-			for (int i = 0; i < numberOfButtons; i++) {
-			
-				Button currentButton;
-				ResolveElement(out currentButton,"level"+(i+1)+"_button");
-				AddListenerToButton(ref currentButton,i+1);
-				leveleSelectButtons.Add(currentButton);
+			foreach (Transform buttonTransform in canvasView.transform) {
 
+				//string buttonName = buttonTransform.GetComponent<LevelSelectButtonModel>().ButtonName;
+				if(buttonTransform.GetComponent<LevelSelectButtonModel>()){
+					Button currentButton;
+					Debug.Log(buttonTransform.name);
+					ResolveElement(out currentButton,buttonTransform.name);
+					AddListenerToButton(ref currentButton,flag);
+					levelSelectButtons.Add(currentButton);
+					flag++;
+				}
 			}
 
 			ResolveElement (out attackButton,"Attack");
@@ -56,7 +55,7 @@ public class LevelSelectCanvasController  : BaseCanvasController {
 
 			resolver.Resolve(out _messager);
 			resolver.Resolve(out _spriteProvider);
-			ChangeLevelSelected (1);
+			ChangeLevelSelected (0);
 			
 		}
 
@@ -68,19 +67,19 @@ public class LevelSelectCanvasController  : BaseCanvasController {
 	
 		public void ChangeLevelSelected(int level){
 		
-			SelectedLevel = level-1;
+			SelectedLevel = level;
 
 			//Change Images for each button
-			mapImage1.color = Color.blue;
-			mapImage2.color = Color.cyan;
-			mapImage3.color = Color.red;
+			//mapImage1.sprite = _spriteProvider.GetSprite ("imageName");
+			//mapImage2.sprite = _spriteProvider.GetSprite ("imageName");
+			//mapImage3.sprite = _spriteProvider.GetSprite ("imageName");
 
-			for (int i = 0; i < numberOfButtons; i++) {
+			for (int i = 0; i < levelSelectButtons.Count; i++) {
 			
-				leveleSelectButtons[i].GetComponent<Image>().sprite = _spriteProvider.GetSprite("dot");
+				levelSelectButtons[i].GetComponent<Image>().sprite = _spriteProvider.GetSprite("dot");
 
 			}
-			leveleSelectButtons[SelectedLevel].GetComponent<Image>().sprite = _spriteProvider.GetSprite("dot_selected");
+			levelSelectButtons[SelectedLevel].GetComponent<Image>().sprite = _spriteProvider.GetSprite("dot_selected");
 		
 		}
 
@@ -274,15 +273,14 @@ public class LevelSelectCanvasController  : BaseCanvasController {
 		{	
 			
 			//Remove Listeners
-			/*_level1Button.onClick.RemoveAllListeners();
-			_level2Button.onClick.RemoveAllListeners();
-			_level3Button.onClick.RemoveAllListeners();*/
+			attackButton.onClick.RemoveAllListeners();
 
-			for (int i = 0; i < numberOfButtons; i++) {
+			for (int i = 0; i < levelSelectButtons.Count; i++) {
 			
-				leveleSelectButtons[i].onClick.RemoveAllListeners();
+				levelSelectButtons[i].onClick.RemoveAllListeners();
 			
 			}
+
 
 			base.TearDown();
 		}
