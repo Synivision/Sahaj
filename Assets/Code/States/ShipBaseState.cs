@@ -120,7 +120,7 @@ namespace Assets.Code.States
 		
 		public void OnOpenBuildingInfoCanvas(OpenBuildingInfoCanvas message) {
 			
-			_uiManager.RegisterUi(new BuildingInfoCanvasController(_resolver, _canvasProvider.GetCanvas("BuildingInfoCanvas")));
+			_uiManager.RegisterUi(new BuildingInfoCanvasController(_resolver, _canvasProvider.GetCanvas("BuildingInfoCanvas"), message.buildingName));
 		}
 		
 		public void OpenInventoryBuilding(OpenInventory message){

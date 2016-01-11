@@ -22,7 +22,7 @@ namespace Assets.Code.Ui.CanvasControllers
 		private Button _closeButton;
 		private MessagingToken _onFindInventoryItem;
 
-        public BuildingInfoCanvasController(IoCResolver resolver, Canvas canvasView)
+        public BuildingInfoCanvasController(IoCResolver resolver, Canvas canvasView, string buildingName)
             : base(resolver, canvasView)
 		{
 

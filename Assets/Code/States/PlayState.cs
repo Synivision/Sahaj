@@ -155,7 +155,15 @@ namespace Assets.Code.States
                         //Debug.Log ("Spawn Point from Input Controller = " + spawnPosition.ToString()
                         //levelManager.CreatePirate(_inputSession.CurrentlySelectedPirateName, spawnPosition);
                     }
-                    
+
+                    if (target != null && (target.gameObject.tag == "Cube"))
+                    { 
+                        var buildingName = target.GetComponent<BuildingController>().name;
+                        _uiManager.RegisterUi(new BuildingInfoCanvasController(_resolver, _canvasProvider.GetCanvas("BuildingInfoCanvas"), buildingName));
+                        target = null;
+
+                    }
+
                     if ( target != null   &&   target.gameObject.tag != null )
                     {
                         Vector3 fireBulletAtPos = new Vector3(hitInfo.point.x, 5.2f, hitInfo.point.z);
