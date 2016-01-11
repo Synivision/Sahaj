@@ -240,8 +240,14 @@ namespace Assets.Code.Ui.CanvasControllers
             HandleShipButtonVisibility();
 
             //display canvas to edit seats of selected rowboat
-            _uiManager.RegisterUi(new RowBoatCanvasController(_resolver,_canvasProvider.GetCanvas("RowBoatCanvas"),name));
+            //_uiManager.RegisterUi(new RowBoatCanvasController(_resolver,_canvasProvider.GetCanvas("RowBoatCanvas"),name));
 
+            _messager.Publish(new RowBoatSelectedMessage {
+                BoatName = name,
+                onCancelled = () => { // Debug.Log("Hello"); 
+                }
+
+        });
         }
 
         //public void InitializeRowBoatButtonNumberLabel()

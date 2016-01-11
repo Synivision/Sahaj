@@ -29,7 +29,9 @@ namespace Assets.Code.States
         private MessagingToken _onTearDownLevel;
         private MessagingToken _onPlayStateToShipBase;
         private MessagingToken _openShipBaseMessage;
-        
+        private MessagingToken _onOpenRowBoatSelectedMessage;
+        private MessagingToken _onAddPirateToRowBoatMessage;
+
         private PoolingObjectManager _poolingObjectManager;
         LevelManager levelManager;
         PlayerManager _playerManager;
@@ -91,8 +93,9 @@ namespace Assets.Code.States
             _onQuitGame = _messager.Subscribe<QuitGameMessage>(OnQuitGame);
             _onTearDownLevel = _messager.Subscribe<TearDownLevelMessage>(OnTearDownLevel);
             _onPlayStateToShipBase = _messager.Subscribe<OpenShipBaseMessage>(OnOpenShipBaseMessage);
-            
-            // ship  lerp into level
+            _onOpenRowBoatSelectedMessage = _messager.Subscribe<RowBoatSelectedMessage>(onOpenRowBoatSelected);
+            _onAddPirateToRowBoatMessage = _messager.Subscribe<AddPirateToRowBoatMessage>(onAddPirateToRowBoat);
+            //Ship lerp into level
             startTime = Time.time;
             shipPrefab = _poolingObjectManager.Instantiate("revolutionaryship").gameObject;
             journeyLength = Vector3.Distance(shipPrefab.transform.position, new Vector3(-120, 15, -120));
@@ -100,9 +103,18 @@ namespace Assets.Code.States
             //shipPrefab.gameObject.transform.position.lerp
             rowBoatList = new List<GameObject>();
         }
-        
-        
-        
+
+        public void onAddPirateToRowBoat(AddPirateToRowBoatMessage message)
+        {
+            _uiManager.RegisterUi(new InventoryCanvasController(_resolver, _canvasProvider.GetCanvas("InventoryCanvas"), message.BoatName));
+        }
+
+        public void onOpenRowBoatSelected(RowBoatSelectedMessage message)
+        {
+            _uiManager.RegisterUi(new RowBoatCanvasController(_resolver, _canvasProvider.GetCanvas("RowBoatCanvas"), message.BoatName));
+            //message.onCancelled();
+        }
+
         public override void Update()
         {
             
@@ -381,7 +393,8 @@ namespace Assets.Code.States
             _uiManager.TearDown();
             
             //	_poolingObjectManager.TearDown ();
-            _messager.CancelSubscription(_onQuitGame, _onTearDownLevel, _onPlayStateToShipBase);
+            _messager.CancelSubscription(_onQuitGame, _onTearDownLevel, _onPlayStateToShipBase,
+                _onOpenRowBoatSelectedMessage, _onAddPirateToRowBoatMessage);
             
         }
         

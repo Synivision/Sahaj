@@ -73,21 +73,20 @@ namespace Assets.Code.Ui.CanvasControllers
                     }
                 }
             }
-               
-            
         }
 
         void onAddPirateButtonClicked()
         {
-            _uiManager.RegisterUi(new InventoryCanvasController(_resolver, _canvasProvider.GetCanvas("InventoryCanvas"), RowBoatName));
-            TearDown();
+            _messager.Publish(new AddPirateToRowBoatMessage {
+                BoatName = RowBoatName,
+                onCancelled = () => {  }
+            });
 
-            
+            TearDown();
         }
 
         void onCloseButtonClicked()
         {
-
             TearDown();
         }
 

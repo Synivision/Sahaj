@@ -28,7 +28,9 @@ namespace Assets.Code.States
 		private MessagingToken _onBuildingInfoOpen;
 		private MessagingToken _onOpenShopMessage;
 		private MessagingToken _onCreateBuildingMessage;
-		MapLayout _map;
+        
+
+        MapLayout _map;
 		private float _time = 5;
 		private GameObject tile;
 		int pointerId = -1;
@@ -70,8 +72,10 @@ namespace Assets.Code.States
 			_onBuildingInfoOpen = _messager.Subscribe<OpenBuildingInfoCanvas>(OnOpenBuildingInfoCanvas);
 			_onOpenShopMessage = _messager.Subscribe<OpenShopMessage>(OnOpenShop);
 			_onCreateBuildingMessage = _messager.Subscribe<CreateBuildingMessage>(onCreateBuilding);
-			//generate tile and disable it
-			var tileo = _poolingObjectManager.Instantiate("tile");
+
+            
+            //generate tile and disable it
+            var tileo = _poolingObjectManager.Instantiate("tile");
 			tile = tileo.gameObject;
 			tile.SetActive(false);
 			
@@ -98,8 +102,10 @@ namespace Assets.Code.States
 			}
 			
 		}
-		
-		public void onCreateBuilding(CreateBuildingMessage message) {
+
+       
+
+        public void onCreateBuilding(CreateBuildingMessage message) {
 			
 			//generate a building and it should follow mouse
 			newBuilding =   shipLevelManager.CreateBuilding(message.BuildingName,new Vector3(0,11,0));
@@ -160,10 +166,14 @@ namespace Assets.Code.States
 				}
 				
 				if (target != null && (target.gameObject.tag == "RowBoat")) {
-					//show RowBoat Canvas
-					var rowBoatName = target.GetComponent<RowBoatController>().RowBoatName;
-					_uiManager.RegisterUi(new RowBoatCanvasController(_resolver, _canvasProvider.GetCanvas("RowBoatCanvas"), rowBoatName));
-					target = null;
+                    //TODO Now show RowBoat Status Canvas to update rowboat or do something to rowboat 
+                    //not adding pirates in ShipBaseState
+
+                    //var rowBoatName = target.GetComponent<RowBoatController>().RowBoatName;
+                    //_uiManager.RegisterUi(new RowBoatCanvasController(_resolver, _canvasProvider.GetCanvas("RowBoatCanvas"), rowBoatName));
+
+                    Debug.Log("Show RowBoat Status Canvas");
+                    target = null;
 					
 				}
 				if (target != null && (target.gameObject.tag == "water")) {

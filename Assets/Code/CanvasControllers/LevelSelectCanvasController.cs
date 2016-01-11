@@ -36,7 +36,6 @@ public class LevelSelectCanvasController  : BaseCanvasController {
 				//string buttonName = buttonTransform.GetComponent<LevelSelectButtonModel>().ButtonName;
 				if(buttonTransform.GetComponent<LevelSelectButtonModel>()){
 					Button currentButton;
-					Debug.Log(buttonTransform.name);
 					ResolveElement(out currentButton,buttonTransform.name);
 					AddListenerToButton(ref currentButton,flag);
 					levelSelectButtons.Add(currentButton);
