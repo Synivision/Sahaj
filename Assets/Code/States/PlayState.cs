@@ -54,7 +54,8 @@ namespace Assets.Code.States
         List<GameObject> rowBoatList;
         private GameObject tile;
         int pointerId = -1;
-        
+        bool rowBoatAttackStarted;
+
         private int rowBoatCount;
         public Dictionary<string, Dictionary<int, string>> _tempRowBoatCountDict;
         //TODO: this should be taken from the base controller in future..
@@ -102,6 +103,7 @@ namespace Assets.Code.States
             shipPrefab.GetComponent<ShipBehaviour>().Initialize(_resolver, levelManager, shipPrefab.transform.position,_playerManager);
             //shipPrefab.gameObject.transform.position.lerp
             rowBoatList = new List<GameObject>();
+            rowBoatAttackStarted = false;
         }
 
         public void onAddPirateToRowBoat(AddPirateToRowBoatMessage message)
@@ -155,12 +157,17 @@ namespace Assets.Code.States
                         //Debug.Log ("Spawn Point from Input Controller = " + spawnPosition.ToString()
                         //levelManager.CreatePirate(_inputSession.CurrentlySelectedPirateName, spawnPosition);
                     }
+                    if (!rowBoatAttackStarted) {
 
-                    if (target != null && (target.gameObject.tag == "Cube"))
-                    { 
-                        var buildingName = target.GetComponent<BuildingController>().name;
-                        _uiManager.RegisterUi(new BuildingInfoCanvasController(_resolver, _canvasProvider.GetCanvas("BuildingInfoCanvas"), buildingName));
-                        target = null;
+
+                        if (target != null && (target.gameObject.tag == "Cube"))
+                        {
+                            var buildingName = target.GetComponent<BuildingController>().name;
+                            _uiManager.RegisterUi(new BuildingInfoCanvasController(_resolver, _canvasProvider.GetCanvas("BuildingInfoCanvas"), buildingName));
+                            target = null;
+
+                        }
+
 
                     }
 
@@ -231,6 +238,7 @@ namespace Assets.Code.States
         
         public void SpawnBoatAt(Vector3 spawn,Vector3 point){
 
+            rowBoatAttackStarted = true;
             //Initialize row boat and controller
             if (_inputSession.CurrentlySelectedRowBoatName!=null && !_inputSession.CurrentlySelectedRowBoatName.Equals("")
                 && _tempRowBoatCountDict.ContainsKey(_inputSession.CurrentlySelectedRowBoatName))
