@@ -8,6 +8,7 @@ using Assets.Code.Logic.Pooling;
 using Assets.Code.Ui.CanvasControllers;
 using Assets.Code.Messaging.Messages;
 using System.Collections;
+using Assets.Code.UnityBehaviours;
 namespace Assets.Code.States
 {
 	public class ShipBaseState : BaseState
@@ -28,7 +29,7 @@ namespace Assets.Code.States
 		private MessagingToken _onBuildingInfoOpen;
 		private MessagingToken _onOpenShopMessage;
 		private MessagingToken _onCreateBuildingMessage;
-        
+        public static bool buildingsMoving = false;
 
         MapLayout _map;
 		private float _time = 5;
@@ -42,6 +43,7 @@ namespace Assets.Code.States
 		private GameObject inspectorCanvas;
 		private GameObject _rowbBoatParent;
 		private PlayerManager _playerManager;
+        private UnityReferenceMaster _unityReferenceMaster;
 		
 		Vector3 curPosition;
 		Vector3 selectedgameObjectPosition = new Vector3(0,0,0);
@@ -56,54 +58,56 @@ namespace Assets.Code.States
 			_resolver.Resolve(out _prefabProvider);
 			_resolver.Resolve(out _spriteProvider);
 			_resolver.Resolve(out _playerManager);
+            _resolver.Resolve(out _unityReferenceMaster);
 			
 			_map = map;
 		}
-		
-		public override void Initialize (){
-			
-			_uiManager = new UiManager ();
-			_uiManager.RegisterUi(new ShipBaseCanvasController(_resolver,_canvasProvider.GetCanvas("ShipBaseCanvas")));
-			
-			
-			shipLevelManager = new ShipLevelManager(_resolver,_map);
-			_onChangeStateToAttack = _messager.Subscribe<StartGameMessage>(OnChangeStateToAttack);	
-			_onInventoryOpen = _messager.Subscribe<OpenInventory>(OpenInventoryBuilding);
-			_onBuildingInfoOpen = _messager.Subscribe<OpenBuildingInfoCanvas>(OnOpenBuildingInfoCanvas);
-			_onOpenShopMessage = _messager.Subscribe<OpenShopMessage>(OnOpenShop);
-			_onCreateBuildingMessage = _messager.Subscribe<CreateBuildingMessage>(onCreateBuilding);
 
-            
+        public override void Initialize()
+        {
+
+            _uiManager = new UiManager();
+            _uiManager.RegisterUi(new ShipBaseCanvasController(_resolver, _canvasProvider.GetCanvas("ShipBaseCanvas")));
+
+
+            shipLevelManager = new ShipLevelManager(_resolver, _map);
+            _onChangeStateToAttack = _messager.Subscribe<StartGameMessage>(OnChangeStateToAttack);
+            _onInventoryOpen = _messager.Subscribe<OpenInventory>(OpenInventoryBuilding);
+            _onBuildingInfoOpen = _messager.Subscribe<OpenBuildingInfoCanvas>(OnOpenBuildingInfoCanvas);
+            _onOpenShopMessage = _messager.Subscribe<OpenShopMessage>(OnOpenShop);
+            _onCreateBuildingMessage = _messager.Subscribe<CreateBuildingMessage>(onCreateBuilding);
+
+
             //generate tile and disable it
             var tileo = _poolingObjectManager.Instantiate("tile");
-			tile = tileo.gameObject;
-			tile.SetActive(false);
-			
-			if (_playerManager.Model != null) {
-				
-				
-				_rowbBoatParent = Object.Instantiate(_prefabProvider.GetPrefab("empty1"));
-				_rowbBoatParent.transform.position = new Vector3(0, 0, 0);
-				_rowbBoatParent.gameObject.name = "RowBoatParent";
-				
-				//instantiate boats
-				int x = 0;
-				foreach (var boat in _playerManager.Model.RowBoatCountDict) {
-					x++;
-					var rowBoat = _poolingObjectManager.Instantiate("row_boat").gameObject;
-					rowBoat.transform.position = new Vector3(-110, 11.5f, -25*x);
-					var boatController = rowBoat.GetComponent<RowBoatController>();
-					boatController.Initialize(_resolver,false,boat.Key,null);
-					
-					rowBoat.transform.SetParent(_rowbBoatParent.transform);
-					
-				}
-				x = 0;
-			}
-			
-		}
+            tile = tileo.gameObject;
+            tile.SetActive(false);
 
-       
+            if (_playerManager.Model != null)
+            {
+
+
+                _rowbBoatParent = Object.Instantiate(_prefabProvider.GetPrefab("empty1"));
+                _rowbBoatParent.transform.position = new Vector3(0, 0, 0);
+                _rowbBoatParent.gameObject.name = "RowBoatParent";
+
+                //instantiate boats
+                int x = 0;
+                foreach (var boat in _playerManager.Model.RowBoatCountDict)
+                {
+                    x++;
+                    var rowBoat = _poolingObjectManager.Instantiate("row_boat").gameObject;
+                    rowBoat.transform.position = new Vector3(-110, 11.5f, -25 * x);
+                    var boatController = rowBoat.GetComponent<RowBoatController>();
+                    boatController.Initialize(_resolver, false, boat.Key, null);
+
+                    rowBoat.transform.SetParent(_rowbBoatParent.transform);
+
+                }
+                x = 0;
+            }
+
+        }
 
         public void onCreateBuilding(CreateBuildingMessage message) {
 			
@@ -210,12 +214,11 @@ namespace Assets.Code.States
 					}
 				}
 				else{
-					if(target!=null && target.gameObject.tag != "Plane"){
-						target.transform.position = selectedgameObjectPosition;						
-					}
+                    if (target != null && target.gameObject.tag != "Plane")
+                    {
+                        target.transform.position = selectedgameObjectPosition;
+                    }
 				}
-
-
 				_mouseState = false;
 				
 			}

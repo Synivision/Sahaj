@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using Assets.Code.UnityBehaviours.Pooling;
 
+
 public class CameraController : MonoBehaviour {
 	
 	// The rate of change of the field of view in perspective mode.
@@ -17,6 +18,7 @@ public class CameraController : MonoBehaviour {
 	public bool InvertMoveY = false;
 	
 	private float _scrollVelocity = 0.0f;
+    public float panSpeed = 5;
 	private Vector2 _scrollDirection = Vector2.zero;
 	
 	private float _timeTouchPhaseEnded;
@@ -36,7 +38,7 @@ public class CameraController : MonoBehaviour {
 	private const float ShakeScale = 2f;
 	private const float ShakeFallOff = 10.0f;
 	private const float MaxShake = 1f;
-	float mouseSensitivity = 1.0f;
+	float mouseSensitivity = 0.5f;
 	Vector3 lastPosition;
 	
 	Vector3 originalPos;
@@ -79,62 +81,35 @@ public class CameraController : MonoBehaviour {
 		}
 		
 		Touch[] touches = Input.touches;
-		
-		if (touches.Length == 1)
-		{
-			if (touches[0].phase == TouchPhase.Began)
-			{
-				_scrollVelocity = 0.0f;
-			}
-			else if (touches[0].phase == TouchPhase.Moved)
-			{
-				_shake = 0f;
-				Vector2 delta = touches[0].deltaPosition;
-				
-				float positionX = delta.x * MoveSensitivityX * Time.deltaTime;
-				positionX = InvertMoveX ? positionX : positionX * -1;
-				
-				float positionY = delta.y * MoveSensitivityY * Time.deltaTime;
-				positionY = InvertMoveY ? positionY : positionY * -1;
-				
-				_camera.transform.position += new Vector3 (positionX, 0, positionY);
-				
-				_scrollDirection = touches[0].deltaPosition.normalized;
-				_scrollVelocity = (touches[0].deltaPosition.magnitude / touches[0].deltaTime)*100f;
-				
-				print(_scrollVelocity.ToString());
-				
-				if (_scrollVelocity <= 500)
-					_scrollVelocity = 0;
-				
-			}
-			else if (touches[0].phase == TouchPhase.Ended)
-			{
-				_timeTouchPhaseEnded = Time.time;
-			}
-		}
-		
-		// If there are two touches on the device...
+        // If there are two touches on the device...
+        //RaycastHit hitInfo;
+       // var target = GetClickedObject(out hitInfo);
 
-		if (Input.GetMouseButtonDown(0))
-		{
-			lastPosition =  Input.mousePosition;
-		}
-		
-		if (Input.GetMouseButton(0) && isButton() == false)
-		{
-			Vector3 delta  = Input.mousePosition - lastPosition;
-			lastPosition =  Input.mousePosition;
-			
-			
-			transform.Translate(delta.x * mouseSensitivity,delta.y * mouseSensitivity,0);
-			transform.position = new Vector3(
-				Mathf.Clamp(transform.position.x, _minBoundX, _maxBoundX),
-				Mathf.Clamp(transform.position.y, _minBoundY, _maxBoundY),
-				Mathf.Clamp(transform.position.z, _minBoundZ, _maxBoundZ));
-		}
+        //if (!isButton() && target.tag!="Cube") {
+            if (!isButton())
+            {
+                if (Input.GetMouseButtonDown(0))
+            {
+                lastPosition = Input.mousePosition;
+            }
 
-		if (Input.GetMouseButtonUp (0) && isButton() == false) {
+            if (Input.GetMouseButton(0) && isButton() == false)
+            {
+                Vector3 delta = Input.mousePosition - lastPosition;
+                lastPosition = Input.mousePosition;
+
+
+                transform.Translate(delta.x * mouseSensitivity, delta.y * mouseSensitivity, 0);
+                transform.position = new Vector3(
+                    Mathf.Clamp(transform.position.x, _minBoundX, _maxBoundX),
+                    Mathf.Clamp(transform.position.y, _minBoundY, _maxBoundY),
+                    Mathf.Clamp(transform.position.z, _minBoundZ, _maxBoundZ));
+            }
+        }
+     
+
+
+        if (Input.GetMouseButtonUp (0) && isButton() == false) {
 		
 			originalPos = _camera.transform.localPosition;
 		
@@ -176,11 +151,20 @@ public class CameraController : MonoBehaviour {
 			}
 			
 		}
-
-
 	}
+    //to know currently selected building (bad choice)
+    public GameObject GetClickedObject(out RaycastHit hit)
+    {
+        GameObject target = null;
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray.origin, ray.direction * 10, out hit))
+        {
+            target = hit.collider.gameObject;
+        }
+        return target;
+    }
 
-	private bool isButton()
+    private bool isButton()
 	{
 		bool result = true;
 		UnityEngine.EventSystems.EventSystem ct
@@ -188,7 +172,7 @@ public class CameraController : MonoBehaviour {
 		
 		if (! ct.IsPointerOverGameObject() ) result = false;
 		if (! ct.currentSelectedGameObject ) result = false;
-
+     
 		
 		return result;
 	}

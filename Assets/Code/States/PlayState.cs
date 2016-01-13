@@ -158,17 +158,12 @@ namespace Assets.Code.States
                         //levelManager.CreatePirate(_inputSession.CurrentlySelectedPirateName, spawnPosition);
                     }
                     if (!rowBoatAttackStarted) {
-
-
                         if (target != null && (target.gameObject.tag == "Cube"))
                         {
                             var buildingName = target.GetComponent<BuildingController>().name;
                             _uiManager.RegisterUi(new BuildingInfoCanvasController(_resolver, _canvasProvider.GetCanvas("BuildingInfoCanvas"), buildingName));
                             target = null;
-
                         }
-
-
                     }
 
                     if ( target != null   &&   target.gameObject.tag != null )
@@ -178,13 +173,14 @@ namespace Assets.Code.States
                         if (_playerManager.Model.ShipBulletsAvailable > 0 && _inputSession.CurrentShipAttackCost != 0 && _playerManager.Model.ShipBulletsAvailable >= _inputSession.CurrentShipAttackCost)
                             
                         {
-                            shipPrefab.GetComponent<ShipBehaviour>().shoot(fireBulletAtPos);
-                            //damage building behaviour
-                            if (target.gameObject.tag == "Cube")
-                            {
-                                target.GetComponent<BuildingController>().Stats.CurrentHealth -= 50;
+                            if (rowBoatAttackStarted) {
+                                shipPrefab.GetComponent<ShipBehaviour>().shoot(fireBulletAtPos);
+                                //damage building behaviour
+                                if (target.gameObject.tag == "Cube")
+                                {
+                                    target.GetComponent<BuildingController>().Stats.CurrentHealth -= 50;
+                                }
                             }
-                            
                         }
                     }
                     if (hitInfo.collider != null && rowBoatCount > 0 && hitInfo.collider.gameObject.tag == "water")

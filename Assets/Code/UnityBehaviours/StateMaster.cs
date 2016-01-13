@@ -138,7 +138,11 @@ namespace Assets.Code.UnityBehaviours
                     MaximumDamage = 5,
                     MaximumCourage = -1
                 },
-				Type = BuildingModel.BuildingType.Defence_Gunner_Towers
+				Type = BuildingModel.BuildingType.Defence_Gunner_Towers,
+                Descipriton = "Archer Towers are extremely versatile structures."+ 
+                "They are able to target both Ground and Air Units,"+
+                "and they have excellent rqange. This versatility"+ 
+                "means that they should form the cornerstone of every player's defense."
             });
 		
 			_gameDataProvider.AddData (new BuildingModel
@@ -153,8 +157,11 @@ namespace Assets.Code.UnityBehaviours
 					MaximumDamage = 1,
 					MaximumCourage = -1
 				},
-				Type = BuildingModel.BuildingType.Gold_Locker
-			});
+				Type = BuildingModel.BuildingType.Gold_Locker,
+                Descipriton = "The Gold Mine collects gold from an unlimited underground reserve and stores it" +
+                "until collected by the player and placed into a Gold Storage."+
+                "When the mine is full, production will be stopped until it is collected (or raided by an enemy player"
+            });
 			
 			_gameDataProvider.AddData (new BuildingModel
 			                           {

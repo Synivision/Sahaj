@@ -230,12 +230,16 @@ namespace Assets.Code.Ui.CanvasControllers
         private void OnRowBoatButtonClicked(Button button, string name)
         {
             _inputSession.CurrentlySelectedRowBoatName = name;
-            if (_previouslyClickedTileButton == button) return;
+            if (_previouslyClickedTileButton == button)
+            {
+                //return;
+
+            }
 
             if (_previouslyClickedTileButton != null)
                 _previouslyClickedTileButton.interactable = true;
 
-            button.interactable = false;
+            //button.interactable = false;
             _previouslyClickedTileButton = button;
             HandleShipButtonVisibility();
 
@@ -388,7 +392,9 @@ namespace Assets.Code.Ui.CanvasControllers
         private void OnPirateButtonClicked(Button button, string name)
         {
             _inputSession.CurrentlySelectedPirateName = name;
-            if (_previouslyClickedTileButton == button) return;
+            if (_previouslyClickedTileButton == button) {
+               // return;
+            }
 
             if (_previouslyClickedTileButton != null)
                 _previouslyClickedTileButton.interactable = true;
