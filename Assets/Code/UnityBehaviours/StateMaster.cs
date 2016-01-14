@@ -10,7 +10,7 @@ using Assets.Code.States;
 using Assets.Code.Utilities;
 using UnityEngine;
 using Assets.Code.Logic.Logging;
-//using UnityEditor;
+using UnityEditor;
 
 
 namespace Assets.Code.UnityBehaviours
@@ -35,7 +35,7 @@ namespace Assets.Code.UnityBehaviours
         {
             /* RESOURCE LIST CREATION */
 #if UNITY_EDITOR
-           // AssetDatabase.Refresh();
+            AssetDatabase.Refresh();
             FileServices.CreateResourcesList("Assets/Resources/resourceslist.txt");
 #else
             FileServices.LoadResourcesList("resourceslist");
@@ -200,9 +200,9 @@ namespace Assets.Code.UnityBehaviours
                     MaximumCourage = 5
                 },
                 Descipriton = "Control the crew and gives orders",
-                PirateName = "Captain" + UnityEngine.Random.Range (0, 100),
+                PirateName = "Captain",
                 PirateNature = PirateNature.Player,
-                PirateRange = (int)PirateModel.Range.Gunner3,
+                PirateRange = (int)PirateModel.Range.Milee,
                 PirateColor = Color.blue,
                 TrainingCost = 2000
             });

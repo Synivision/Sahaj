@@ -71,6 +71,7 @@
 		button_bg_1.png
 		button_bg_2.png
 		Captain.png
+		captain_sword.png
 		dot.png
 		dot_bullet.png
 		dot_selected.png

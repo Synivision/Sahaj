@@ -81,7 +81,6 @@ namespace Assets.Code.Ui.CanvasControllers{
             }
         }
 
-
         public InventoryCanvasController(IoCResolver resolver, Canvas canvasView, string rowBoatName)
            : base(resolver, canvasView)
         {
@@ -151,7 +150,6 @@ namespace Assets.Code.Ui.CanvasControllers{
                     }
 
                 }
-
 
                 _messager.Publish(new UpdateRowBoatPirateNumberMessage {
 
