@@ -110,13 +110,28 @@ namespace Assets.Code.States
 
         public void onCreateBuilding(CreateBuildingMessage message) {
 			
-			//generate a building and it should follow mouse
+			//generate a building from shop
 			newBuilding =   shipLevelManager.CreateBuilding(message.BuildingName,new Vector3(0,11,0));
+            newBuilding.name = message.BuildingName;
+            //find a new position for generated building with tile empty
+            var bluePrint = shipLevelManager.GetBluePrint();
+            Vector3 newPosition =  new Vector3(0, 11, 0) ;
+            for (int i = 0; i<25; i++) {
+                if (bluePrint[i,i].Equals("empty")) {
+                    //calculate Vector3 for new building
+                    newPosition = new Vector3(10*i,11,10*i) - new Vector3(125,0,125);
+                    break;
+                }
+            }
+            newBuilding.transform.position = newPosition;
 
+            //bring tile under new building
             tile.SetActive(true);
             tile.GetComponent<Renderer>().material.color = Color.green;
             tile.transform.position = newBuilding.transform.position + new Vector3(0,-10,0);
-		}
+
+            shipLevelManager.AddBuildingToBlueprint(newBuilding.name, newBuilding.transform.position + new Vector3(125, 0, 125));
+        }
 		
 		public void OnOpenShop (OpenShopMessage message)
 		{
@@ -208,14 +223,12 @@ namespace Assets.Code.States
 					
 					if (newBuilding)
 					{
-						
-						//TODO: make indicator active on first click then allow movement from second click.
-						//newBuilding.GetComponent<BuildingController>().movementIndicatorActive = false;
 						shipLevelManager.UpdateBlueprint(selectedgameObjectPosition + new Vector3(125, 0, 125), curPosition + new Vector3(125, 0, 125));
-                        
+                        newBuilding = null;
                     }
 				}
 				else{
+                    //move back the building
                     if (target != null && target.gameObject.tag != "Plane")
                     {
                         target.transform.position = selectedgameObjectPosition;

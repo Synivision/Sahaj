@@ -74,7 +74,7 @@ namespace Assets.Code.Ui.CanvasControllers
             var fab = Object.Instantiate(_prefabProvider.GetPrefab("buildings_button").gameObject.GetComponent<Button>());
             var buttonLabel = fab.transform.GetChild(0).GetComponent<Text>();
             var buttomImage = fab.GetComponent<Image>();
-            buttomImage.sprite = _spriteProvider.GetSprite("");
+            buttomImage.sprite = _spriteProvider.GetSprite(name);
             fab.name = name;
             buttonLabel.text = name;
 
@@ -103,16 +103,12 @@ namespace Assets.Code.Ui.CanvasControllers
             {
 
                 button.onClick.RemoveAllListeners();
-                Debug.Log("Destroy button");
                 GameObject.Destroy(button.gameObject);
             }
 
             openBuildingPanelButton.onClick.RemoveAllListeners();
             closeButton.onClick.RemoveAllListeners();
             buildingButtonList.Clear();
-
-            Debug.Log("Count of list "+ buildingButtonList.Count);
-
             base.TearDown();
         }
     }

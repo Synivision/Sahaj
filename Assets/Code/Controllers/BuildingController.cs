@@ -209,7 +209,7 @@ public class BuildingController : InitializeRequiredBehaviour {
         if(_currentTarget != null && Vector3.Distance(transform.position, _currentTarget.transform.position) <= Model.Range && Model.Type == BuildingModel.BuildingType.Defence_Platoons && maxenemyPirateCount > 0){
 
             _createPirateTime += Time.deltaTime;
-            if(_createPirateTime >.5){
+            if(_createPirateTime >1){
                 _levelManager.CreatePirate("EnemyPirate3",_pirateSpawnPoint.transform.position + new Vector3(Random.Range(0,15),0,Random.Range(0,15)));
                 maxenemyPirateCount--;
                 _createPirateTime = 0;

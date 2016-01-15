@@ -206,7 +206,31 @@ public class ShipLevelManager {
 		return tileName;
 	}
 
-	public void GenerateGroundCovers(){
+    public string[,] GetBluePrint()
+    {
+        return blueprint;
+    }
+
+    public void AddBuildingToBlueprint(string buildingName, Vector3 position)
+    {
+
+        var newx = (int)(position.x / GridSize);
+        var newz = (int)(position.z / GridSize);
+
+        if ((newx >= 0 && newx < 25) && (newz >= 0 && newz < 25))
+        {
+           
+            var temp = blueprint[newx, newz];
+            if (temp.Equals("empty"))
+            {
+                blueprint[newx, newz] = buildingName;
+                Debug.Log(blueprint[newx, newz]);
+            }
+        }
+
+    }
+
+    public void GenerateGroundCovers(){
 
 		_groundCoverParent  = Object.Instantiate(_prefabProvider.GetPrefab("empty_prefab"));
 		_groundCoverParent.name = "GroundCovers";
