@@ -292,7 +292,9 @@ namespace Assets.Code.Ui.CanvasControllers
 
             //send message to playstate to switch state
             TearDown();
-            _messager.Publish(new OpenShipBaseMessage { });
+            _messager.Publish(new OpenShipBaseMessage {
+
+            });
         }
 
         public void InitializeCanvasPanels(PlayerManager playerManager)

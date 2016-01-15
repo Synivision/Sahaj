@@ -23,7 +23,7 @@ namespace Assets.Code.Ui.CanvasControllers
         private GameObject buildingButtonListContentPanel;
         private  PrefabProvider _prefabProvider;
         private Button buildingButton;
-
+        private SpriteProvider _spriteProvider;
         private List<Button> buildingButtonList;
 
         public ShopCanvasController(IoCResolver resolver, Canvas canvasView)
@@ -33,6 +33,7 @@ namespace Assets.Code.Ui.CanvasControllers
             _resolver = resolver;
             _resolver.Resolve(out _messager);
             _resolver.Resolve(out _prefabProvider);
+            _resolver.Resolve(out _spriteProvider);
             //_canvas.enabled = true;
 
             buildingButtonList = new List<Button>();
@@ -61,6 +62,9 @@ namespace Assets.Code.Ui.CanvasControllers
             
             buildingButtonListPanel.SetActive(true);
             addBuildingButton("gold_storage");
+            addBuildingButton("platoons");
+            addBuildingButton("water_cannon");
+            addBuildingButton("gunner_tower");
             buttonPanel.SetActive(false);
 
         }
@@ -69,6 +73,8 @@ namespace Assets.Code.Ui.CanvasControllers
 
             var fab = Object.Instantiate(_prefabProvider.GetPrefab("buildings_button").gameObject.GetComponent<Button>());
             var buttonLabel = fab.transform.GetChild(0).GetComponent<Text>();
+            var buttomImage = fab.GetComponent<Image>();
+            buttomImage.sprite = _spriteProvider.GetSprite("");
             fab.name = name;
             buttonLabel.text = name;
 

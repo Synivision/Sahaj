@@ -28,8 +28,8 @@ public class BuildingController : InitializeRequiredBehaviour {
     private GameObject _bulletOrigin;
     private GameObject _pirateSpawnPoint;
 
-    public bool movementIndicatorActive;
-    private GameObject movementIndicator;
+   
+    
 
     // data
     private BuildingModel Model;
@@ -75,10 +75,7 @@ public class BuildingController : InitializeRequiredBehaviour {
 
         MarkAsInitialized();
 
-        var indicator = _poolingObjectManager.Instantiate("move_indicator");
-        movementIndicator = indicator.gameObject;
-        movementIndicator.transform.position = transform.position;
-        movementIndicator.SetActive(false);
+        //var indicator = _poolingObjectManager.Instantiate("move_indicator");
     }
 
     public void Initialize (IoCResolver resolver,BuildingModel model,ShipLevelManager shiplevelmanager)
@@ -119,10 +116,8 @@ public class BuildingController : InitializeRequiredBehaviour {
         
         MarkAsInitialized();
 
-        var indicator = _poolingObjectManager.Instantiate("move_indicator");
-        movementIndicator = indicator.gameObject;
-        movementIndicator.transform.position = transform.position;
-        movementIndicator.SetActive(false);
+       // var indicator = _poolingObjectManager.Instantiate("move_indicator");
+        
         //movementIndicator.transform.SetParent(gameObject.transform);
 
         var inspectorCanvasGameObject = transform.GetChild (0);
@@ -182,17 +177,17 @@ public class BuildingController : InitializeRequiredBehaviour {
     public void Update()
     {
 
-        if (movementIndicatorActive)
-        {
+        //if (movementIndicatorActive)
+        //{
 
-            //show indicator
-            movementIndicator.SetActive(true);
-            movementIndicator.transform.position = transform.position + new Vector3(-50, 30, 0);
-        }
-        else {
-            movementIndicator.SetActive(false);
+        //    //show indicator
+        //    movementIndicator.SetActive(true);
+        //    movementIndicator.transform.position = transform.position + new Vector3(-50, 30, 0);
+        //}
+        //else {
+        //    movementIndicator.SetActive(false);
 
-        }
+        //}
      
 
     transform.LookAt(_unityReference.Sun.transform,-Vector3.down);

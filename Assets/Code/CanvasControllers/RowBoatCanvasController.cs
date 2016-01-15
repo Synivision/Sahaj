@@ -19,6 +19,7 @@ namespace Assets.Code.Ui.CanvasControllers
         private UiManager _uiManager;
         private CanvasProvider _canvasProvider;
         private Button _closeButton;
+        private Button _selectRowBoatButton;
         private PlayerManager _playerManager;
         private GameObject _mainPanel;
         private GameObject _seatPanel;
@@ -42,9 +43,10 @@ namespace Assets.Code.Ui.CanvasControllers
             _mainPanel = GetElement("MainPanel");
             _seatPanel = GetElement("MainPanel/SeatPanel");
             _canvasView.gameObject.SetActive(true);
+            ResolveElement(out _selectRowBoatButton, "MainPanel/SelectRowBoatButton");
 
             _closeButton.onClick.AddListener(onCloseButtonClicked);
-
+            _selectRowBoatButton.onClick.AddListener(onCloseButtonClicked);
             _playerManager.Model.RowBoatCountDict.TryGetValue(rowBoatName,out _seatsDictionary);
             //draw pirate images according to rowboat dict
 

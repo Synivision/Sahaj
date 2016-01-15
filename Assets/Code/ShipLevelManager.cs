@@ -58,8 +58,9 @@ public class ShipLevelManager {
 
 		//_messager.Subscribe<OpenShopMessage>(EnableShopCanvas);
 		GenerateLevelMap();
+        bluePrintToMapLayout();
 
-	}
+    }
 
 	public void GenerateLevelMap(){
 		InitializeStringList();
@@ -237,7 +238,63 @@ public class ShipLevelManager {
 		
 	}
 
-	public void TearDown(){
+    public MapLayout bluePrintToMapLayout()
+    {
+
+        MapLayout layout = new MapLayout();
+
+        MapItemSpawn itemSpawn = new MapItemSpawn();
+        BuildingSpawn buildingSpawn = new BuildingSpawn();
+        //itemSpawn.Name = blueprintItem;
+
+        int w = blueprint.GetLength(0); // width
+        int h = blueprint.GetLength(1); // height
+
+        for (int x = 0; x < w; ++x)
+        {
+            for (int y = 0; y < h; ++y)
+            {
+                if (blueprint[x, y].Equals("empty"))
+                {
+                    itemSpawn = new MapItemSpawn(blueprint[x, y], x, y);
+                    layout.mapItemSpawnList.Add(itemSpawn);
+                }
+
+                if (blueprint[x, y].Equals("river"))
+                {
+                    itemSpawn = new MapItemSpawn(blueprint[x, y], x, y);
+                    layout.mapItemSpawnList.Add(itemSpawn);
+                }
+
+                if (blueprint[x, y].Equals("gold_storage"))
+                {
+                    buildingSpawn = new BuildingSpawn(blueprint[x, y], x, y);
+                    layout.buildingSpawnList.Add(buildingSpawn);
+                }
+
+                if (blueprint[x, y].Equals("gunner_tower"))
+                {
+                    buildingSpawn = new BuildingSpawn(blueprint[x, y], x, y);
+                    layout.buildingSpawnList.Add(buildingSpawn);
+                }
+
+                if (blueprint[x, y].Equals("platoons"))
+                {
+                    buildingSpawn = new BuildingSpawn(blueprint[x, y], x, y);
+                    layout.buildingSpawnList.Add(buildingSpawn);
+                }
+
+                if (blueprint[x, y].Equals("water_cannon"))
+                {
+                    buildingSpawn = new BuildingSpawn(blueprint[x, y], x, y);
+                    layout.buildingSpawnList.Add(buildingSpawn);
+                }
+            }
+        }
+        return layout;
+    }
+
+    public void TearDown(){
 
 		_unityReferenceMaster.AStarPlane.SetActive(false);
 		Object.Destroy (_buildingsParent);

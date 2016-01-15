@@ -40,7 +40,7 @@ public class CameraController : MonoBehaviour {
 	private const float MaxShake = 1f;
 	float mouseSensitivity = 0.5f;
 	Vector3 lastPosition;
-	
+	public  bool canMove = true;
 	Vector3 originalPos;
 	
 	public void Start(){
@@ -86,7 +86,7 @@ public class CameraController : MonoBehaviour {
        // var target = GetClickedObject(out hitInfo);
 
         //if (!isButton() && target.tag!="Cube") {
-            if (!isButton())
+            if (!isButton()&& canMove)
             {
                 if (Input.GetMouseButtonDown(0))
             {
@@ -152,17 +152,7 @@ public class CameraController : MonoBehaviour {
 			
 		}
 	}
-    //to know currently selected building (bad choice)
-    public GameObject GetClickedObject(out RaycastHit hit)
-    {
-        GameObject target = null;
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray.origin, ray.direction * 10, out hit))
-        {
-            target = hit.collider.gameObject;
-        }
-        return target;
-    }
+  
 
     private bool isButton()
 	{
