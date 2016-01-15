@@ -44,7 +44,7 @@ namespace Assets.Code.States
 		private GameObject _rowbBoatParent;
 		private PlayerManager _playerManager;
         private UnityReferenceMaster _unityReferenceMaster;
-		
+        private CameraController _camera;
 		Vector3 curPosition;
 		Vector3 selectedgameObjectPosition = new Vector3(0,0,0);
 		
@@ -85,8 +85,6 @@ namespace Assets.Code.States
 
             if (_playerManager.Model != null)
             {
-
-
                 _rowbBoatParent = Object.Instantiate(_prefabProvider.GetPrefab("empty1"));
                 _rowbBoatParent.transform.position = new Vector3(0, 0, 0);
                 _rowbBoatParent.gameObject.name = "RowBoatParent";
@@ -106,15 +104,34 @@ namespace Assets.Code.States
                 }
                 x = 0;
             }
+            _camera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraController>();
 
         }
 
         public void onCreateBuilding(CreateBuildingMessage message) {
 			
-			//generate a building and it should follow mouse
+			//generate a building from shop
 			newBuilding =   shipLevelManager.CreateBuilding(message.BuildingName,new Vector3(0,11,0));
-			newBuilding.GetComponent<BuildingController>().movementIndicatorActive = true;
-		}
+            newBuilding.name = message.BuildingName;
+            //find a new position for generated building with tile empty
+            var bluePrint = shipLevelManager.GetBluePrint();
+            Vector3 newPosition =  new Vector3(0, 11, 0) ;
+            for (int i = 0; i<25; i++) {
+                if (bluePrint[i,i].Equals("empty")) {
+                    //calculate Vector3 for new building
+                    newPosition = new Vector3(10*i,11,10*i) - new Vector3(125,0,125);
+                    break;
+                }
+            }
+            newBuilding.transform.position = newPosition;
+
+            //bring tile under new building
+            tile.SetActive(true);
+            tile.GetComponent<Renderer>().material.color = Color.green;
+            tile.transform.position = newBuilding.transform.position + new Vector3(0,-10,0);
+
+            shipLevelManager.AddBuildingToBlueprint(newBuilding.name, newBuilding.transform.position + new Vector3(125, 0, 125));
+        }
 		
 		public void OnOpenShop (OpenShopMessage message)
 		{
@@ -206,22 +223,24 @@ namespace Assets.Code.States
 					
 					if (newBuilding)
 					{
-						
-						//TODO: make indicator active on first click then allow movement from second click.
-						
-						//newBuilding.GetComponent<BuildingController>().movementIndicatorActive = false;
-						//shipLevelManager.UpdateBlueprint(selectedgameObjectPosition + new Vector3(125, 0, 125), curPosition + new Vector3(125, 0, 125));
-					}
+						shipLevelManager.UpdateBlueprint(selectedgameObjectPosition + new Vector3(125, 0, 125), curPosition + new Vector3(125, 0, 125));
+                        newBuilding = null;
+                    }
 				}
 				else{
+                    //move back the building
                     if (target != null && target.gameObject.tag != "Plane")
                     {
                         target.transform.position = selectedgameObjectPosition;
+                       
                     }
 				}
 				_mouseState = false;
-				
-			}
+                _camera.canMove = true;
+                //save map data to file 
+                saveMapLayoutToFile();
+
+            }
 			
 			if (_mouseState) {
 				screenSpace = Camera.main.WorldToScreenPoint (target.transform.position);
@@ -230,7 +249,9 @@ namespace Assets.Code.States
 				curPosition.y = target.transform.position.y;
 
 				//move the building to where the mouse is
-					target.transform.position = curPosition;
+				target.transform.position = curPosition;
+
+                _camera.canMove = false;
 				//Get grid on curposition
 				//instantiate red or green according to grid
 				tile.SetActive(true);
@@ -253,13 +274,15 @@ namespace Assets.Code.States
 			else if (tile.GetComponent<Renderer> ().material.color == Color.red) {
 				
 				tile.transform.position = new Vector3 (1000, -10, 0);
-				
-			}
-			
-			
-			
+               
+            }
 		}
-		
+
+        public void saveMapLayoutToFile() {
+            MapLayout layout = shipLevelManager.bluePrintToMapLayout();
+            Serializer.Save<MapLayout>("MapLayout", layout);
+        }
+
 		public GameObject GetClickedObject (out RaycastHit hit)
 		{
 			GameObject target = null;

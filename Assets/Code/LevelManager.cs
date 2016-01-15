@@ -255,7 +255,29 @@ public class LevelManager
         return fab;
         
     }
-    
+
+    public string[,] getBluePrint()
+    {
+        return blueprint;
+    }
+
+    public void AddBuildingToBlueprint(string buildingName, Vector3 position) {
+
+        var newx = (int)(position.x / GridSize);
+        var newz = (int)(position.z / GridSize);
+
+        if ((newx >= 0 && newx < 25) && (newz >= 0 && newz < 25))
+        {
+
+            var temp = blueprint[newx, newz];
+            if (temp.Equals("empty"))
+            {
+                blueprint[newx, newz] = buildingName;
+            }
+        }
+
+    }
+
     private void OnBuildingKilled(BuildingController building)
     {
         _knownBuildings.Remove(building);

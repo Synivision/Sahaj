@@ -56,8 +56,9 @@ public class PirateController : AIPath
 
     private PirateState _currentState;
     private bool isDead = false;
+    private GameObject sword = null;
 
-    public void Initialize (IoCResolver resolver, PirateModel model, LevelManager levelManager)
+    public void Initialize(IoCResolver resolver, PirateModel model, LevelManager levelManager)
     {
         // resolve references
         _levelManager = levelManager;
@@ -95,6 +96,17 @@ public class PirateController : AIPath
         // NOTE: this should be replaced with an attack speed value from the model
         _timeTillNextShot = 1f;
         _timeTillNextSearch = 2f;
+
+        if (Model.PirateColor.Equals(Color.blue))
+        {
+            //instantiate sword
+            Debug.Log("instantiate");
+            var fab = _poolingObjectManager.Instantiate("captain_melee_weapon").gameObject;
+            
+            fab.transform.SetParent(gameObject.transform);
+            fab.transform.position = new Vector3(2.7f,2.1f,6);
+
+        }
     }
 
     private void OnCurrentHealthChanged (float oldHealth, float newHealth, float delta)
@@ -138,7 +150,17 @@ public class PirateController : AIPath
             case PirateState.Fleeing:
                 break;
             case PirateState.Shooting:
-                HandleShooting();
+                {
+                   
+                    if (Model.PirateColor.Equals(Color.blue))
+                    {
+                        HandleMeleeAttack();
+                    }
+                    else {
+                        HandleShooting();
+                    }
+                    
+                }
                 break;
             case PirateState.Scanning:
                 HandleScanning();
@@ -170,6 +192,21 @@ public class PirateController : AIPath
             ChangeState(PirateState.Scanning);
     }
 
+    private void HandleMeleeAttack() {
+        _timeTillNextShot -= Time.deltaTime;
+        if (_currentTarget != null)
+        {
+            if (_timeTillNextShot <= 0f)
+            {
+                MeleeAttack(_currentTarget);
+                _timeTillNextShot = 1f;
+            }
+        }
+        else
+            ChangeState(PirateState.Scanning);
+
+
+    }
     private void HandleShooting()
     {
         _timeTillNextShot -= Time.deltaTime;
@@ -210,6 +247,34 @@ public class PirateController : AIPath
         }
     }
     #endregion
+
+    private void MeleeAttack(StatsBehaviour shootingTarget)
+    {
+        if (shootingTarget!=null) {
+            _unityReference.Delay(() =>
+            {
+                shootingTarget.CurrentHealth -= Model.Stats.MaximumDamage;
+            }, 0.1f);
+
+
+        }
+
+        // TODO sword animation
+        if (sword != null)
+        {
+            var pos = sword.transform.rotation;
+
+            sword.transform.Rotate(Vector3.up * Time.deltaTime, Space.World);
+
+            sword.transform.rotation = pos;
+        }
+        _poolingAudioPlayer.PlaySound(new PooledAudioRequest
+            {
+                Sound = _soundProvider.GetSound("lazer_shoot1"),
+                Target = transform.position,
+                Volume = 0.3f
+            });
+    }
 
     private void Shoot(StatsBehaviour shootingTarget)
     {
