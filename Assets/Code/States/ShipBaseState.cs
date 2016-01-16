@@ -45,7 +45,8 @@ namespace Assets.Code.States
 		private PlayerManager _playerManager;
         private UnityReferenceMaster _unityReferenceMaster;
         private CameraController _camera;
-		Vector3 curPosition;
+        private ShopCanvasController _shopCanvasController;
+        Vector3 curPosition;
 		Vector3 selectedgameObjectPosition = new Vector3(0,0,0);
 		
 		public ShipBaseState (IoCResolver resolver, MapLayout map) : base(resolver){
@@ -135,8 +136,15 @@ namespace Assets.Code.States
 		
 		public void OnOpenShop (OpenShopMessage message)
 		{
-			_uiManager.RegisterUi(new ShopCanvasController(_resolver, _canvasProvider.GetCanvas("ShopCanvas")));
-			
+            if (_shopCanvasController != null)
+            {
+                _shopCanvasController.enableCanvas();
+            }
+            else
+            {
+                _shopCanvasController = new ShopCanvasController(_resolver, _canvasProvider.GetCanvas("ShopCanvas"));
+                _uiManager.RegisterUi(_shopCanvasController);
+            }
 		}
 		
 		public void OnOpenBuildingInfoCanvas(OpenBuildingInfoCanvas message) {
@@ -160,12 +168,6 @@ namespace Assets.Code.States
 			
 			_uiManager.Update ();
 			
-			//if (newBuilding) {
-			
-			//    newBuilding.transform.position = Input.mousePosition;
-			
-			//}
-			
 			Touch[] touch = Input.touches;
 			if (Application.platform == RuntimePlatform.Android)
 				pointerId = touch[0].fingerId;
@@ -188,10 +190,6 @@ namespace Assets.Code.States
 				
 				if (target != null && (target.gameObject.tag == "RowBoat")) {
                     //TODO Now show RowBoat Status Canvas to update rowboat or do something to rowboat 
-                    //not adding pirates in ShipBaseState
-
-                    //var rowBoatName = target.GetComponent<RowBoatController>().RowBoatName;
-                    //_uiManager.RegisterUi(new RowBoatCanvasController(_resolver, _canvasProvider.GetCanvas("RowBoatCanvas"), rowBoatName));
 
                     Debug.Log("Show RowBoat Status Canvas");
                     target = null;

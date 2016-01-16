@@ -67,7 +67,6 @@ namespace Assets.Code.Ui.CanvasControllers
 		private void OnUpgradeClicked(){
 			
 			//ToDo Open Upgrade Canvas
-			Debug.Log ("On Upgrade Clicked");
 			
 		}
 		
@@ -75,8 +74,14 @@ namespace Assets.Code.Ui.CanvasControllers
 			
 			//ToDo Open Info Canvas
 			Debug.Log ("On Info Clicked");
-			_messager.Publish(new OpenBuildingInfoCanvas { });
-			
+            var buildingNameStr = gameObject.transform.parent.name;
+			_messager.Publish(new OpenBuildingInfoCanvas {
+                
+                buildingName = buildingNameStr
+
+            });
+
+            gameObject.SetActive(false);
 		}
 		
 		private void OnActionClicked(){

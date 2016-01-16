@@ -37,5 +37,5 @@ public class InputSession : IResolvableItem  {
         get { return _data.ShipAttackCost; }
         set { _data.ShipAttackCost = value; }
     }
-    //	set{fire off event; data = value}
+   
 }
