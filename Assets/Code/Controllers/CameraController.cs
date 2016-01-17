@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using Assets.Code.UnityBehaviours.Pooling;
-
+using UnityEngine.EventSystems;
+using System.Collections.Generic;
 
 public class CameraController : MonoBehaviour {
 	
@@ -86,14 +87,14 @@ public class CameraController : MonoBehaviour {
        // var target = GetClickedObject(out hitInfo);
 
         //if (!isButton() && target.tag!="Cube") {
-            if (!isButton()&& canMove)
+            if (!IsPointerOverUIObject() && canMove)
             {
                 if (Input.GetMouseButtonDown(0))
             {
                 lastPosition = Input.mousePosition;
             }
 
-            if (Input.GetMouseButton(0) && isButton() == false)
+            if (Input.GetMouseButton(0) && !IsPointerOverUIObject())
             {
                 Vector3 delta = Input.mousePosition - lastPosition;
                 lastPosition = Input.mousePosition;
@@ -109,13 +110,13 @@ public class CameraController : MonoBehaviour {
      
 
 
-        if (Input.GetMouseButtonUp (0) && isButton() == false) {
+        if (Input.GetMouseButtonUp (0) && !IsPointerOverUIObject()) {
 		
 			originalPos = _camera.transform.localPosition;
 		
 		}
 		
-		if (Input.touchCount == 2 && isButton() == false)
+		if (Input.touchCount == 2 && !IsPointerOverUIObject())
 		{
 			// Store both touches.
 			Touch touchZero = Input.GetTouch(0);
@@ -153,18 +154,14 @@ public class CameraController : MonoBehaviour {
 		}
 	}
   
+    private bool IsPointerOverUIObject()
+    {
+ 
+        PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
+        eventDataCurrentPosition.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
 
-    private bool isButton()
-	{
-		bool result = true;
-		UnityEngine.EventSystems.EventSystem ct
-			= UnityEngine.EventSystems.EventSystem.current;
-		
-		if (! ct.IsPointerOverGameObject() ) result = false;
-		if (! ct.currentSelectedGameObject ) result = false;
-     
-		
-		return result;
-	}
-	
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
+        return results.Count > 0;
+    }
 }

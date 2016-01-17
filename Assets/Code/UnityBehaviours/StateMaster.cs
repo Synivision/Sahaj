@@ -425,32 +425,32 @@ namespace Assets.Code.UnityBehaviours
             _pirateCountDict.Add("EnemyPirate3", 10);
 
             _shipAttacksCountDict = new Dictionary<string, int>();
-            _shipAttacksCountDict.Add("Gas", 2);
-            _shipAttacksCountDict.Add("Fire", 2);
-            _shipAttacksCountDict.Add("Bomb", 2);
-            _shipAttacksCountDict.Add("Gun", 2);
+            _shipAttacksCountDict.Add("ship_gas", 2);
+            _shipAttacksCountDict.Add("ship_fire", 2);
+            _shipAttacksCountDict.Add("ship_bomb", 2);
+            _shipAttacksCountDict.Add("ship_gun", 2);
 
             _shipAttackCostDict = new Dictionary<string, int>();
-            _shipAttackCostDict.Add("Gas", 2);
-            _shipAttackCostDict.Add("Fire", 3);
-            _shipAttackCostDict.Add("Bomb", 4);
-            _shipAttackCostDict.Add("Gun", 11);
+            _shipAttackCostDict.Add("ship_gas", 2);
+            _shipAttackCostDict.Add("ship_fire", 3);
+            _shipAttackCostDict.Add("ship_bomb", 4);
+            _shipAttackCostDict.Add("ship_gun", 11);
 
             _unlockedShipAttacks = new Dictionary<string, bool>();
-            _unlockedShipAttacks.Add("Gas", true);
-            _unlockedShipAttacks.Add("Fire", true);
-            _unlockedShipAttacks.Add("Bomb", true);
-            _unlockedShipAttacks.Add("Gun", true);
+            _unlockedShipAttacks.Add("ship_gas", true);
+            _unlockedShipAttacks.Add("ship_fire", true);
+            _unlockedShipAttacks.Add("ship_bomb", true);
+            _unlockedShipAttacks.Add("ship_gun", true);
 
 
             _rowBoatDict = new Dictionary<string, Dictionary<int, string>>();
 
             //boat1
             seatsDictionary = new Dictionary<int, string>();
-            seatsDictionary.Add(0, "Quarter Master");
-            seatsDictionary.Add(1, "Captain");
-            seatsDictionary.Add(2, "Gunner");
-            seatsDictionary.Add(3, "Bomber");
+            seatsDictionary.Add(0, "");
+            seatsDictionary.Add(1, "");
+            seatsDictionary.Add(2, "");
+            seatsDictionary.Add(3, "");
             seatsDictionary.Add(4, "");
             seatsDictionary.Add(5, "");
 
@@ -458,20 +458,20 @@ namespace Assets.Code.UnityBehaviours
 
             //boat2
             seatsDictionary = new Dictionary<int, string>();
-            seatsDictionary.Add(0, "Quarter Master");
-            seatsDictionary.Add(1, "Captain");
-            seatsDictionary.Add(2, "Gunner");
-            seatsDictionary.Add(3, "Bomber");
-            seatsDictionary.Add(4, "Surgeon");
-            seatsDictionary.Add(5, "Gunner");
+            seatsDictionary.Add(0, "");
+            seatsDictionary.Add(1, "");
+            seatsDictionary.Add(2, "");
+            seatsDictionary.Add(3, "");
+            seatsDictionary.Add(4, "");
+            seatsDictionary.Add(5, "");
 
 
             _rowBoatDict.Add("Boat2", seatsDictionary);
 
             //boat 3
             seatsDictionary = new Dictionary<int, string>();
-            seatsDictionary.Add(0, "Bomber");
-            seatsDictionary.Add(1, "Captain");
+            seatsDictionary.Add(0, "");
+            seatsDictionary.Add(1, "");
             seatsDictionary.Add(2, "");
             seatsDictionary.Add(3, "");
             seatsDictionary.Add(4, "");
