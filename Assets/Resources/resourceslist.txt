@@ -6,10 +6,6 @@
 		goldcoin.png
 		icon.jpg
 		rowboat_canvas_bg.jpg
-		shipbomb.png
-		ship_fire.png
-		ship_gas.png
-		ship_gun.png
 		star.png
 	}
 	Materials
@@ -93,6 +89,10 @@
 		row_boat.png
 		row_boat_mini.png
 		shipp.png
+		ship_bomb.png
+		ship_fire.png
+		ship_gas.png
+		ship_gun.png
 		Surgeon.png
 		SwatchMauveAlbedo.png
 		SwatchNavyAlbedo.png

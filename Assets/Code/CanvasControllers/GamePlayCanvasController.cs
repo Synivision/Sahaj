@@ -55,14 +55,15 @@ namespace Assets.Code.Ui.CanvasControllers
         private List<Button> _shipAttackButtonList;
         private Dictionary<string, Text> _numberLabelDict;
         private PlayerManager _playerManager;
-
+        private Text _shipGunPowderLabel;
+        private Text _rowBoatsRemainingLabel;
         private InputSession _inputSession;
         private UiManager _uiManager;
         private CanvasProvider _canvasProvider;
         private readonly MessagingToken _onWin;
 
         private SpriteProvider _spriteProvider;
-
+        private int rowBoatsRemainingCount = 0;
         public GamePlayCanvasController(IoCResolver resolver, Canvas canvasView, PlayerManager playerManager)
             : base(resolver, canvasView)
         {
@@ -81,6 +82,8 @@ namespace Assets.Code.Ui.CanvasControllers
 
             ResolveElement(out _fpsText, "FpsText");
             ResolveElement(out _quitButton, "QuitButton");
+            ResolveElement(out _shipGunPowderLabel, "NoTouchZone/GunPowderText"); 
+            ResolveElement(out _rowBoatsRemainingLabel, "NoTouchZone/RowBoatCountText");
 
             var shipAttackspanel = GetElement("ShipAttacksPanel");
             var shipAttackContentPanel = shipAttackspanel.transform.GetChild(0).gameObject;
@@ -135,10 +138,13 @@ namespace Assets.Code.Ui.CanvasControllers
 
             foreach (var item in _playerManager.Model.RowBoatCountDict)
             { 
-              _buttonList.Add(CreateRowBoatButton(item.Key));
+              //_buttonList.Add(CreateRowBoatButton(item.Key));
+                rowBoatsRemainingCount++;
             }
+            Debug.Log("Boat" + rowBoatsRemainingCount.ToString());
+            _buttonList.Add(CreateRowBoatButton("Boat" + rowBoatsRemainingCount.ToString()));
 
-
+           
             foreach (var item in _playerManager.Model.UnlockedShipAttacks)
             {
 
@@ -152,21 +158,23 @@ namespace Assets.Code.Ui.CanvasControllers
             HandleShipButtonVisibility();
 
             _onWin = _messager.Subscribe<WinMessage>(OnWin);
-
-            //InitializePirateButtonNumberLabel();
-           // InitializeRowBoatButtonNumberLabel();
-            _shipAttacksLabel.text = "Ship Attacks Left : " + _playerManager.Model.ShipBulletsAvailable.ToString();
-
+            _shipGunPowderLabel.text = "Ship GunPowder Remaining : " + _playerManager.Model.ShipBulletsAvailable.ToString();
+            _rowBoatsRemainingLabel.text = "RowBoat Remaining : " + rowBoatsRemainingCount.ToString();
         }
 
         public void OnRowBoatSentToAttack(RowBoatSentToAttackMessage message) {
 
-            foreach (var button in _buttonList) {
-                if (button.name == message.BoatName) {
-
-                    button.gameObject.SetActive(false);
+            rowBoatsRemainingCount--;
+            _rowBoatsRemainingLabel.text = "RowBoat Remaining : " + rowBoatsRemainingCount.ToString();
+            foreach (var button in _buttonList)
+                {
+                 button.gameObject.SetActive(false);
                 }
+
+            if (rowBoatsRemainingCount>0 && rowBoatsRemainingCount<=4) {
+                _buttonList.Add(CreateRowBoatButton("Boat" + rowBoatsRemainingCount.ToString()));
             }
+            
         }
 
         public void UpdateRowBoatButtonNumberLabel(UpdateRowBoatPirateNumberMessage message)
@@ -178,7 +186,7 @@ namespace Assets.Code.Ui.CanvasControllers
 
         private void UpdateShipAttackLabel(UpdateCurrentShipBulletsMessage message){
 
-            _shipAttacksLabel.text = "Ship Attacks Left : " + _playerManager.Model.ShipBulletsAvailable.ToString();
+            _shipGunPowderLabel.text = "Ship GunPowder Remaining : " + _playerManager.Model.ShipBulletsAvailable.ToString();
             //TODO check what buttons can be used for attack by ship
 
             HandleShipButtonVisibility();
@@ -187,6 +195,7 @@ namespace Assets.Code.Ui.CanvasControllers
 
         public Button CreateRowBoatButton(string name)
         {
+           
             var fab = Object.Instantiate(_prefabProvider.GetPrefab("pirate_button")).gameObject.GetComponent<Button>();
 
             fab.gameObject.name = name;
@@ -198,14 +207,14 @@ namespace Assets.Code.Ui.CanvasControllers
             var buttonLabel = fab.transform.GetChild(0).GetComponent<Text>();
             buttonLabel.text = name;
             var buttonNumberLabel = fab.transform.GetChild(1).GetComponent<Text>();
-
             buttonNumberLabel.text = calculateOccupiedSeatsOfRowBoat(name).ToString();
 
            _numberLabelDict.Add(name, buttonNumberLabel);
 
             fab.onClick.AddListener(() => OnRowBoatButtonClicked(fab, name));
-
+            Debug.Log(name);
             fab.transform.SetParent(_parentButtonObject.transform);
+            fab.transform.SetAsFirstSibling();
 
             return fab;
         }
@@ -375,18 +384,20 @@ namespace Assets.Code.Ui.CanvasControllers
 
         public Button CreateShipAttackButton(string name) {
 
-            var fab = Object.Instantiate(_prefabProvider.GetPrefab("ship_attack_button").gameObject.GetComponent<Button>());
+            var fab = Object.Instantiate(_prefabProvider.GetPrefab("pirate_button").gameObject.GetComponent<Button>());
             fab.gameObject.name = name;
             int value;
             _playerManager.Model.ShipAttackCostDict.TryGetValue(name, out value);
             fab.transform.GetChild(0).GetComponent<Text>().text = value.ToString();
+            fab.GetComponent<Image>().sprite = _spriteProvider.GetSprite(name);
             //var buttonLabel = fab.transform.GetChild(0).GetComponent<Text>();
             //buttonLabel.text = name;
             //var buttonNumberLabel = fab.transform.GetChild(1).GetComponent<Text>();
-
+            var buttonNumberLabel = fab.transform.GetChild(1).GetComponent<Text>();
+            buttonNumberLabel.text = "";
             fab.onClick.AddListener(() => OnShipAttackButtonClicked(fab, name));
 
-            fab.transform.SetParent(_parentShipAttackButtonObject.transform);
+            fab.transform.SetParent(_parentButtonObject.transform);
 
             return fab;
         }

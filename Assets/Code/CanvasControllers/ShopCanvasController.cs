@@ -53,8 +53,17 @@ namespace Assets.Code.Ui.CanvasControllers
         }
 
         public void onCloseClicked() {
+            
+            disableCanvas();
+            
+        }
 
-            TearDown();
+        public void enableCanvas() {
+            _canvas.enabled = true;
+        }
+
+        public void disableCanvas() {
+            _canvas.enabled = false;
         }
 
         public void onBuildingPanelButtonClicked()
