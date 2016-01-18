@@ -144,7 +144,10 @@ public class ShipLevelManager {
 		fab.name = buildingName;
 		fab.transform.position = spawnPosition;
 		fab.transform.SetParent (_buildingsParent.transform);
-		
+		model.piratesContained = new List<PirateModel> ();
+
+		for(int i = 0; i < 5 ; i++)
+			model.piratesContained.Add (_gameDataProvider.GetData<PirateModel> ("Quarter Master"));
 		//if (OnBuildingCreatedEvent != null){
 		//	OnBuildingCreatedEvent(buildingController);
 		//}

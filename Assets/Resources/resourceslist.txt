@@ -70,8 +70,10 @@
 		Bomber.png
 		button_bg_1.png
 		button_bg_2.png
+		canvas_bg.jpg
 		Captain.png
 		captain_sword.png
+		cross.png
 		dot.png
 		dot_bullet.png
 		dot_selected.png
@@ -103,6 +105,7 @@
 		SwatchYellowAlbedo.png
 		water_cannon.png
 		Water_Cannon3.png
+		white.jpg
 		win.png
 	}
 }

@@ -12,8 +12,7 @@ using Assets.Code.States;
 
 namespace Assets.Code.Ui.CanvasControllers
 {
-	
-	
+
 	public class InspectorCanvasController : MonoBehaviour
 	{
 		private Canvas _canvasView;
@@ -28,14 +27,18 @@ namespace Assets.Code.Ui.CanvasControllers
 		private Dictionary<string, GameObject> _elements;
 
 		private BuildingModel.BuildingType _type;
+
+		private BuildingModel _buildingModel;
 		
-		public void Initialize (IoCResolver resolver,Canvas canvasView,BuildingModel.BuildingType type) 
+		public void Initialize (IoCResolver resolver,Canvas canvasView,BuildingModel buildingModel) 
 		{
 			_resolver = resolver;
 			_resolver.Resolve(out _messager);
+			_resolver.Resolve (out _canvasProvider);
 			_canvasView = canvasView;
 			_uiManager = new UiManager ();
-			_type = type;
+			_buildingModel = buildingModel;
+			_type = buildingModel.Type;
 			
 			_elements = new Dictionary<string, GameObject>();
 			
@@ -60,7 +63,6 @@ namespace Assets.Code.Ui.CanvasControllers
 			_info.onClick.AddListener (OnInfoClicked);
 			_action.onClick.AddListener (OnActionClicked);
 
-
 		}
 		
 		
@@ -83,9 +85,8 @@ namespace Assets.Code.Ui.CanvasControllers
 			
 			//ToDo Open Respective Action Canvas depending on the BuildingModel.BuildingType i.e. _type
 			Debug.Log ("On Action Clicked");
-			_messager.Publish(new OpenInventory{});
-
-           
+			//_messager.Publish(new OpenInventory{});
+			_messager.Publish (new OpenCreatePirateCanvasMessage{BuildingModel = this._buildingModel});
 		}
 		
 		// Use this for initialization
@@ -93,7 +94,7 @@ namespace Assets.Code.Ui.CanvasControllers
 		{
 			
 		}
-		
+			
 		// Update is called once per frame
 		void Update ()
 		{

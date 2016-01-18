@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 using Assets.Code.Models;
 
 public class BuildingModel : IGameDataModel {
@@ -29,6 +30,7 @@ public class BuildingModel : IGameDataModel {
 	public int TileArea{get;set;}
 	public Color BuildingColor{ get; set;}
 	public bool CanAttack {get;set;}
+	public List<PirateModel> piratesContained{ get; set;}
 
 
 }
