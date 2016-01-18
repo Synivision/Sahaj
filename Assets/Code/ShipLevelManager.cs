@@ -146,8 +146,8 @@ public class ShipLevelManager {
 		fab.transform.SetParent (_buildingsParent.transform);
 		model.piratesContained = new List<PirateModel> ();
 
-		for(int i = 0; i < 5 ; i++)
-			model.piratesContained.Add (_gameDataProvider.GetData<PirateModel> ("Quarter Master"));
+		model.piratesContained.Add (_gameDataProvider.GetData<PirateModel> ("Quarter Master"));
+		model.piratesContained.Add (_gameDataProvider.GetData<PirateModel> ("Captain"));
 		//if (OnBuildingCreatedEvent != null){
 		//	OnBuildingCreatedEvent(buildingController);
 		//}

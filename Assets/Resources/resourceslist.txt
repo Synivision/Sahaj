@@ -75,10 +75,12 @@
 		dot_selected.png
 		frame.png
 		frame_map_image.png
+		Garen_Render.png
 		gold_storage.png
 		GridEmissive.png
 		Gunner.png
 		gunner_tower.png
+		info.png
 		level_select_map.jpg
 		map_img1.png
 		map_img2.png

@@ -8,6 +8,7 @@ using Assets.Code.Messaging;
 using Assets.Code.Messaging.Messages;
 using Assets.Code.UnityBehaviours;
 using Assets.Code.States;
+//using System;
 
 namespace Assets.Code.Ui.CanvasControllers
 {
@@ -34,6 +35,9 @@ namespace Assets.Code.Ui.CanvasControllers
 		BuildingModel _buildingModel;
 
 		List<Button> _pirateButtons;
+		List<PirateModel> _pirateVarietyList;
+		List<string> _piratesBiengGenerated;
+		List<Button> _piratesBiengGeneratedButtons;
 
 		public CreatePirateCanvasController(IoCResolver resolver, Canvas canvasView,BuildingModel buildingModel)
 		: base(resolver, canvasView){
@@ -45,6 +49,10 @@ namespace Assets.Code.Ui.CanvasControllers
 			_resolver.Resolve(out _messager);
 
 			_pirateButtons = new List<Button>();
+			_pirateVarietyList = new List<PirateModel>();
+			_piratesBiengGenerated = new List<string> ();
+			_piratesBiengGeneratedButtons = new List<Button> ();
+
 
 			ResolveElement (out _leftNavigationButton, "Main Panel/Left Button");
 			ResolveElement (out _rightNavigationButton, "Main Panel/Right Button");
@@ -52,9 +60,10 @@ namespace Assets.Code.Ui.CanvasControllers
 
 			var mainPanel = GetElement("Main Panel") as GameObject;
 			_parentPirateButtonPanel = mainPanel.transform.GetChild (1).transform.GetChild (0).gameObject;
+			_parentPirateImagesScrollViewPanel = mainPanel.transform.GetChild (2).transform.GetChild (0).gameObject;
 
-			_leftNavigationButton.gameObject.SetActive (false);
-			_rightNavigationButton.gameObject.SetActive (false);
+			//_leftNavigationButton.gameObject.SetActive (false);
+			//_rightNavigationButton.gameObject.SetActive (false);
 
 			//Add Pirate buttons to ui
 
@@ -75,8 +84,9 @@ namespace Assets.Code.Ui.CanvasControllers
 
 				fab.transform.SetParent(_parentPirateButtonPanel.transform);
 
-				fab.onClick.AddListener(OnPirateButtonClicked);
-
+				//fab.onClick.AddListener(() => OnPirateButtonClicked(i));
+				AddListenerToButton(ref fab,i);
+				_pirateVarietyList.Add(_buildingModel.piratesContained[i]);
 				_pirateButtons.Add(fab);
 			}
 
@@ -86,11 +96,28 @@ namespace Assets.Code.Ui.CanvasControllers
 
 		}
 
-		public void OnPirateButtonClicked(){
+		public void AddListenerToButton(ref Button button, int position){
+			
+			button.onClick.AddListener(() => OnPirateButtonClicked(position));
+			
+		}
 
-			//Add pirate to second scroll panel
+		public void OnPirateButtonClicked(int number){
 
+			//Debug.Log ("Pirate button number " + number.ToString() + " clicked");
 
+			if (!_piratesBiengGenerated.Contains (_pirateVarietyList [number].Name)) {
+				//Add pirate to second scroll panel
+				var fab = Object.Instantiate (_prefabProvider.GetPrefab ("pirate_bieng_generated")).gameObject.GetComponent<Button> ();
+				fab.transform.SetParent (_parentPirateImagesScrollViewPanel.transform);
+				_piratesBiengGenerated.Add(_pirateVarietyList [number].Name);
+				_piratesBiengGeneratedButtons.Add (fab);
+			} else {
+
+				int numberOfPiratesOfThisType = System.Int32.Parse(_piratesBiengGeneratedButtons[number].transform.GetChild(0).GetComponent<Text>().text);
+				_piratesBiengGeneratedButtons[number].transform.GetChild(0).GetComponent<Text>().text = (numberOfPiratesOfThisType+1).ToString();
+			
+			}
 		}
 
 		public void OnQuitClicked(){
