@@ -241,19 +241,14 @@ namespace Assets.Code.Ui.CanvasControllers
             _inputSession.CurrentlySelectedRowBoatName = name;
             if (_previouslyClickedTileButton == button)
             {
-                //return;
-
+      
             }
 
             if (_previouslyClickedTileButton != null)
                 _previouslyClickedTileButton.interactable = true;
 
-            //button.interactable = false;
             _previouslyClickedTileButton = button;
             HandleShipButtonVisibility();
-
-            //display canvas to edit seats of selected rowboat
-            //_uiManager.RegisterUi(new RowBoatCanvasController(_resolver,_canvasProvider.GetCanvas("RowBoatCanvas"),name));
 
             _messager.Publish(new RowBoatSelectedMessage {
                 BoatName = name,
@@ -262,18 +257,6 @@ namespace Assets.Code.Ui.CanvasControllers
 
         });
         }
-
-        //public void InitializeRowBoatButtonNumberLabel()
-        //{
-
-        //    foreach (var entry in _playerManager.Model.RowBoatCountDict)
-        //    {
-        //            var text = _numberLabelDict[entry.Key];
-        //            text.text = entry.Value.ToString();
-        //    }
-
-        //}
-
         public void HandleShipButtonVisibility() {
 
             foreach (var button in _shipAttackButtonList)
@@ -421,7 +404,7 @@ namespace Assets.Code.Ui.CanvasControllers
         private void OnShipAttackButtonClicked(Button button, string name)
         {
             _inputSession.CurrentlySelectedShipAttackName = name;
-            _inputSession.CurrentlySelectedPirateName = "";
+            _inputSession.CurrentlySelectedRowBoatName = "";
 
             int value;
             _playerManager.Model.ShipAttackCostDict.TryGetValue(name, out value);

@@ -434,7 +434,7 @@ namespace Assets.Code.UnityBehaviours
             _shipAttackCostDict.Add("ship_gas", 2);
             _shipAttackCostDict.Add("ship_fire", 3);
             _shipAttackCostDict.Add("ship_bomb", 4);
-            _shipAttackCostDict.Add("ship_gun", 11);
+            _shipAttackCostDict.Add("ship_gun", 5);
 
             _unlockedShipAttacks = new Dictionary<string, bool>();
             _unlockedShipAttacks.Add("ship_gas", true);

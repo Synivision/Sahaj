@@ -53,29 +53,30 @@ public class ShipBehaviour : MonoBehaviour {
 
     public void shoot(Vector3 firePos) {
 
-        //var fab = _poolingObjectManager.Instantiate("bullet2_prefab");
-        //var missDelta = new Vector3(Random.Range(1, 3), Random.Range(1, 3), Random.Range(1, 3));
+        if (_inputSession.CurrentlySelectedShipAttackName.Equals("ship_gun"))
+        {
+            var fab = _poolingObjectManager.Instantiate("cannon_bombs");
+            fab.transform.position = firePos + new Vector3(0,100,0);
 
-        //fab.GetComponent<BulletController>().Initialize(_resolver, gameObject.transform.position + missDelta,
-        //                                                true, Color.green, firePos, "Ship");
+        }
+        else {
 
+            var fab = _poolingObjectManager.Instantiate("bomb_prefab");
+            //var missDelta = new Vector3(Random.Range(1, 3), Random.Range(1, 3), Random.Range(1, 3));
 
-        var fab = _poolingObjectManager.Instantiate("bomb_prefab");
-        //var missDelta = new Vector3(Random.Range(1, 3), Random.Range(1, 3), Random.Range(1, 3));
+            BombModel model = new BombModel();
+            model.color = Color.green;
+            model.endPos = firePos;
+            model.startPos = gameObject.transform.position;
 
-        BombModel model = new BombModel();
-        model.color = Color.green;
-        model.endPos = firePos;
-        model.startPos = gameObject.transform.position;
+            //depends on name of bullet ! maybe add it to input session
+            model.damage = 20;
+            model.Name = _inputSession.CurrentlySelectedShipAttackName;
 
-        //depends on name of bullet ! maybe add it to input session
-        model.damage = 20;
-        model.Name = _inputSession.CurrentlySelectedShipAttackName;
+            model.ParticlePrefabName = "blood_prefab";
 
-        model.ParticlePrefabName = "blood_prefab";
-
-        fab.GetComponent<BombBehaviour>().Initialize(_resolver, model);
-
+            fab.GetComponent<BombBehaviour>().Initialize(_resolver, model);
+        }
 
         _playerManager.Model.ShipBulletsAvailable -= _inputSession.CurrentShipAttackCost;
         _messager.Publish(new UpdateCurrentShipBulletsMessage { });
