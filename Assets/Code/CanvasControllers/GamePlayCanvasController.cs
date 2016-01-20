@@ -70,11 +70,11 @@ namespace Assets.Code.Ui.CanvasControllers
             _canvas = canvasView;
             _playerManager = playerManager;
             _resolver = resolver;
-            resolver.Resolve(out _prefabProvider);
-            resolver.Resolve(out _messager);
-            resolver.Resolve(out _unityReference);
-            resolver.Resolve(out _inputSession);
-            resolver.Resolve(out _spriteProvider);
+            _resolver.Resolve(out _prefabProvider);
+            _resolver.Resolve(out _messager);
+            _resolver.Resolve(out _unityReference);
+            _resolver.Resolve(out _inputSession);
+            _resolver.Resolve(out _spriteProvider);
 
 
             _uiManager = new UiManager();

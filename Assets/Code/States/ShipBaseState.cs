@@ -29,6 +29,7 @@ namespace Assets.Code.States
 		private MessagingToken _onBuildingInfoOpen;
 		private MessagingToken _onOpenShopMessage;
 		private MessagingToken _onCreateBuildingMessage;
+		private MessagingToken _onOpenCreatePirateCanvasMessage;
         public static bool buildingsMoving = false;
 
         MapLayout _map;
@@ -77,7 +78,7 @@ namespace Assets.Code.States
             _onBuildingInfoOpen = _messager.Subscribe<OpenBuildingInfoCanvas>(OnOpenBuildingInfoCanvas);
             _onOpenShopMessage = _messager.Subscribe<OpenShopMessage>(OnOpenShop);
             _onCreateBuildingMessage = _messager.Subscribe<CreateBuildingMessage>(onCreateBuilding);
-
+			_onOpenCreatePirateCanvasMessage = _messager.Subscribe<OpenCreatePirateCanvasMessage> (onOpenCreatePirateCanvas);
 
             //generate tile and disable it
             var tileo = _poolingObjectManager.Instantiate("tile");
@@ -162,6 +163,11 @@ namespace Assets.Code.States
 			
 			SwitchState (new PlayState(_resolver,message.MapLayout));
 			
+		}
+
+		public void onOpenCreatePirateCanvas(OpenCreatePirateCanvasMessage message){
+
+			_uiManager.RegisterUi (new CreatePirateCanvasController(_resolver,_canvasProvider.GetCanvas("CreatePirateCanvas"),message.BuildingModel));
 		}
 		
 		public override void Update (){

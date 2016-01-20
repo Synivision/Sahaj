@@ -122,7 +122,7 @@ public class BuildingController : InitializeRequiredBehaviour {
 
         var inspectorCanvasGameObject = transform.GetChild (0);
         var inspectorCanvas = inspectorCanvasGameObject.GetComponent<Canvas> ();
-        inspectorCanvasGameObject.GetComponent<InspectorCanvasController>().Initialize(_resolver,inspectorCanvas,Model.Type);
+        inspectorCanvasGameObject.GetComponent<InspectorCanvasController>().Initialize(_resolver,inspectorCanvas,Model);
     }
 
 
