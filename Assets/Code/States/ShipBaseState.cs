@@ -15,7 +15,7 @@ namespace Assets.Code.States
 	{
 		
 		private Canvas _shipBaseCanvas;
-		
+			
 		private CanvasProvider _canvasProvider;
 		private PoolingObjectManager _poolingObjectManager;
 		private UiManager _uiManager;
@@ -24,6 +24,7 @@ namespace Assets.Code.States
 		readonly GameDataProvider _gameDataProvider;
 		private readonly PrefabProvider _prefabProvider;
 		private SpriteProvider _spriteProvider;
+
 		private MessagingToken _onChangeStateToAttack;
 		private MessagingToken _onInventoryOpen;
 		private MessagingToken _onBuildingInfoOpen;
