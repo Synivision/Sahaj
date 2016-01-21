@@ -8,17 +8,20 @@ using Assets.Code.Messaging;
 using Assets.Code.Messaging.Messages;
 using Assets.Code.UnityBehaviours;
 using Assets.Code.States;
-//using System;
 
 namespace Assets.Code.Ui.CanvasControllers
 {
 	public class CreatePirateCanvasController : BaseCanvasController
 	{
+		//Name of the building that created the canvas
+		private string _buildingName;
+
 		//Private utility objects
 		private Canvas _canvas;
 		private IoCResolver _resolver;
 		private PrefabProvider _prefabProvider;
 		private readonly Messager _messager;
+		private PirateGenerator _pirateGenerator;
 		
 		//Scroll Views
 		private GameObject _parentPirateButtonPanel;
@@ -32,22 +35,28 @@ namespace Assets.Code.Ui.CanvasControllers
 		private Button _rightNavigationButton;
 		private Button _quitButton;
 		
-		BuildingModel _buildingModel;
+		public BuildingModel BuildingModel{ get; set;}
 		
 		List<Button> _pirateButtons;
 		List<PirateModel> _pirateVarietyList;
 		List<string> _piratesBiengGenerated;
 		List<Button> _piratesBiengGeneratedButtons;
 		
-		public CreatePirateCanvasController(IoCResolver resolver, Canvas canvasView,BuildingModel buildingModel)
+		public CreatePirateCanvasController(IoCResolver resolver, Canvas canvasView)
 		: base(resolver, canvasView){
-			
-			_buildingModel = buildingModel;
+		
 			_resolver = resolver;
 			_canvas = canvasView;
 			_resolver.Resolve(out _prefabProvider);
 			_resolver.Resolve(out _messager);
-			
+			_resolver.Resolve (out _pirateGenerator);
+
+		}
+
+		public void Initialize(){
+
+			_buildingName = BuildingModel.Name;
+
 			_pirateButtons = new List<Button>();
 			_pirateVarietyList = new List<PirateModel>();
 			_piratesBiengGenerated = new List<string> ();
@@ -66,8 +75,8 @@ namespace Assets.Code.Ui.CanvasControllers
 			//_rightNavigationButton.gameObject.SetActive (false);
 			
 			//Add Pirate buttons to ui
-			if(_buildingModel.piratesContained != null)
-			for (int i = 0; i < _buildingModel.piratesContained.Count; i++) {
+			if(BuildingModel.piratesContained != null)
+			for (int i = 0; i < BuildingModel.piratesContained.Count; i++) {
 				
 				var fab = Object.Instantiate(_prefabProvider.GetPrefab("create_pirate_button")).gameObject.GetComponent<Button>();
 				
@@ -76,24 +85,24 @@ namespace Assets.Code.Ui.CanvasControllers
 				fab.name = "pirate choice " + i.ToString();
 				
 				var buttonLabel = fab.transform.GetChild(0).GetComponent<Text>();
-				buttonLabel.text = _buildingModel.piratesContained[i].Name;
+				buttonLabel.text = BuildingModel.piratesContained[i].Name;
 				
 				var buttonNumberLabel = fab.transform.GetChild(2).GetComponent<Text>();
 				
-				buttonNumberLabel.text = _buildingModel.piratesContained[i].TrainingCost.ToString();
+				buttonNumberLabel.text = BuildingModel.piratesContained[i].TrainingCost.ToString();
 				
 				fab.transform.SetParent(_parentPirateButtonPanel.transform);
 				
 				//fab.onClick.AddListener(() => OnPirateButtonClicked(i));
 				AddListenerToButton(ref fab,i);
-				_pirateVarietyList.Add(_buildingModel.piratesContained[i]);
+				_pirateVarietyList.Add(BuildingModel.piratesContained[i]);
 				_pirateButtons.Add(fab);
 			}
 			
 			//_leftNavigationButton.onClick.AddListener (OnQuitClicked);
 			//_rightNavigationButton.onClick.AddListener (OnQuitClicked);
 			_quitButton.onClick.AddListener (OnQuitClicked);
-			
+
 		}
 		
 		public void AddListenerToButton(ref Button button, int position){
@@ -114,6 +123,10 @@ namespace Assets.Code.Ui.CanvasControllers
 				_piratesBiengGenerated.Add(_pirateVarietyList [number].Name);
 				_piratesBiengGeneratedButtons.Add (fab);
 
+				//Start Generation of Pirate
+				_pirateGenerator.GeneratePirate(_pirateVarietyList[number],_buildingName,System.TimeSpan.FromSeconds((double)Time.time));
+
+
 			} else {
 				
 				int numberOfPiratesOfThisType = System.Int32.Parse(_piratesBiengGeneratedButtons[number].transform.GetChild(0).GetComponent<Text>().text);
@@ -124,10 +137,17 @@ namespace Assets.Code.Ui.CanvasControllers
 		
 		public void OnQuitClicked(){
 			
-			TearDown ();
+			disableCanvas ();
 			
 		}
+
+		void Update(){
 		
+			if(_pirateVarietyList.Count > 0)
+				Debug.Log (_pirateGenerator.GetTimeToCompletionOfPirate(_buildingName,_pirateVarietyList[0].Name));
+		
+		}
+
 		public override void TearDown()
 		{
 			foreach (var button in _pirateButtons) {
@@ -142,6 +162,13 @@ namespace Assets.Code.Ui.CanvasControllers
 			
 			base.TearDown();
 		}
-		
+	
+		public void enableCanvas() {
+			_canvas.enabled = true;
+		}
+
+		public void disableCanvas() {
+			_canvas.enabled = false;
+		}
 	}
 }

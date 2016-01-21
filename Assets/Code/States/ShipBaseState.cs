@@ -48,6 +48,7 @@ namespace Assets.Code.States
         private UnityReferenceMaster _unityReferenceMaster;
         private CameraController _camera;
         private ShopCanvasController _shopCanvasController;
+		private CreatePirateCanvasController _createPirateCanvasController;
         Vector3 curPosition;
 		Vector3 selectedgameObjectPosition = new Vector3(0,0,0);
 		
@@ -169,7 +170,20 @@ namespace Assets.Code.States
 
 		public void onOpenCreatePirateCanvas(OpenCreatePirateCanvasMessage message){
 
-			_uiManager.RegisterUi (new CreatePirateCanvasController(_resolver,_canvasProvider.GetCanvas("CreatePirateCanvas"),message.BuildingModel));
+			if (_createPirateCanvasController == null) {
+			
+				_createPirateCanvasController = new CreatePirateCanvasController (_resolver, _canvasProvider.GetCanvas ("CreatePirateCanvas"));
+				_uiManager.RegisterUi (_createPirateCanvasController);
+				Debug.Log ("Kar dia");
+			
+			} else {
+			
+				_createPirateCanvasController.enableCanvas();
+			
+			}
+
+			_createPirateCanvasController.BuildingModel = message.BuildingModel;
+			_createPirateCanvasController.Initialize();
 		}
 		
 		public override void Update (){

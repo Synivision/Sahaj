@@ -23,7 +23,7 @@ public class PirateGenerator : IResolvableItem {
 	}
 
 	//Add the pirate to be created to the list in this method
-	public void GeneratePirate(PirateModel pirate,string buildingName,int startTime){
+	public void GeneratePirate(PirateModel pirate,string buildingName,System.TimeSpan startTime){
 	
 		PirateGeneratorModel model = new PirateGeneratorModel ();
 		model.PirateModel = pirate;
@@ -114,9 +114,9 @@ public class PirateGenerator : IResolvableItem {
 	}
 
 	//returns time in seconds
-	public float GetTimeToCompletionOfPirate(string buildingName,string pirateName){
+	public System.TimeSpan GetTimeToCompletionOfPirate(string buildingName,string pirateName){
 	
-		float timeLeft = 0;
+		System.TimeSpan timeLeft = new System.TimeSpan();
 
 		//dictionary of Pirates For This Building
 		Dictionary<string,List<PirateGeneratorModel>> dictionaryofPirates;
@@ -133,14 +133,15 @@ public class PirateGenerator : IResolvableItem {
 
 				if(pirate.PirateGenerationStatus == (int)PirateGeneratorModel.Status.IN_QUEUE){
 
-					timeLeft += pirate.PirateModel.TrainingTime;
+					timeLeft += System.TimeSpan.FromSeconds((double)pirate.PirateModel.TrainingTime);
 				
 				}else{
 
 					//time remaining for processing pirate
-					int time = (int)(pirate.StartTime%60 - pirate.PirateModel.TrainingTime);
+					var time = (pirate.StartTime - System.TimeSpan.FromSeconds((double)pirate.PirateModel.TrainingTime));
 					//add this time only if it is positive because at this instant it might be possible that status changed
-					timeLeft += (time>0) ? time : 0;
+					timeLeft += (time > System.TimeSpan.FromSeconds(0)) ? time : System.TimeSpan.FromSeconds(0);
+				
 				}
 
 			}
