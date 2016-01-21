@@ -158,6 +158,10 @@ namespace Assets.Code.Ui.CanvasControllers{
 
                 });
 
+                _messager.Publish(new UpdateRowBoatCanvasMessage
+                {
+                    BoatName = _rowBoatName
+                });
 
                 TearDown();
 

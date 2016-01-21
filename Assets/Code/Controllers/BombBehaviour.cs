@@ -24,14 +24,12 @@ public class BombBehaviour : PoolingBehaviour{
         resolver.Resolve(out _poolingParticleManager);
         resolver.Resolve(out _unityReference);
 
-
         startTime = Time.time;
         gameObject.GetComponent<Renderer>().material.color = model.color;
         _startPos = model.startPos;
         _target = model.endPos;
 
         journeyLength = Vector3.Distance(_startPos, _target);
-       
         _unityReference.Delay(() => Delete(), 2f);
 
     }
@@ -49,7 +47,7 @@ public class BombBehaviour : PoolingBehaviour{
     {
         if (collision.gameObject.tag == "Cube") {
             //Damage Building
-            Destroy(this.gameObject);
+            
 
         }
     }

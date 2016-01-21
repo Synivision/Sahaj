@@ -51,9 +51,9 @@ public class MenuState : BaseState{
 	private void OnOpenShipBaseMessage(OpenShipBaseMessage message){
 
         //try getting map from saved file 
-         MapLayout loadedMap = Serializer.Load<MapLayout>("MapLayout");
+         MapLayout loadedMap = Serializer.Load<MapLayout>("MapLayout1");
         if (loadedMap != null) {
-
+            
             Debug.Log("Loading Map");
             SwitchState(new ShipBaseState(_resolver, loadedMap));
 

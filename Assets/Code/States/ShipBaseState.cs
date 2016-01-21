@@ -137,6 +137,7 @@ namespace Assets.Code.States
 		
 		public void OnOpenShop (OpenShopMessage message)
 		{
+           
             if (_shopCanvasController != null)
             {
                 _shopCanvasController.enableCanvas();
@@ -284,7 +285,7 @@ namespace Assets.Code.States
 
         public void saveMapLayoutToFile() {
             MapLayout layout = shipLevelManager.bluePrintToMapLayout();
-            Serializer.Save<MapLayout>("MapLayout", layout);
+            Serializer.Save<MapLayout>("MapLayout1", layout);
         }
 
 		public GameObject GetClickedObject (out RaycastHit hit)

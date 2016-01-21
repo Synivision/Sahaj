@@ -19,7 +19,7 @@ namespace Assets.Code.States
         
         /* PROPERTIES */
         private UiManager _uiManager;
-        
+        InventoryCanvasController _inventoryCanvasController;
         /* UiControllers */
         private MainCanvasController _mainCanvasController;
         private CanvasProvider _canvasProvider;
@@ -108,6 +108,7 @@ namespace Assets.Code.States
 
         public void onAddPirateToRowBoat(AddPirateToRowBoatMessage message)
         {
+         
             _uiManager.RegisterUi(new InventoryCanvasController(_resolver, _canvasProvider.GetCanvas("InventoryCanvas"), message.BoatName));
         }
 

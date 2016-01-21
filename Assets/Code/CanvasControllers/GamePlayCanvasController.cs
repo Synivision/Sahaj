@@ -212,7 +212,6 @@ namespace Assets.Code.Ui.CanvasControllers
            _numberLabelDict.Add(name, buttonNumberLabel);
 
             fab.onClick.AddListener(() => OnRowBoatButtonClicked(fab, name));
-            Debug.Log(name);
             fab.transform.SetParent(_parentButtonObject.transform);
             fab.transform.SetAsFirstSibling();
 
