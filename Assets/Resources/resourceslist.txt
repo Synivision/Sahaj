@@ -20,6 +20,8 @@
 		PinkGrid.mat
 		PinkSmooth.mat
 		river.mat
+		rowboat_arrow.png
+		rowboat_arrow_mat.mat
 		SwatchMauveAlbedo.mat
 		SwatchNavyDarkAlbedo.mat
 		SwatchOrangeAlbedo.mat

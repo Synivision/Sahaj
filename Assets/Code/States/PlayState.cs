@@ -57,6 +57,7 @@ namespace Assets.Code.States
         bool rowBoatAttackStarted;
 
         private int rowBoatCount;
+        private GameObject _arrowGameObject;
         public Dictionary<string, Dictionary<int, string>> _tempRowBoatCountDict;
         //TODO: this should be taken from the base controller in future..
 
@@ -104,6 +105,8 @@ namespace Assets.Code.States
             //shipPrefab.gameObject.transform.position.lerp
             rowBoatList = new List<GameObject>();
             rowBoatAttackStarted = false;
+
+            _arrowGameObject = _poolingObjectManager.Instantiate("rowboat_tile").gameObject;
         }
 
         public void onAddPirateToRowBoat(AddPirateToRowBoatMessage message)
@@ -120,7 +123,20 @@ namespace Assets.Code.States
 
         public override void Update()
         {
-            
+
+            if (_inputSession.CurrentlySelectedRowBoatName != null)
+            {
+                _arrowGameObject.SetActive(true);
+                var pos1 = new Vector3(-200,20,0);
+                var pos2 = new Vector3(-150, 20, 0);
+                _arrowGameObject.transform.position = Vector3.Lerp(pos1, pos2, Mathf.PingPong(Time.time * speed, 1.0f));
+
+            }
+            else {
+                _arrowGameObject.SetActive(false);
+
+            }
+
             float distCovered = (Time.time - startTime) * speed;
             float fracJourney = distCovered / journeyLength;
             shipPrefab.transform.position = Vector3.Lerp(shipPrefab.transform.position, new Vector3(-120, 15, -120), fracJourney);
@@ -260,6 +276,7 @@ namespace Assets.Code.States
 
                 _tempRowBoatCountDict.Remove(boatName);
 
+                _inputSession.CurrentlySelectedRowBoatName = null;
                 //send message to gameplaycanvas about rowboat sent to attack to disable rowboat button
                 _messager.Publish(new RowBoatSentToAttackMessage {
                     BoatName = boatName
@@ -319,8 +336,7 @@ namespace Assets.Code.States
         
         public override void TearDown()
         {
-            
-            
+           
             for (int i=0; i < rowBoatList.Count; i++) {
                 
                 Object.Destroy(rowBoatList[i]);
@@ -328,6 +344,7 @@ namespace Assets.Code.States
             }
             
             Object.Destroy(shipPrefab);
+            GameObject.Destroy( _arrowGameObject);
             levelManager.TearDownLevel();
             
             

@@ -139,7 +139,7 @@ namespace Assets.Code.Ui.CanvasControllers
 
         void onCloseButtonClicked()
         {
-            _inputSession.CurrentlySelectedRowBoatName = "";
+            _inputSession.CurrentlySelectedRowBoatName = null;
             TearDown();
         }
 
