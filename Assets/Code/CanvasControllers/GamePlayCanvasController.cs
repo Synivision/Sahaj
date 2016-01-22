@@ -141,7 +141,7 @@ namespace Assets.Code.Ui.CanvasControllers
               //_buttonList.Add(CreateRowBoatButton(item.Key));
                 rowBoatsRemainingCount++;
             }
-            Debug.Log("Boat" + rowBoatsRemainingCount.ToString());
+           
             _buttonList.Add(CreateRowBoatButton("Boat" + rowBoatsRemainingCount.ToString()));
 
            
@@ -305,30 +305,6 @@ namespace Assets.Code.Ui.CanvasControllers
 
         }
 
-        public void UpdatePirateButtonNumberLabel(UpdatePirateNumber message)
-        {
-
-
-            var text = _numberLabelDict[message.PirateName];
-            text.text = message.PirateNumber.ToString();
-
-        }
-
-        public void InitializePirateButtonNumberLabel()
-        {
-
-            foreach (KeyValuePair<string, int> entry in _playerManager.Model.PirateCountDict)
-            {
-
-                if (_playerManager.Model.UnlockedPirates.ContainsKey(entry.Key) && _playerManager.Model.UnlockedPirates[entry.Key] == true)
-                {
-
-                    var text = _numberLabelDict[entry.Key];
-                    text.text = entry.Value.ToString();
-                }
-            }
-
-        }
         public void UpdateCanvasPanels(UpdateGamePlayUiMessage message)
         {
 

@@ -70,15 +70,27 @@ namespace Assets.Code.Ui.CanvasControllers{
 
             if (_playerManager.Model !=null) {
 
-                foreach (var pirate in _playerManager.Model.UnlockedPirates)
+                foreach (var pirate in _playerManager.Model.PirateCountDict)
                 {
                     //if unlocked then add to list
-                    if (pirate.Value) {
+                    if (pirate.Value > 0) {
 
-                        _pirateButtonList.Add(CreatePirateButton(pirate.Key));
+                        _pirateButtonList.Add(CreatePirateButton(pirate.Key, pirate.Value));
                     }
                 }
             }
+        }
+
+        public void CheckForEmptyPirateList()
+        {
+            
+
+            if (_pirateButtonList.Count == 0) {
+                _addPirateButton.enabled = false;
+                _addPirateButton.gameObject.SetActive(false);
+                _pirateImage.GetComponent<Image>().sprite = _spriteProvider.GetSprite("");
+            }
+
         }
 
         public InventoryCanvasController(IoCResolver resolver, Canvas canvasView, string rowBoatName)
@@ -118,18 +130,85 @@ namespace Assets.Code.Ui.CanvasControllers{
 
             if (_playerManager.Model != null)
             {
-
-                foreach (var pirate in _playerManager.Model.UnlockedPirates)
+                
+                foreach (var pirate in _playerManager.Model.PirateCountDict)
                 {
-                    //if unlocked then add to list
-                    if (pirate.Value)
-                    {
+                    if (_playerManager.Model.UnlockedPirates[pirate.Key] == true) {
+                        //if unlocked then add to list
+                        var key = pirate.Key;
+                        if (pirate.Value > 0)
+                        {
 
-                        _pirateButtonList.Add(CreatePirateButton(pirate.Key));
+                            _pirateButtonList.Add(CreatePirateButton(pirate.Key, pirate.Value));
+                        }
                     }
                 }
             }
+            _pirateImage.GetComponent<Image>().sprite = _spriteProvider.GetSprite("");
+            CheckForEmptyPirateList();
         }
+
+        public Button CreatePirateButton(string name, int pirateCount)
+        {
+
+            var fab = Object.Instantiate(_prefabProvider.GetPrefab("pirate_button")).gameObject.GetComponent<Button>();
+
+            fab.gameObject.name = name;
+
+            fab.GetComponent<Image>().sprite = _spriteProvider.GetSprite(name);
+
+            var buttonLabel = fab.transform.GetChild(0).GetComponent<Text>();
+            buttonLabel.text = name;
+
+            var countNumberLabel = fab.transform.GetChild(1).GetComponent<Text>();
+            countNumberLabel.text = pirateCount.ToString();
+
+            fab.onClick.AddListener(() => OnPirateButtonClicked(fab, name));
+
+            fab.transform.SetParent(_pirateButtonScrollPanel.transform);
+
+            //fab.transform.localScale = Vector3.one;
+            return fab;
+        }
+
+        private void OnPirateButtonClicked(Button button, string name)
+        {
+
+
+            _pirateImage.GetComponent<Image>().sprite = _spriteProvider.GetSprite(name);
+            _inputSession.CurrentlySelectedPirateName = name;
+            if (_previouslyClickedTileButton == button) return;
+
+            if (_previouslyClickedTileButton != null)
+                _previouslyClickedTileButton.interactable = true;
+
+            button.interactable = false;
+            _previouslyClickedTileButton = button;
+
+            //TODO update details panel
+            var healthSlider = GetElement("MainPanel/PirateDetailsPanel/HealthSlider").GetComponent<Slider>();
+            var healthValueText = GetElement("MainPanel/PirateDetailsPanel/HealthValue").GetComponent<Text>();
+            var costSlider = GetElement("MainPanel/PirateDetailsPanel/CostSlider").GetComponent<Slider>();
+            var costValueText = GetElement("MainPanel/PirateDetailsPanel/CostValue").GetComponent<Text>();
+            var powerSlider = GetElement("MainPanel/PirateDetailsPanel/PowerSlider").GetComponent<Slider>();
+            var powerValueText = GetElement("MainPanel/PirateDetailsPanel/PowerValue").GetComponent<Text>();
+
+            healthSlider.maxValue = 300;
+            costSlider.maxValue = 3000;
+            powerSlider.maxValue = 50;
+            //get pirate details  
+            PirateModel pirateModel = _gameDataProvider.GetData<PirateModel>(name);
+            StatBlock stats = pirateModel.Stats;
+
+            healthSlider.value = stats.MaximumHealth;
+            healthValueText.text = stats.MaximumHealth.ToString();
+            costSlider.value = pirateModel.TrainingCost;
+            costValueText.text = pirateModel.TrainingCost.ToString();
+            powerSlider.value = stats.MaximumDamage;
+            powerValueText.text = stats.MaximumDamage.ToString();
+
+        }
+
 
         void onAddPirateToRowBoatClicked() {
             //canvas opened from rowboat add pirate option
@@ -146,11 +225,13 @@ namespace Assets.Code.Ui.CanvasControllers{
                     if (seat.Value.Equals(""))
                     {
                         seatsDictionary[seat.Key] = _inputSession.CurrentlySelectedPirateName;
+                        //delete pirate from rowboat count dict
+                      var pirateCount = _playerManager.Model.PirateCountDict[_inputSession.CurrentlySelectedPirateName];
+                        _playerManager.Model.PirateCountDict[_inputSession.CurrentlySelectedPirateName] = pirateCount - 1;
                         break;
                     }
-
                 }
-
+               
                 _messager.Publish(new UpdateRowBoatPirateNumberMessage {
 
                     BoatName = _rowBoatName,
@@ -162,6 +243,8 @@ namespace Assets.Code.Ui.CanvasControllers{
                 {
                     BoatName = _rowBoatName
                 });
+
+                
 
                 TearDown();
 
@@ -206,64 +289,9 @@ namespace Assets.Code.Ui.CanvasControllers{
             
         }
 
-        public Button CreatePirateButton(string name)
-        {
-           
-            var fab = Object.Instantiate(_prefabProvider.GetPrefab("pirate_button")).gameObject.GetComponent<Button>();
+    
 
-            fab.gameObject.name = name;
-
-            fab.GetComponent<Image>().sprite = _spriteProvider.GetSprite(name);
-
-            var buttonLabel = fab.transform.GetChild(0).GetComponent<Text>();
-            buttonLabel.text = name;
-
-            fab.onClick.AddListener(() => OnPirateButtonClicked(fab, name));
-
-            fab.transform.SetParent(_pirateButtonScrollPanel.transform);
-
-            //fab.transform.localScale = Vector3.one;
-            return fab;
-        }
-
-        private void OnPirateButtonClicked(Button button, string name)
-        {
-
-
-            _pirateImage.GetComponent<Image>().sprite = _spriteProvider.GetSprite(name);
-            _inputSession.CurrentlySelectedPirateName = name;
-            if (_previouslyClickedTileButton == button) return;
-
-            if (_previouslyClickedTileButton != null)
-                _previouslyClickedTileButton.interactable = true;
-
-            button.interactable = false;
-            _previouslyClickedTileButton = button;
-
-            //TODO update details panel
-            var healthSlider = GetElement("MainPanel/PirateDetailsPanel/HealthSlider").GetComponent<Slider>();
-            var healthValueText = GetElement("MainPanel/PirateDetailsPanel/HealthValue").GetComponent<Text>();
-            var costSlider = GetElement("MainPanel/PirateDetailsPanel/CostSlider").GetComponent<Slider>();
-            var costValueText = GetElement("MainPanel/PirateDetailsPanel/CostValue").GetComponent<Text>();
-            var powerSlider = GetElement("MainPanel/PirateDetailsPanel/PowerSlider").GetComponent<Slider>();
-            var powerValueText = GetElement("MainPanel/PirateDetailsPanel/PowerValue").GetComponent<Text>();
-
-            healthSlider.maxValue = 300;
-            costSlider.maxValue = 3000;
-            powerSlider.maxValue = 50;
-            //get pirate details  
-            PirateModel pirateModel =  _gameDataProvider.GetData<PirateModel>(name);
-            StatBlock stats = pirateModel.Stats;
-
-            healthSlider.value = stats.MaximumHealth;
-            healthValueText.text = stats.MaximumHealth.ToString();
-            costSlider.value = pirateModel.TrainingCost;
-            costValueText.text = pirateModel.TrainingCost.ToString();
-            powerSlider.value = stats.MaximumDamage;
-            powerValueText.text = stats.MaximumDamage.ToString();
-
-        }
-
+       
         public override void TearDown()
         {
             foreach (var button in _pirateButtonList)

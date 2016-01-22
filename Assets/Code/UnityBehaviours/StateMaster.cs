@@ -424,8 +424,8 @@ namespace Assets.Code.UnityBehaviours
 			_unlockedPirates.Add("Surgeon", true);
 			_unlockedPirates.Add("Carpenter", false);
 			_unlockedPirates.Add("Chef", false);
-			_unlockedPirates.Add("Pirate4", false);
-			_unlockedPirates.Add("EnemyPirate5", false);
+			//_unlockedPirates.Add("Pirate4", false);
+			//_unlockedPirates.Add("EnemyPirate5", false);
 			
 			_pirateCountDict = new Dictionary<string, int>();
 			_pirateCountDict.Add("Captain", 1);
@@ -435,8 +435,8 @@ namespace Assets.Code.UnityBehaviours
 			_pirateCountDict.Add("Surgeon", 4);
 			_pirateCountDict.Add("Carpenter", 2);
 			_pirateCountDict.Add("Chef", 2);
-			_pirateCountDict.Add("Pirate4", 1);
-			_pirateCountDict.Add("EnemyPirate3", 10);
+			//_pirateCountDict.Add("Pirate4", 1);
+			//_pirateCountDict.Add("EnemyPirate3", 10);
 			
 			_shipAttacksCountDict = new Dictionary<string, int>();
 			_shipAttacksCountDict.Add("ship_gas", 2);

@@ -298,36 +298,28 @@ public class LevelManager
         // NOTE: we might also use this model to define the pirate's prefab
         // this way we could have special pirates with scripts alternate to the default
         // (same applies to buildings above)
-        if (PirateCountDict.ContainsKey(pirateName)){
-            int val = PirateCountDict [pirateName];
-            if (val > 0) {
-                PirateCountDict [pirateName] = val - 1;
-                //send message to canvas to update number of pirate
-                if(pirateName!="EnemyPirate3"){
-                _messager.Publish(new UpdatePirateNumber{
-                    PirateName = pirateName,
-                    PirateNumber = PirateCountDict [pirateName]
-                });
-                }
-                var model = _gameDataProvider.GetData<PirateModel> (pirateName);
-                
-                var fab = Object.Instantiate (_prefabProvider.GetPrefab ("Sphere"));
-                var pirateController = fab.GetComponent<PirateController> ();
-                
-                pirateController.Initialize (_resolver, model, this);
-                
-                fab.name = pirateName;
-                fab.transform.position = spawnposition;
-                fab.transform.SetParent (_piratesParent.transform);
-                
-                if (OnPirateCreatedEvent != null)
-                    OnPirateCreatedEvent (pirateController);
-                
-                pirateController.Stats.OnKilledEvent += () => OnPirateKilled (pirateController);
-                
-                _knownPirates.Add (pirateController);
-            }
+
+        if (PirateCountDict.ContainsKey(pirateName))
+        {
+            var model = _gameDataProvider.GetData<PirateModel>(pirateName);
+
+            var fab = Object.Instantiate(_prefabProvider.GetPrefab("Sphere"));
+            var pirateController = fab.GetComponent<PirateController>();
+
+            pirateController.Initialize(_resolver, model, this);
+
+            fab.name = pirateName;
+            fab.transform.position = spawnposition;
+            fab.transform.SetParent(_piratesParent.transform);
+
+            if (OnPirateCreatedEvent != null)
+               OnPirateCreatedEvent (pirateController);
+
+            pirateController.Stats.OnKilledEvent += () => OnPirateKilled(pirateController);
+
+            _knownPirates.Add(pirateController);
         }
+        
     }
     /*
     public void GenerateShip(){
