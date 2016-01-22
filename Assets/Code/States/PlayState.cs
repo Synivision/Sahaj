@@ -140,7 +140,8 @@ namespace Assets.Code.States
             Touch[] touch = Input.touches;
             if (Application.platform == RuntimePlatform.Android)
                 pointerId = touch[0].fingerId;
-            
+
+
             //used to move cube around 
             if (Input.GetMouseButtonDown(0))
             {
@@ -158,7 +159,7 @@ namespace Assets.Code.States
                         //Debug.Log ("Spawn Point from Input Controller = " + spawnPosition.ToString()
                         //levelManager.CreatePirate(_inputSession.CurrentlySelectedPirateName, spawnPosition);
                     }
-                    if (!rowBoatAttackStarted) {
+                    if (!rowBoatAttackStarted && _inputSession.CurrentlySelectedShipAttackName == null) {
                         if (target != null && (target.gameObject.tag == "Cube"))
                         {
                             var buildingName = target.GetComponent<BuildingController>().name;
@@ -174,7 +175,7 @@ namespace Assets.Code.States
                         if (_playerManager.Model.ShipBulletsAvailable > 0 && _inputSession.CurrentShipAttackCost != 0 && _playerManager.Model.ShipBulletsAvailable >= _inputSession.CurrentShipAttackCost)
                             
                         {
-                            if (rowBoatAttackStarted) {
+                            if (rowBoatAttackStarted || _inputSession.CurrentlySelectedShipAttackName != null) {
                                 shipPrefab.GetComponent<ShipBehaviour>().shoot(fireBulletAtPos);
                                 //damage building behaviour
                                 if (target.gameObject.tag == "Cube")
@@ -301,7 +302,7 @@ namespace Assets.Code.States
         private void OnOpenShipBaseMessage(OpenShipBaseMessage message)
         {
 
-            MapLayout loadedMap = Serializer.Load<MapLayout>("MapLayout");
+            MapLayout loadedMap = Serializer.Load<MapLayout>("MapLayout1");
             if (loadedMap != null)
             {
 

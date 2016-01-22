@@ -83,12 +83,11 @@ namespace Assets.Code.Ui.CanvasControllers{
 
         public void CheckForEmptyPirateList()
         {
-            
 
             if (_pirateButtonList.Count == 0) {
                 _addPirateButton.enabled = false;
                 _addPirateButton.gameObject.SetActive(false);
-                _pirateImage.GetComponent<Image>().sprite = _spriteProvider.GetSprite("");
+                _pirateImage.GetComponent<Image>().sprite = _spriteProvider.GetSprite("SwatchNavyDarkAlbedo");
             }
 
         }
@@ -144,8 +143,9 @@ namespace Assets.Code.Ui.CanvasControllers{
                     }
                 }
             }
-            _pirateImage.GetComponent<Image>().sprite = _spriteProvider.GetSprite("");
+            _pirateImage.GetComponent<Image>().sprite = _spriteProvider.GetSprite("SwatchNavyDarkAlbedo");
             CheckForEmptyPirateList();
+            _addPirateButton.gameObject.SetActive(false);
         }
 
         public Button CreatePirateButton(string name, int pirateCount)
@@ -168,6 +168,7 @@ namespace Assets.Code.Ui.CanvasControllers{
             fab.transform.SetParent(_pirateButtonScrollPanel.transform);
 
             //fab.transform.localScale = Vector3.one;
+            
             return fab;
         }
 
@@ -207,6 +208,8 @@ namespace Assets.Code.Ui.CanvasControllers{
             powerSlider.value = stats.MaximumDamage;
             powerValueText.text = stats.MaximumDamage.ToString();
 
+            _addPirateButton.gameObject.SetActive(true);
+
         }
 
 
@@ -219,31 +222,35 @@ namespace Assets.Code.Ui.CanvasControllers{
                 Dictionary<int, string> seatsDictionary;
                 _playerManager.Model.RowBoatCountDict.TryGetValue(_rowBoatName, out seatsDictionary);
 
-                foreach (var seat in seatsDictionary)
+                if (_playerManager.Model.PirateCountDict[_inputSession.CurrentlySelectedPirateName] > 0)
                 {
 
-                    if (seat.Value.Equals(""))
+                    foreach (var seat in seatsDictionary)
                     {
-                        seatsDictionary[seat.Key] = _inputSession.CurrentlySelectedPirateName;
-                        //delete pirate from rowboat count dict
-                      var pirateCount = _playerManager.Model.PirateCountDict[_inputSession.CurrentlySelectedPirateName];
-                        _playerManager.Model.PirateCountDict[_inputSession.CurrentlySelectedPirateName] = pirateCount - 1;
-                        break;
+
+                        if (seat.Value.Equals(""))
+                        {
+                            seatsDictionary[seat.Key] = _inputSession.CurrentlySelectedPirateName;
+                            //delete pirate from rowboat count dict
+                            var pirateCount = _playerManager.Model.PirateCountDict[_inputSession.CurrentlySelectedPirateName];
+                            _playerManager.Model.PirateCountDict[_inputSession.CurrentlySelectedPirateName] = pirateCount - 1;
+                            break;
+                        }
                     }
+
+                    _messager.Publish(new UpdateRowBoatPirateNumberMessage
+                    {
+
+                        BoatName = _rowBoatName,
+                        PirateNumber = calculateOccupiedSeatsOfRowBoat(seatsDictionary)
+
+                    });
+
+                    _messager.Publish(new UpdateRowBoatCanvasMessage
+                    {
+                        BoatName = _rowBoatName
+                    });
                 }
-               
-                _messager.Publish(new UpdateRowBoatPirateNumberMessage {
-
-                    BoatName = _rowBoatName,
-                    PirateNumber = calculateOccupiedSeatsOfRowBoat(seatsDictionary)
-
-                });
-
-                _messager.Publish(new UpdateRowBoatCanvasMessage
-                {
-                    BoatName = _rowBoatName
-                });
-
                 
 
                 TearDown();

@@ -45,10 +45,10 @@ namespace Assets.Code.Ui.CanvasControllers
             var healthValueText = GetElement("Panel/HealthValue").GetComponent<Text>();
             var descriptionText = GetElement("Panel/DescText").GetComponent<Text>();
 
-			//TODO: Check before the below code if these values are availalble
-//            healthValueText.text = buildingModel.Stats.MaximumHealth.ToString();
-//            goldValueText.text = buildingModel.GoldAmount.ToString();
-//            descriptionText.text = buildingModel.Descipriton;
+            //TODO: Check before the below code if these values are availalble
+            healthValueText.text = buildingModel.Stats.MaximumHealth.ToString();
+            goldValueText.text = buildingModel.GoldAmount.ToString();
+            descriptionText.text = buildingModel.Descipriton;
         }
 
 		void onCloseClicked()

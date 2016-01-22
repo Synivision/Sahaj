@@ -231,6 +231,7 @@ namespace Assets.Code.States
 				//show inspector if selected and current tilename and objectname is same espectively.
 				if( _mouseState && shipLevelManager.GetTileAt(curPosition + new Vector3(125,0,125)) == target.gameObject.name){
 
+                    //shows building menu
 						inspectorCanvas = target.transform.GetChild(0).gameObject;
 						inspectorCanvas.SetActive(true);
 					
