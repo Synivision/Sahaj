@@ -41,7 +41,9 @@ namespace Assets.Code.Ui.CanvasControllers
 		List<PirateModel> _pirateVarietyList;
 		List<string> _piratesBiengGenerated;
 		List<Button> _piratesBiengGeneratedButtons;
-		
+
+		private MessagingToken _newPirateGeneratedMessage;
+
 		public CreatePirateCanvasController(IoCResolver resolver, Canvas canvasView)
 		: base(resolver, canvasView){
 		
@@ -66,6 +68,7 @@ namespace Assets.Code.Ui.CanvasControllers
 			ResolveElement (out _leftNavigationButton, "Main Panel/Left Button");
 			ResolveElement (out _rightNavigationButton, "Main Panel/Right Button");
 			ResolveElement (out _quitButton, "Main Panel/quit");
+			ResolveElement (out timeLeftText,"Main Panel/Time Remaining");
 			
 			var mainPanel = GetElement("Main Panel") as GameObject;
 			_parentPirateButtonPanel = mainPanel.transform.GetChild (1).transform.GetChild (0).gameObject;
@@ -103,6 +106,10 @@ namespace Assets.Code.Ui.CanvasControllers
 			//_rightNavigationButton.onClick.AddListener (OnQuitClicked);
 			_quitButton.onClick.AddListener (OnQuitClicked);
 
+			if(_pirateVarietyList.Count > 0)
+				_newPirateGeneratedMessage = _messager.Subscribe<NewPirateGeneratedMessage>(RemovePirate);
+
+			
 		}
 		
 		public void AddListenerToButton(ref Button button, int position){
@@ -120,6 +127,7 @@ namespace Assets.Code.Ui.CanvasControllers
 				//Add pirate to second scroll panel
 				var fab = Object.Instantiate (_prefabProvider.GetPrefab ("pirate_bieng_generated")).gameObject.GetComponent<Button> ();
 				fab.transform.SetParent (_parentPirateImagesScrollViewPanel.transform);
+				fab.gameObject.name = _pirateVarietyList [number].Name;
 				_piratesBiengGenerated.Add(_pirateVarietyList [number].Name);
 				_piratesBiengGeneratedButtons.Add (fab);
 
@@ -128,24 +136,60 @@ namespace Assets.Code.Ui.CanvasControllers
 
 
 			} else {
-				
-				int numberOfPiratesOfThisType = System.Int32.Parse(_piratesBiengGeneratedButtons[number].transform.GetChild(0).GetComponent<Text>().text);
-				_piratesBiengGeneratedButtons[number].transform.GetChild(0).GetComponent<Text>().text = (numberOfPiratesOfThisType+1).ToString();
-				
+
+				int buttonPosition;
+				//foreach(var button in _piratesBiengGeneratedButtons)
+				//	if(button.name == _pirateVarietyList[number].Name)
+				//		buttonPosition = _piratesBiengGeneratedButtons.IndexOf(button);
+
+				buttonPosition = _piratesBiengGeneratedButtons.IndexOf(_piratesBiengGeneratedButtons.Find (button => button.name == _pirateVarietyList[number].Name ));
+
+				int numberOfPiratesOfThisType = System.Int32.Parse(_piratesBiengGeneratedButtons[buttonPosition].transform.GetChild(0).GetComponent<Text>().text);
+				_piratesBiengGeneratedButtons[buttonPosition].transform.GetChild(0).GetComponent<Text>().text = (numberOfPiratesOfThisType+1).ToString();
+				//Start Generation of Pirate
+				_pirateGenerator.GeneratePirate(_pirateVarietyList[number],_buildingName,System.TimeSpan.FromSeconds((double)Time.time));
 			}
 		}
 		
 		public void OnQuitClicked(){
 			
 			disableCanvas ();
-			
+
+			foreach (var button in _pirateButtons) {
+				
+				button.onClick.RemoveAllListeners();
+				GameObject.Destroy(button.gameObject);
+			}
+			_pirateButtons.Clear ();
+			_piratesBiengGenerated.Clear ();
+			_piratesBiengGeneratedButtons.Clear ();
 		}
 
-		void Update(){
+		public override void Update(){
 		
-			if(_pirateVarietyList.Count > 0)
-				Debug.Log (_pirateGenerator.GetTimeToCompletionOfPirate(_buildingName,_pirateVarietyList[0].Name));
+			base.Update ();
+			timeLeftText.text = _pirateGenerator.GetTimeToCompletionOfPirate (_buildingName).ToString ();
+		}
+
+		public void RemovePirate(NewPirateGeneratedMessage message){
 		
+			var pos = _pirateVarietyList.IndexOf(message.PirateModel);
+			int buttonPosition = 0;
+			buttonPosition = _piratesBiengGeneratedButtons.IndexOf(_piratesBiengGeneratedButtons.Find (button => button.name == _pirateVarietyList[pos].Name ));
+
+
+			int numberOfPiratesOfThisType = System.Int32.Parse(_piratesBiengGeneratedButtons[buttonPosition].transform.GetChild(0).GetComponent<Text>().text);
+			if (numberOfPiratesOfThisType - 1 > 0) {
+
+				_piratesBiengGeneratedButtons [buttonPosition].transform.GetChild (0).GetComponent<Text> ().text = (numberOfPiratesOfThisType - 1).ToString ();
+		
+			} else {
+
+				_piratesBiengGeneratedButtons[buttonPosition].onClick.RemoveAllListeners();
+				GameObject.Destroy(_piratesBiengGeneratedButtons[buttonPosition].gameObject);
+				_piratesBiengGeneratedButtons.RemoveAt(buttonPosition);
+				_piratesBiengGenerated.RemoveAt(buttonPosition);
+			}
 		}
 
 		public override void TearDown()

@@ -2,14 +2,16 @@
 using System.Collections.Generic;
 using Assets.Code.DataPipeline;
 using Assets.Code.UnityBehaviours;
+using Assets.Code.Messaging;
+using Assets.Code.Messaging.Messages;
 
 public class PirateGenerator : IResolvableItem {
 
-	private Dictionary <string,Dictionary<string,List<PirateGeneratorModel>>> _piratesInProcess;
+	private Dictionary <string,List<PirateGeneratorModel>> _piratesInProcess;
 	private  IoCResolver _resolver;
 	private UnityReferenceMaster _unityReference;
 	private PlayerManager _playerManager;
-
+	private Messager _messager;
 	public void Initialize (IoCResolver resolver)
 	{
 		//Get Resolver
@@ -18,8 +20,9 @@ public class PirateGenerator : IResolvableItem {
 		//Resolve required objects
 		_resolver.Resolve (out _unityReference);
 		_resolver.Resolve (out _playerManager);
+		_resolver.Resolve (out _messager);
 
-		_piratesInProcess =new Dictionary <string,Dictionary<string,List<PirateGeneratorModel>>>();
+		_piratesInProcess =new Dictionary <string,List<PirateGeneratorModel>>();
 	}
 
 	//Add the pirate to be created to the list in this method
@@ -30,54 +33,43 @@ public class PirateGenerator : IResolvableItem {
 		model.StartTime = startTime;
 		model.PirateGenerationStatus = (int)PirateGeneratorModel.Status.IN_QUEUE;
 
-		//dictionary of Pirates For This Building
-		Dictionary<string,List<PirateGeneratorModel>> dictionaryofPirates;
-
+		//list Of Pirates For Any Key To Building
+		List<PirateGeneratorModel> listOfPirates;
+	
 		//check if this building is creating any pirate or not
-		if (_piratesInProcess.TryGetValue (buildingName, out dictionaryofPirates)) {
+		if (_piratesInProcess.TryGetValue (buildingName, out listOfPirates)) {
 
-			//list Of Pirates For Any Key To Building
-			List<PirateGeneratorModel> listOfPirates;
+			//add pirate to list obtained from dictionary of pirates
+			if(listOfPirates != null){
 
-			//check if any pirate of this type is in queue, if no then create it
-			if(dictionaryofPirates.TryGetValue(pirate.Name,out listOfPirates)){
-
-				//add pirate to list obtained from dictionary of pirates
 				listOfPirates.Add(model);
-				dictionaryofPirates[pirate.Name] = listOfPirates;
+				if(listOfPirates.Count == 1){
+					_unityReference.Delay (() => DoneGeneratingPirate(model,buildingName), pirate.TrainingTime);	
 
+				}
 			}else{
 
 				listOfPirates = new List<PirateGeneratorModel>();
 				listOfPirates.Add (model);
-				dictionaryofPirates.Add(pirate.Name,listOfPirates);
-
 			}
 
-			//add dictionary of pirates to our main dictionary
-			_piratesInProcess[buildingName] = dictionaryofPirates;
+			_piratesInProcess[buildingName] = listOfPirates;
 
 		} else { //create a new entry for this type of pirate for this building
-		
-			//new dictionary of Pirates For This Building
-			dictionaryofPirates = new Dictionary<string, List<PirateGeneratorModel>>();
 
 			//new list Of Pirates For a new Key To Building
-			List<PirateGeneratorModel> listOfPirates = new List<PirateGeneratorModel>();
+			listOfPirates = new List<PirateGeneratorModel>();
 
 			model.PirateGenerationStatus = (int)PirateGeneratorModel.Status.IN_PROCESS;
 
 			listOfPirates.Add(model);
 
-			dictionaryofPirates.Add(pirate.Name,listOfPirates);
+			_piratesInProcess.Add (buildingName,listOfPirates);
 
-			_piratesInProcess.Add (buildingName,dictionaryofPirates);
-
-			//create first pirate of the list
+			//Create first pirate
 			_unityReference.Delay (() => DoneGeneratingPirate(model,buildingName), pirate.TrainingTime);	
 
 		}
-			
 	}
 
 	void DoneGeneratingPirate(PirateGeneratorModel model,string buildingName){
@@ -86,46 +78,48 @@ public class PirateGenerator : IResolvableItem {
 		int newPirateCount = 0;
 		_playerManager.Model.PirateCountDict.TryGetValue (model.PirateModel.Name, out newPirateCount);
 		newPirateCount++;
-		_playerManager.Model.PirateCountDict.Add (model.PirateModel.Name,newPirateCount);
+		_playerManager.Model.PirateCountDict[model.PirateModel.Name] = newPirateCount;
 
-		Dictionary<string,List<PirateGeneratorModel>> tempDict;
-
-		List<PirateGeneratorModel> tempModelList;
+		List<PirateGeneratorModel> tempModelList = new List<PirateGeneratorModel>();
 
 		//Delete this pirate from pirates in process list
-		if (_piratesInProcess.TryGetValue (buildingName, out tempDict) && tempDict.TryGetValue (model.PirateModel.Name,out tempModelList)) {
+		if (_piratesInProcess.TryGetValue (buildingName, out tempModelList)) {
 
-			tempModelList.Remove(model);
-			tempDict[model.PirateModel.Name] = tempModelList;
-			
+			tempModelList.RemoveAt(0);
+
+			/*for(int i = 0; i < tempModelList.Count; i++){
+
+				Debug.Log(tempModelList[i].PirateModel.Name);
+
+			}*/
+			Debug.Log ("Count of pirates left = " + tempModelList.Count);
 			//Start next pirate creation (if any)
 			if (tempModelList.Count > 0) {
+
 				//set status of first pirate to in process
 				tempModelList[0].PirateGenerationStatus = (int)PirateGeneratorModel.Status.IN_PROCESS;
-				tempDict[model.PirateModel.Name] = tempModelList;
-
 				_unityReference.Delay (() => DoneGeneratingPirate(tempModelList[0],buildingName), tempModelList[0].PirateModel.TrainingTime);
 				
 			}//else pirates in queue are completed :) Enjoy!!
 
-			_piratesInProcess[buildingName] = tempDict;
-		
+
+			_piratesInProcess[buildingName] = tempModelList;
+
+			_messager.Publish(new NewPirateGeneratedMessage{
+				PirateModel = model.PirateModel
+			});
 		}
 	}
 
 	//returns time in seconds
-	public System.TimeSpan GetTimeToCompletionOfPirate(string buildingName,string pirateName){
+	public System.TimeSpan GetTimeToCompletionOfPirate(string buildingName){
 	
 		System.TimeSpan timeLeft = new System.TimeSpan();
-
-		//dictionary of Pirates For This Building
-		Dictionary<string,List<PirateGeneratorModel>> dictionaryofPirates;
 
 		//list Of Pirates For a new Key To Building
 		List<PirateGeneratorModel> listOfPirates;
 
-		if(_piratesInProcess.TryGetValue(buildingName,out dictionaryofPirates) 
-		   && dictionaryofPirates.TryGetValue(pirateName,out listOfPirates)){
+		if(_piratesInProcess.TryGetValue(buildingName,out listOfPirates)){
 
 			int piratesLeft = listOfPirates.Count;
 
@@ -138,9 +132,10 @@ public class PirateGenerator : IResolvableItem {
 				}else{
 
 					//time remaining for processing pirate
-					var time = (pirate.StartTime - System.TimeSpan.FromSeconds((double)pirate.PirateModel.TrainingTime));
+					//var time = (System.TimeSpan.FromSeconds((double)pirate.PirateModel.TrainingTime) - (System.TimeSpan.FromSeconds((double)Time.time)));
+					var time = (System.TimeSpan.FromSeconds((double)Time.time) - pirate.StartTime );
 					//add this time only if it is positive because at this instant it might be possible that status changed
-					timeLeft += (time > System.TimeSpan.FromSeconds(0)) ? time : System.TimeSpan.FromSeconds(0);
+					timeLeft += (time < System.TimeSpan.FromSeconds((double)pirate.PirateModel.TrainingTime)) ? (System.TimeSpan.FromSeconds((double)pirate.PirateModel.TrainingTime) - time): System.TimeSpan.FromSeconds(0);
 				
 				}
 

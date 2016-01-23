@@ -75,7 +75,7 @@ namespace Assets.Code.States
 
 
             shipLevelManager = new ShipLevelManager(_resolver, _map);
-            _onChangeStateToAttack = _messager.Subscribe<StartGameMessage>(OnChangeStateToAttack);
+	            _onChangeStateToAttack = _messager.Subscribe<StartGameMessage>(OnChangeStateToAttack);
             _onInventoryOpen = _messager.Subscribe<OpenInventory>(OpenInventoryBuilding);
             _onBuildingInfoOpen = _messager.Subscribe<OpenBuildingInfoCanvas>(OnOpenBuildingInfoCanvas);
             _onOpenShopMessage = _messager.Subscribe<OpenShopMessage>(OnOpenShop);
@@ -174,7 +174,6 @@ namespace Assets.Code.States
 			
 				_createPirateCanvasController = new CreatePirateCanvasController (_resolver, _canvasProvider.GetCanvas ("CreatePirateCanvas"));
 				_uiManager.RegisterUi (_createPirateCanvasController);
-				Debug.Log ("Kar dia");
 			
 			} else {
 			
@@ -182,6 +181,7 @@ namespace Assets.Code.States
 			
 			}
 
+			_createPirateCanvasController.BuildingModel = null;
 			_createPirateCanvasController.BuildingModel = message.BuildingModel;
 			_createPirateCanvasController.Initialize();
 		}

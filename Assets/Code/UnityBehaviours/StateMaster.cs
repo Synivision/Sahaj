@@ -147,7 +147,8 @@ namespace Assets.Code.UnityBehaviours
 				PirateNature = PirateNature.Player,
 				PirateRange = (int)PirateModel.Range.Milee,
 				PirateColor = Color.blue,
-				TrainingCost = 2000
+				TrainingCost = 2000,
+				TrainingTime = 60
 			});
 			
 			_gameDataProvider.AddData(new PirateModel
@@ -164,7 +165,8 @@ namespace Assets.Code.UnityBehaviours
 				PirateNature = (int)PirateNature.Player ,
 				PirateRange = (int)PirateModel.Range.Gunner3,
 				PirateColor = Color.green,
-				TrainingCost = 1000
+				TrainingCost = 1000,
+				TrainingTime = 60
 			});
 			_gameDataProvider.AddData(new PirateModel
 			                          {
@@ -180,7 +182,8 @@ namespace Assets.Code.UnityBehaviours
 				PirateRange = (int)PirateModel.Range.Gunner2,
 				PirateNature = PirateNature.Player,
 				PirateColor = Color.yellow,
-				TrainingCost = 500
+				TrainingCost = 500,
+				TrainingTime = 15
 			});
 			
 			_gameDataProvider.AddData(new PirateModel
@@ -197,7 +200,8 @@ namespace Assets.Code.UnityBehaviours
 				PirateRange = (int)PirateModel.Range.Gunner2,
 				PirateNature = PirateNature.Player,
 				PirateColor = Color.white,
-				TrainingCost = 1000
+				TrainingCost = 1000,
+				TrainingTime = 10
 			});
 			
 			_gameDataProvider.AddData(new PirateModel
@@ -214,7 +218,8 @@ namespace Assets.Code.UnityBehaviours
 				PirateRange = (int)PirateModel.Range.Gunner2,
 				PirateNature = PirateNature.Player,
 				PirateColor = Color.magenta,
-				TrainingCost = 500
+				TrainingCost = 500,
+				TrainingTime = 60
 			});
 			
 			_gameDataProvider.AddData(new PirateModel
@@ -231,7 +236,8 @@ namespace Assets.Code.UnityBehaviours
 				PirateRange = (int)PirateModel.Range.Gunner2,
 				PirateNature = PirateNature.Player,
 				PirateColor = Color.yellow,
-				TrainingCost = 3000
+				TrainingCost = 3000,
+				TrainingTime = 60
 			});
 			_gameDataProvider.AddData(new PirateModel
 			                          {
@@ -247,7 +253,8 @@ namespace Assets.Code.UnityBehaviours
 				PirateRange = (int)PirateModel.Range.Gunner2,
 				PirateNature = PirateNature.Player,
 				PirateColor = Color.yellow,
-				TrainingCost = 1000
+				TrainingCost = 1000,
+				TrainingTime = 60
 			});
 			
 			/* ENEMY PIRATES */
