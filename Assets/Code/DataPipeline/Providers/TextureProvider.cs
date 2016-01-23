@@ -6,12 +6,12 @@ namespace Assets.Code.DataPipeline.Providers
 {
     public class TextureProvider : IResolvableItem
     {
-        private readonly Logger _logger;
+        private readonly CanonLogger _logger;
         private readonly Dictionary<string, Texture> _textures;
 
-        public TextureProvider(Logger logger)
+        public TextureProvider(CanonLogger CanonLogger)
         {
-            _logger = logger;
+            _logger = CanonLogger;
             _textures = new Dictionary<string, Texture>();
         }
 

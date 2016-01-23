@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Assets.Code.Logic.Logging
 {
-    public class Logger : IResolvableItem
+    public class CanonLogger : IResolvableItem
     {
         private readonly string _logPath;
         private readonly bool _logToUnity;
@@ -12,7 +12,7 @@ namespace Assets.Code.Logic.Logging
         private int _backlogIndex;
         private readonly string[] _backlog;
 
-        public Logger(string logPath, bool logToUnity)
+        public CanonLogger(string logPath, bool logToUnity)
         {
             _backlogIndex = 0;
             _backlog = new string[50];

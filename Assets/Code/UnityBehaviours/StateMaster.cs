@@ -23,7 +23,7 @@ namespace Assets.Code.UnityBehaviours
 		private GameDataProvider _gameDataProvider;
         /* PROPERTIES */
         private Messager _messager;
-        private Logger _logger;
+        private CanonLogger _logger;
         private IoCResolver _resolver;
 
         private BaseState _currentState;
@@ -41,7 +41,7 @@ namespace Assets.Code.UnityBehaviours
             FileServices.LoadResourcesList("resourceslist");
 #endif
             
-            _logger = new Logger("info.log", false);
+            _logger = new CanonLogger("info.log", false);
             _resolver = new IoCResolver(_logger);
 
             #region LOAD RESOURCES

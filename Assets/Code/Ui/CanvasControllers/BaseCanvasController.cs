@@ -7,7 +7,7 @@ namespace Assets.Code.Ui.CanvasControllers
 {
     public abstract class BaseCanvasController
     {
-        private readonly Logger _logger;
+        private readonly CanonLogger _logger;
         protected readonly Canvas _canvasView;
 
         private readonly Dictionary<string, GameObject> _elements;

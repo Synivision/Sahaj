@@ -7,12 +7,12 @@ namespace Assets.Code.DataPipeline.Providers
     public class SoundProvider : IResolvableItem
     {
         /* PROPERTIES */
-        private readonly Logger _logger;
+        private readonly CanonLogger _logger;
         private readonly Dictionary<string, AudioClip> _sounds;
 
-        public SoundProvider(Logger logger)
+        public SoundProvider(CanonLogger CanonLogger)
         {
-            _logger = logger;
+            _logger = CanonLogger;
             _sounds = new Dictionary<string, AudioClip>();
         }
 

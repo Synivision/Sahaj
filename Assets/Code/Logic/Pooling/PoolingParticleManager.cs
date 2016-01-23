@@ -12,7 +12,7 @@ namespace Assets.Code.Logic.Pooling
     public class PoolingParticleManager : IResolvableItem
     {
         /* REFERENCES */
-        private readonly Logger _logger;
+        private readonly CanonLogger _logger;
         private readonly PrefabProvider _prefabProvider;
         private readonly UnityReferenceMaster _unityReferenceMaster;
 

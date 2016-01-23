@@ -14,15 +14,15 @@ namespace Assets.Code.Logic.Pooling
         private const int NumberOfSources = 32;
 
         /* REFERENCES */
-        private readonly Logger _logger;
+        private readonly CanonLogger _logger;
 
         /* PROPERTIES */
         private readonly PooledAudioSource[] _sources;
         private readonly GameObject _sourceParent;
 
-        public PoolingAudioPlayer(Logger logger, UnityReferenceMaster unityReferenceMaster, GameObject audioSourcePrefab)
+        public PoolingAudioPlayer(CanonLogger CanonLogger, UnityReferenceMaster unityReferenceMaster, GameObject audioSourcePrefab)
         {
-            _logger = logger;
+            _logger = CanonLogger;
 
             _sourceParent = Object.Instantiate(new GameObject());
             _sourceParent.name = "audio_source_parent";

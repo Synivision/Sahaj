@@ -9,12 +9,12 @@ namespace Assets.Code.DataPipeline.Providers
 {
     public class GameDataProvider : IResolvableItem
     {
-        private readonly Logger _logger;
+        private readonly CanonLogger _logger;
         private readonly Dictionary<Type, Dictionary<string, IGameDataModel>> _data;
 
-        public GameDataProvider(Logger logger)
+        public GameDataProvider(CanonLogger CanonLogger)
         {
-            _logger = logger;
+            _logger = CanonLogger;
             _data = new Dictionary<Type, Dictionary<string, IGameDataModel>>();
         }
 

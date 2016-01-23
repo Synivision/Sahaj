@@ -8,12 +8,12 @@ namespace Assets.Code.DataPipeline.Providers
 {
     public class SpriteProvider : IResolvableItem
     {
-        private readonly Logger _logger;
+        private readonly CanonLogger _logger;
         private readonly Dictionary<string, Sprite> _sprites;
 
-        public SpriteProvider(Logger logger)
+        public SpriteProvider(CanonLogger CanonLogger)
         {
-            _logger = logger;
+            _logger = CanonLogger;
             _sprites = new Dictionary<string, Sprite>();
         }
 

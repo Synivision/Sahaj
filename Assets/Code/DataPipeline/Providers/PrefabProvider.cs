@@ -6,12 +6,12 @@ namespace Assets.Code.DataPipeline.Providers
 {
     public class PrefabProvider : IResolvableItem
     {
-        private readonly Logger _logger;
+        private readonly CanonLogger _logger;
         private readonly Dictionary<string, GameObject> _prefabs;
 
-        public PrefabProvider(Logger logger)
+        public PrefabProvider(CanonLogger CanonLogger)
         {
-            _logger = logger;
+            _logger = CanonLogger;
             _prefabs = new Dictionary<string, GameObject>();
         }
 

@@ -7,7 +7,7 @@ namespace Assets.Code.DataPipeline
     public class IoCResolver
     {
         private static IoCResolver _instance;
-        private readonly Logger _logger;
+        private readonly CanonLogger _logger;
         private readonly Dictionary<Type, object> _items;
         private bool _isLocked;
 
@@ -19,9 +19,9 @@ namespace Assets.Code.DataPipeline
             _instance.Resolve(out subject);
         }
 
-        public IoCResolver(Logger logger)
+        public IoCResolver(CanonLogger CanonLogger)
         {
-            _logger = logger;
+            _logger = CanonLogger;
             _items = new Dictionary<Type, object>();
             _isLocked = false;
 
