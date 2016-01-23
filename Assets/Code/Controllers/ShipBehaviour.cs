@@ -53,7 +53,7 @@ public class ShipBehaviour : MonoBehaviour {
 
     public void shoot(Vector3 firePos) {
 
-        if (_inputSession.CurrentlySelectedShipAttackName.Equals("ship_gun"))
+        if (_inputSession.CurrentlySelectedShipAttackName.Equals("ship_gun")) 
         {
             var fab = _poolingObjectManager.Instantiate("cannon_bombs");
             fab.transform.position = firePos + new Vector3(0,100,0);

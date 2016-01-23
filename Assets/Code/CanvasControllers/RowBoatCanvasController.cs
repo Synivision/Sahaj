@@ -88,7 +88,8 @@ namespace Assets.Code.Ui.CanvasControllers
         void AttackButtonClicked() {
             _inputSession.CurrentlySelectedRowBoatName = RowBoatName;
             _inputSession.CurrentlySelectedShipAttackName = null;
-           TearDown();
+
+            TearDown();
 
         }
 
@@ -124,6 +125,8 @@ namespace Assets.Code.Ui.CanvasControllers
                         button.transform.GetChild(0).GetComponent<Text>().text = buttonName;
                     }
                 }
+
+                
             }
 
 

@@ -251,8 +251,6 @@ namespace Assets.Code.Ui.CanvasControllers{
                         BoatName = _rowBoatName
                     });
                 }
-                
-
                 TearDown();
 
             }

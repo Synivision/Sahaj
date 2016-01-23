@@ -41,7 +41,8 @@ namespace Assets.Code.Ui.CanvasControllers
 		void onReturnClicked()
 		{
 			
-			_messager.Publish (new OpenShipBaseMessage{});
+			_messager.Publish (new OpenShipBaseMessage{
+            });
 			TearDown();
 		}
 		

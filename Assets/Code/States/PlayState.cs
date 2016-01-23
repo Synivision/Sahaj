@@ -31,7 +31,7 @@ namespace Assets.Code.States
         private MessagingToken _openShipBaseMessage;
         private MessagingToken _onOpenRowBoatSelectedMessage;
         private MessagingToken _onAddPirateToRowBoatMessage;
-
+        private MessagingToken _onWin;
         private PoolingObjectManager _poolingObjectManager;
         LevelManager levelManager;
         PlayerManager _playerManager;
@@ -97,6 +97,7 @@ namespace Assets.Code.States
             _onPlayStateToShipBase = _messager.Subscribe<OpenShipBaseMessage>(OnOpenShipBaseMessage);
             _onOpenRowBoatSelectedMessage = _messager.Subscribe<RowBoatSelectedMessage>(onOpenRowBoatSelected);
             _onAddPirateToRowBoatMessage = _messager.Subscribe<AddPirateToRowBoatMessage>(onAddPirateToRowBoat);
+            _onWin = _messager.Subscribe<WinMessage>(OnWin);
             //Ship lerp into level
             startTime = Time.time;
             shipPrefab = _poolingObjectManager.Instantiate("revolutionaryship").gameObject;
@@ -119,6 +120,13 @@ namespace Assets.Code.States
         {
             _uiManager.RegisterUi(new RowBoatCanvasController(_resolver, _canvasProvider.GetCanvas("RowBoatCanvas"), message.BoatName));
             //message.onCancelled();
+        }
+
+
+        private void OnWin(WinMessage message)
+        {
+            _uiManager.RegisterUi(new WinLooseCanvasController(_resolver, _canvasProvider.GetCanvas("WinCanvas")));
+
         }
 
         public override void Update()
@@ -276,6 +284,17 @@ namespace Assets.Code.States
 
                 _tempRowBoatCountDict.Remove(boatName);
 
+
+                Dictionary<int, string> tempDictionary = new Dictionary<int, string>();
+                tempDictionary.Add(0, "");
+                tempDictionary.Add(1, "");
+                tempDictionary.Add(2, "");
+                tempDictionary.Add(3, "");
+                tempDictionary.Add(4, "");
+                tempDictionary.Add(5, "");
+
+                _playerManager.Model.RowBoatCountDict[_inputSession.CurrentlySelectedRowBoatName] = tempDictionary;
+
                 _inputSession.CurrentlySelectedRowBoatName = null;
                 //send message to gameplaycanvas about rowboat sent to attack to disable rowboat button
                 _messager.Publish(new RowBoatSentToAttackMessage {
@@ -352,7 +371,7 @@ namespace Assets.Code.States
             
             //	_poolingObjectManager.TearDown ();
             _messager.CancelSubscription(_onQuitGame, _onTearDownLevel, _onPlayStateToShipBase,
-                _onOpenRowBoatSelectedMessage, _onAddPirateToRowBoatMessage);
+                _onOpenRowBoatSelectedMessage, _onAddPirateToRowBoatMessage, _onWin);
             
         }
         
