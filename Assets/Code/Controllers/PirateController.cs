@@ -100,7 +100,6 @@ public class PirateController : AIPath
         if (Model.PirateColor.Equals(Color.blue))
         {
             //instantiate sword
-            Debug.Log("instantiate");
             var fab = _poolingObjectManager.Instantiate("captain_melee_weapon").gameObject;
             
             fab.transform.SetParent(gameObject.transform);

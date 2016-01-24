@@ -85,7 +85,7 @@ public class RowBoatController : MonoBehaviour
             if (Vector3.Distance(gameObject.transform.position, destinationPosition) <= 15 && !_rowBoatEmpty)
             {
                 SpawnPirateFromRowboats(destinationPosition);
-                _rowBoatEmpty = true;
+               // _rowBoatEmpty = true;
             }
 
         }
@@ -124,19 +124,14 @@ public class RowBoatController : MonoBehaviour
 
     public void SpawnPirateFromRowboats(Vector3 spawnPosition)
     {
-        //var keys =;
 
-        var keys = new List<int>(SeatsDictionary.Keys);
-        foreach (var seat in keys)
-            {
+        foreach (var seat in SeatsDictionary)
+        {
+          
+            _levelManager.CreatePirate(seat.Value, spawnPosition + new Vector3(seat.Key + 10, seat.Key + 10, 0));
+        }
 
-             _levelManager.CreatePirate(SeatsDictionary[seat], spawnPosition + new Vector3(seat + 10, seat + 10, 0));
-
-            //update values of seats in rowboats
-            //empty the rowboat seats
-            SeatsDictionary[seat] = "";
-
-            }
+        _rowBoatEmpty = true;
     }
 }
 

@@ -53,10 +53,17 @@ public class ShipBehaviour : MonoBehaviour {
 
     public void shoot(Vector3 firePos) {
 
-        if (_inputSession.CurrentlySelectedShipAttackName.Equals("ship_gun"))
+        if (_inputSession.CurrentlySelectedShipAttackName.Equals("ship_gun")) 
         {
             var fab = _poolingObjectManager.Instantiate("cannon_bombs");
             fab.transform.position = firePos + new Vector3(0,100,0);
+
+            BombModel model = new BombModel();
+            model.color = Color.green;
+            model.endPos = firePos;
+            model.startPos = firePos + new Vector3(0, 100, 0);
+
+            fab.GetComponent<CannonBombBehaviour>().Initialize(_resolver, model, 10);
 
         }
         else {
@@ -89,19 +96,7 @@ public class ShipBehaviour : MonoBehaviour {
 
         //move ship
         _createPirateTime += Time.deltaTime;
-        /*if(_createPirateTime >.5 && enablePirate == true && maxenemyPirateCount > 0){
-            //_levelManager.CreatePirate("EnemyPirate3",_pirateSpawnPoint.transform.position + new Vector3(Random.Range(0,15),0,Random.Range(0,15)));
-            _levelManager.CreatePirate("EnemyPirate3",new Vector3(-120,5,-25)  + new Vector3(Random.Range(0,10),0,Random.Range(0,10)) );
-            maxenemyPirateCount--;
-            _createPirateTime = 0;
-        }*/
+    
     }
-
-    /*
-    public override void TearDown ()
-    {
-        _messager.CancelSubscription (OnAttackSelected);
-
-    }*/
 
 }

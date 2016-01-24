@@ -19,7 +19,7 @@ namespace Assets.Code.States
         
         /* PROPERTIES */
         private UiManager _uiManager;
-        
+        InventoryCanvasController _inventoryCanvasController;
         /* UiControllers */
         private MainCanvasController _mainCanvasController;
         private CanvasProvider _canvasProvider;
@@ -31,7 +31,7 @@ namespace Assets.Code.States
         private MessagingToken _openShipBaseMessage;
         private MessagingToken _onOpenRowBoatSelectedMessage;
         private MessagingToken _onAddPirateToRowBoatMessage;
-
+        private MessagingToken _onWin;
         private PoolingObjectManager _poolingObjectManager;
         LevelManager levelManager;
         PlayerManager _playerManager;
@@ -57,6 +57,7 @@ namespace Assets.Code.States
         bool rowBoatAttackStarted;
 
         private int rowBoatCount;
+        private GameObject _arrowGameObject;
         public Dictionary<string, Dictionary<int, string>> _tempRowBoatCountDict;
         //TODO: this should be taken from the base controller in future..
 
@@ -96,6 +97,7 @@ namespace Assets.Code.States
             _onPlayStateToShipBase = _messager.Subscribe<OpenShipBaseMessage>(OnOpenShipBaseMessage);
             _onOpenRowBoatSelectedMessage = _messager.Subscribe<RowBoatSelectedMessage>(onOpenRowBoatSelected);
             _onAddPirateToRowBoatMessage = _messager.Subscribe<AddPirateToRowBoatMessage>(onAddPirateToRowBoat);
+            _onWin = _messager.Subscribe<WinMessage>(OnWin);
             //Ship lerp into level
             startTime = Time.time;
             shipPrefab = _poolingObjectManager.Instantiate("revolutionaryship").gameObject;
@@ -104,10 +106,13 @@ namespace Assets.Code.States
             //shipPrefab.gameObject.transform.position.lerp
             rowBoatList = new List<GameObject>();
             rowBoatAttackStarted = false;
+
+            _arrowGameObject = _poolingObjectManager.Instantiate("rowboat_tile").gameObject;
         }
 
         public void onAddPirateToRowBoat(AddPirateToRowBoatMessage message)
         {
+         
             _uiManager.RegisterUi(new InventoryCanvasController(_resolver, _canvasProvider.GetCanvas("InventoryCanvas"), message.BoatName));
         }
 
@@ -117,9 +122,29 @@ namespace Assets.Code.States
             //message.onCancelled();
         }
 
+
+        private void OnWin(WinMessage message)
+        {
+            _uiManager.RegisterUi(new WinLooseCanvasController(_resolver, _canvasProvider.GetCanvas("WinCanvas")));
+
+        }
+
         public override void Update()
         {
-            
+
+            if (_inputSession.CurrentlySelectedRowBoatName != null)
+            {
+                _arrowGameObject.SetActive(true);
+                var pos1 = new Vector3(-200,20,0);
+                var pos2 = new Vector3(-150, 20, 0);
+                _arrowGameObject.transform.position = Vector3.Lerp(pos1, pos2, Mathf.PingPong(Time.time * speed, 1.0f));
+
+            }
+            else {
+                _arrowGameObject.SetActive(false);
+
+            }
+
             float distCovered = (Time.time - startTime) * speed;
             float fracJourney = distCovered / journeyLength;
             shipPrefab.transform.position = Vector3.Lerp(shipPrefab.transform.position, new Vector3(-120, 15, -120), fracJourney);
@@ -139,7 +164,8 @@ namespace Assets.Code.States
             Touch[] touch = Input.touches;
             if (Application.platform == RuntimePlatform.Android)
                 pointerId = touch[0].fingerId;
-            
+
+
             //used to move cube around 
             if (Input.GetMouseButtonDown(0))
             {
@@ -157,7 +183,7 @@ namespace Assets.Code.States
                         //Debug.Log ("Spawn Point from Input Controller = " + spawnPosition.ToString()
                         //levelManager.CreatePirate(_inputSession.CurrentlySelectedPirateName, spawnPosition);
                     }
-                    if (!rowBoatAttackStarted) {
+                    if (!rowBoatAttackStarted && _inputSession.CurrentlySelectedShipAttackName == null) {
                         if (target != null && (target.gameObject.tag == "Cube"))
                         {
                             var buildingName = target.GetComponent<BuildingController>().name;
@@ -173,7 +199,7 @@ namespace Assets.Code.States
                         if (_playerManager.Model.ShipBulletsAvailable > 0 && _inputSession.CurrentShipAttackCost != 0 && _playerManager.Model.ShipBulletsAvailable >= _inputSession.CurrentShipAttackCost)
                             
                         {
-                            if (rowBoatAttackStarted) {
+                            if (rowBoatAttackStarted || _inputSession.CurrentlySelectedShipAttackName != null) {
                                 shipPrefab.GetComponent<ShipBehaviour>().shoot(fireBulletAtPos);
                                 //damage building behaviour
                                 if (target.gameObject.tag == "Cube")
@@ -258,6 +284,18 @@ namespace Assets.Code.States
 
                 _tempRowBoatCountDict.Remove(boatName);
 
+
+                Dictionary<int, string> tempDictionary = new Dictionary<int, string>();
+                tempDictionary.Add(0, "");
+                tempDictionary.Add(1, "");
+                tempDictionary.Add(2, "");
+                tempDictionary.Add(3, "");
+                tempDictionary.Add(4, "");
+                tempDictionary.Add(5, "");
+
+                _playerManager.Model.RowBoatCountDict[_inputSession.CurrentlySelectedRowBoatName] = tempDictionary;
+
+                _inputSession.CurrentlySelectedRowBoatName = null;
                 //send message to gameplaycanvas about rowboat sent to attack to disable rowboat button
                 _messager.Publish(new RowBoatSentToAttackMessage {
                     BoatName = boatName
@@ -300,7 +338,7 @@ namespace Assets.Code.States
         private void OnOpenShipBaseMessage(OpenShipBaseMessage message)
         {
 
-            MapLayout loadedMap = Serializer.Load<MapLayout>("MapLayout");
+            MapLayout loadedMap = Serializer.Load<MapLayout>("MapLayout1");
             if (loadedMap != null)
             {
 
@@ -317,8 +355,7 @@ namespace Assets.Code.States
         
         public override void TearDown()
         {
-            
-            
+           
             for (int i=0; i < rowBoatList.Count; i++) {
                 
                 Object.Destroy(rowBoatList[i]);
@@ -326,6 +363,7 @@ namespace Assets.Code.States
             }
             
             Object.Destroy(shipPrefab);
+            GameObject.Destroy( _arrowGameObject);
             levelManager.TearDownLevel();
             
             
@@ -333,7 +371,7 @@ namespace Assets.Code.States
             
             //	_poolingObjectManager.TearDown ();
             _messager.CancelSubscription(_onQuitGame, _onTearDownLevel, _onPlayStateToShipBase,
-                _onOpenRowBoatSelectedMessage, _onAddPirateToRowBoatMessage);
+                _onOpenRowBoatSelectedMessage, _onAddPirateToRowBoatMessage, _onWin);
             
         }
         

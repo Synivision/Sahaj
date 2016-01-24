@@ -15,7 +15,7 @@ namespace Assets.Code.States
 	{
 		
 		private Canvas _shipBaseCanvas;
-		
+			
 		private CanvasProvider _canvasProvider;
 		private PoolingObjectManager _poolingObjectManager;
 		private UiManager _uiManager;
@@ -24,6 +24,7 @@ namespace Assets.Code.States
 		readonly GameDataProvider _gameDataProvider;
 		private readonly PrefabProvider _prefabProvider;
 		private SpriteProvider _spriteProvider;
+
 		private MessagingToken _onChangeStateToAttack;
 		private MessagingToken _onInventoryOpen;
 		private MessagingToken _onBuildingInfoOpen;
@@ -47,6 +48,7 @@ namespace Assets.Code.States
         private UnityReferenceMaster _unityReferenceMaster;
         private CameraController _camera;
         private ShopCanvasController _shopCanvasController;
+		private CreatePirateCanvasController _createPirateCanvasController;
         Vector3 curPosition;
 		Vector3 selectedgameObjectPosition = new Vector3(0,0,0);
 		
@@ -73,7 +75,7 @@ namespace Assets.Code.States
 
 
             shipLevelManager = new ShipLevelManager(_resolver, _map);
-            _onChangeStateToAttack = _messager.Subscribe<StartGameMessage>(OnChangeStateToAttack);
+	            _onChangeStateToAttack = _messager.Subscribe<StartGameMessage>(OnChangeStateToAttack);
             _onInventoryOpen = _messager.Subscribe<OpenInventory>(OpenInventoryBuilding);
             _onBuildingInfoOpen = _messager.Subscribe<OpenBuildingInfoCanvas>(OnOpenBuildingInfoCanvas);
             _onOpenShopMessage = _messager.Subscribe<OpenShopMessage>(OnOpenShop);
@@ -137,6 +139,7 @@ namespace Assets.Code.States
 		
 		public void OnOpenShop (OpenShopMessage message)
 		{
+           
             if (_shopCanvasController != null)
             {
                 _shopCanvasController.enableCanvas();
@@ -167,7 +170,20 @@ namespace Assets.Code.States
 
 		public void onOpenCreatePirateCanvas(OpenCreatePirateCanvasMessage message){
 
-			_uiManager.RegisterUi (new CreatePirateCanvasController(_resolver,_canvasProvider.GetCanvas("CreatePirateCanvas"),message.BuildingModel));
+			if (_createPirateCanvasController == null) {
+			
+				_createPirateCanvasController = new CreatePirateCanvasController (_resolver, _canvasProvider.GetCanvas ("CreatePirateCanvas"));
+				_uiManager.RegisterUi (_createPirateCanvasController);
+			
+			} else {
+			
+				_createPirateCanvasController.enableCanvas();
+			
+			}
+
+			_createPirateCanvasController.BuildingModel = null;
+			_createPirateCanvasController.BuildingModel = message.BuildingModel;
+			_createPirateCanvasController.Initialize();
 		}
 		
 		public override void Update (){
@@ -215,6 +231,7 @@ namespace Assets.Code.States
 				//show inspector if selected and current tilename and objectname is same espectively.
 				if( _mouseState && shipLevelManager.GetTileAt(curPosition + new Vector3(125,0,125)) == target.gameObject.name){
 
+                    //shows building menu
 						inspectorCanvas = target.transform.GetChild(0).gameObject;
 						inspectorCanvas.SetActive(true);
 					
@@ -284,7 +301,7 @@ namespace Assets.Code.States
 
         public void saveMapLayoutToFile() {
             MapLayout layout = shipLevelManager.bluePrintToMapLayout();
-            Serializer.Save<MapLayout>("MapLayout", layout);
+            Serializer.Save<MapLayout>("MapLayout1", layout);
         }
 
 		public GameObject GetClickedObject (out RaycastHit hit)

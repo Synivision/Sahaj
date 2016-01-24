@@ -103,7 +103,7 @@ namespace Assets.Code.Ui.CanvasControllers
 
             });
 
-            TearDown();
+            _canvas.enabled = false;
         }
 
         public override void TearDown()

@@ -43,10 +43,7 @@ namespace Assets.Code.Ui.CanvasControllers
         private readonly Button _quitButton;
         private readonly Button _shipBaseButton;
         //ship attack buttons
-        private Button shipBombAttackButton;
-        private Button shipGunAttackButton;
-        private Button shipFireAttackButton;
-        private Button shipGasAttackButton;
+
 
         private IoCResolver _resolver;
         private UnityReferenceMaster _unityReference;
@@ -60,7 +57,7 @@ namespace Assets.Code.Ui.CanvasControllers
         private InputSession _inputSession;
         private UiManager _uiManager;
         private CanvasProvider _canvasProvider;
-        private readonly MessagingToken _onWin;
+       
 
         private SpriteProvider _spriteProvider;
         private int rowBoatsRemainingCount = 0;
@@ -141,7 +138,7 @@ namespace Assets.Code.Ui.CanvasControllers
               //_buttonList.Add(CreateRowBoatButton(item.Key));
                 rowBoatsRemainingCount++;
             }
-            Debug.Log("Boat" + rowBoatsRemainingCount.ToString());
+           
             _buttonList.Add(CreateRowBoatButton("Boat" + rowBoatsRemainingCount.ToString()));
 
            
@@ -157,7 +154,7 @@ namespace Assets.Code.Ui.CanvasControllers
 
             HandleShipButtonVisibility();
 
-            _onWin = _messager.Subscribe<WinMessage>(OnWin);
+            
             _shipGunPowderLabel.text = "Ship GunPowder Remaining : " + _playerManager.Model.ShipBulletsAvailable.ToString();
             _rowBoatsRemainingLabel.text = "RowBoat Remaining : " + rowBoatsRemainingCount.ToString();
         }
@@ -212,7 +209,6 @@ namespace Assets.Code.Ui.CanvasControllers
            _numberLabelDict.Add(name, buttonNumberLabel);
 
             fab.onClick.AddListener(() => OnRowBoatButtonClicked(fab, name));
-            Debug.Log(name);
             fab.transform.SetParent(_parentButtonObject.transform);
             fab.transform.SetAsFirstSibling();
 
@@ -238,7 +234,7 @@ namespace Assets.Code.Ui.CanvasControllers
 
         private void OnRowBoatButtonClicked(Button button, string name)
         {
-            _inputSession.CurrentlySelectedRowBoatName = name;
+            //_inputSession.CurrentlySelectedRowBoatName = name;
             if (_previouslyClickedTileButton == button)
             {
       
@@ -283,10 +279,12 @@ namespace Assets.Code.Ui.CanvasControllers
         {
 
             //send message to playstate to switch state
-            TearDown();
+           
             _messager.Publish(new OpenShipBaseMessage {
 
             });
+             TearDown();
+            
         }
 
         public void InitializeCanvasPanels(PlayerManager playerManager)
@@ -299,37 +297,7 @@ namespace Assets.Code.Ui.CanvasControllers
 
         }
 
-        private void OnWin(WinMessage message)
-        {
-            _uiManager.RegisterUi(new WinLooseCanvasController(_resolver, _canvasProvider.GetCanvas("WinCanvas")));
-            TearDown();
 
-        }
-
-        public void UpdatePirateButtonNumberLabel(UpdatePirateNumber message)
-        {
-
-
-            var text = _numberLabelDict[message.PirateName];
-            text.text = message.PirateNumber.ToString();
-
-        }
-
-        public void InitializePirateButtonNumberLabel()
-        {
-
-            foreach (KeyValuePair<string, int> entry in _playerManager.Model.PirateCountDict)
-            {
-
-                if (_playerManager.Model.UnlockedPirates.ContainsKey(entry.Key) && _playerManager.Model.UnlockedPirates[entry.Key] == true)
-                {
-
-                    var text = _numberLabelDict[entry.Key];
-                    text.text = entry.Value.ToString();
-                }
-            }
-
-        }
         public void UpdateCanvasPanels(UpdateGamePlayUiMessage message)
         {
 
@@ -404,7 +372,7 @@ namespace Assets.Code.Ui.CanvasControllers
         private void OnShipAttackButtonClicked(Button button, string name)
         {
             _inputSession.CurrentlySelectedShipAttackName = name;
-            _inputSession.CurrentlySelectedRowBoatName = "";
+            _inputSession.CurrentlySelectedRowBoatName = null;
 
             int value;
             _playerManager.Model.ShipAttackCostDict.TryGetValue(name, out value);
@@ -437,18 +405,22 @@ namespace Assets.Code.Ui.CanvasControllers
             {
 
                 button.onClick.RemoveAllListeners();
-                button.gameObject.SetActive(false);
+               
+                GameObject.Destroy(button.gameObject);
 
             }
 
             foreach (var button in _shipAttackButtonList) {
 
                 button.onClick.RemoveAllListeners();
-                button.gameObject.SetActive(false);
+                
+                GameObject.Destroy(button.gameObject);
             }
-            _messager.CancelSubscription (_onUpdateCanvasPanels,_onUpdateRowBoatButtonNumberLabel, _onUpdateCurrentShipBulletsMessage);
+            _messager.CancelSubscription (_onUpdateCanvasPanels,_onUpdateRowBoatButtonNumberLabel,
+                _onUpdateCurrentShipBulletsMessage, _onRowBoatSentToAttackMessageToken);
             _buttonList.Clear();
             _quitButton.onClick.RemoveAllListeners();
+            _shipBaseButton.onClick.RemoveAllListeners();
             base.TearDown();
         }
 
