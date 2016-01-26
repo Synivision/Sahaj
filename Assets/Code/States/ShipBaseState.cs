@@ -173,17 +173,21 @@ namespace Assets.Code.States
 			if (_createPirateCanvasController == null) {
 			
 				_createPirateCanvasController = new CreatePirateCanvasController (_resolver, _canvasProvider.GetCanvas ("CreatePirateCanvas"));
+				_createPirateCanvasController.BuildingModel = message.BuildingModel;
+				_createPirateCanvasController.Initialize();
+
 				_uiManager.RegisterUi (_createPirateCanvasController);
 			
 			} else {
 			
+				
+				//_createPirateCanvasController.BuildingModel = null;
+				_createPirateCanvasController.BuildingModel = message.BuildingModel;
+				_createPirateCanvasController.Initialize();
 				_createPirateCanvasController.enableCanvas();
 			
 			}
 
-			_createPirateCanvasController.BuildingModel = null;
-			_createPirateCanvasController.BuildingModel = message.BuildingModel;
-			_createPirateCanvasController.Initialize();
 		}
 		
 		public override void Update (){

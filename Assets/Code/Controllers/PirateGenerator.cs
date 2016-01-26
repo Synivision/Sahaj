@@ -92,7 +92,7 @@ public class PirateGenerator : IResolvableItem {
 				Debug.Log(tempModelList[i].PirateModel.Name);
 
 			}*/
-			Debug.Log ("Count of pirates left = " + tempModelList.Count);
+			//Debug.Log ("Count of pirates left = " + tempModelList.Count);
 			//Start next pirate creation (if any)
 			if (tempModelList.Count > 0) {
 
@@ -145,6 +145,26 @@ public class PirateGenerator : IResolvableItem {
 
 		return timeLeft;
 	
+	}
+
+	public List<string> PiratesBiengGeneratedForBuilding(string buildingName){
+
+		List<string> result= new List<string>();
+
+		List<PirateGeneratorModel> listOfPirates;
+
+		if (_piratesInProcess.TryGetValue (buildingName, out listOfPirates)) {
+
+			foreach(var pirateBiengGenerated in listOfPirates){
+
+				result.Add (pirateBiengGenerated.PirateModel.Name);
+
+			}
+		
+		}
+
+		return result;
+
 	}
 
 }
