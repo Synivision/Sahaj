@@ -27,6 +27,7 @@ namespace Assets.Code.Utilities
             _resourcesList = resourceListText.Split('\n');
 
             File.WriteAllText(saveToPath, resourceListText);
+            
         }
 
         private static string AddFolderToList(FileSystemInfo folder, string list, int tabCount = 0)

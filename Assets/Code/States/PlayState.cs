@@ -122,7 +122,6 @@ namespace Assets.Code.States
             //message.onCancelled();
         }
 
-
         private void OnWin(WinMessage message)
         {
             _uiManager.RegisterUi(new WinLooseCanvasController(_resolver, _canvasProvider.GetCanvas("WinCanvas")));
@@ -301,7 +300,6 @@ namespace Assets.Code.States
                     BoatName = boatName
 
                 });
-
             }
 
         }
@@ -331,7 +329,6 @@ namespace Assets.Code.States
         
         private void OnTearDownLevel(TearDownLevelMessage message)
         {
-            
             levelManager.TearDownLevel();
         }
         
@@ -341,8 +338,6 @@ namespace Assets.Code.States
             MapLayout loadedMap = Serializer.Load<MapLayout>("MapLayout1");
             if (loadedMap != null)
             {
-
-                
                 SwitchState(new ShipBaseState(_resolver, loadedMap));
 
             }

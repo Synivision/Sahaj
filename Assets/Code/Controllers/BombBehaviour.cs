@@ -47,8 +47,6 @@ public class BombBehaviour : PoolingBehaviour{
     {
         if (collision.gameObject.tag == "Cube") {
             //Damage Building
-            
-
         }
     }
 
