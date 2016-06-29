@@ -18,20 +18,28 @@ public class LevelSelectCanvasController  : BaseCanvasController {
 
 		private readonly Button attackButton;
 		private readonly Button scoutButton;
+        private readonly Button closeCanvasButton;
 
 		private readonly Image mapImage1, mapImage2, mapImage3;
 
 		private int SelectedLevel;
 		private SpriteProvider _spriteProvider;
+        private UiManager _uiManager;
+        private CanvasProvider _canvasProvider;
+        private IoCResolver _resolver;
 
-		public LevelSelectCanvasController (IoCResolver resolver, Canvas canvasView) : base(resolver, canvasView)
+        public LevelSelectCanvasController (IoCResolver resolver, Canvas canvasView) : base(resolver, canvasView)
 		{
 			//List of Buttons i.e. Level1, Level2, Level3 ...
 			levelSelectButtons = new List<Button> ();
 			int flag = 0;
 
-			//Initialize Buttons + there listeners and add them to the list
-			foreach (Transform buttonTransform in canvasView.transform) {
+            _uiManager = new UiManager();
+            _resolver = resolver;
+            _resolver.Resolve(out _canvasProvider);
+
+            //Initialize Buttons + there listeners and add them to the list
+            foreach (Transform buttonTransform in canvasView.transform) {
 
 				//string buttonName = buttonTransform.GetComponent<LevelSelectButtonModel>().ButtonName;
 				if(buttonTransform.GetComponent<LevelSelectButtonModel>()){
@@ -48,11 +56,14 @@ public class LevelSelectCanvasController  : BaseCanvasController {
 			ResolveElement (out mapImage1, "map_image_1");
 			ResolveElement (out mapImage2,"map_image_2");
 			ResolveElement (out mapImage3,"map_image_3");
+            ResolveElement (out closeCanvasButton, "Close_Canvas_Button");
 
 
 			attackButton.onClick.AddListener (PerformAttack);
+            closeCanvasButton.onClick.AddListener(PerformCloseCanvas);
 
-			resolver.Resolve(out _messager);
+
+            resolver.Resolve(out _messager);
 			resolver.Resolve(out _spriteProvider);
 			ChangeLevelSelected (0);
 			
@@ -63,8 +74,15 @@ public class LevelSelectCanvasController  : BaseCanvasController {
 			button.onClick.AddListener(() => ChangeLevelSelected(level));
 		
 		}
-	
-		public void ChangeLevelSelected(int level){
+
+        public void PerformCloseCanvas() {
+
+            _uiManager.RegisterUi(new ShipBaseCanvasController(_resolver, _canvasProvider.GetCanvas("ShipBaseCanvas")));
+            TearDown();
+
+        }
+
+        public void ChangeLevelSelected(int level){
 		
 			SelectedLevel = level;
 
@@ -273,6 +291,7 @@ public class LevelSelectCanvasController  : BaseCanvasController {
 			
 			//Remove Listeners
 			attackButton.onClick.RemoveAllListeners();
+            closeCanvasButton.onClick.RemoveAllListeners();
 
 			for (int i = 0; i < levelSelectButtons.Count; i++) {
 			
