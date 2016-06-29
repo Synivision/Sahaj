@@ -35,12 +35,24 @@ public class BombBehaviour : PoolingBehaviour{
     }
 
     void Update() {
-        float distCovered = (Time.time - startTime) * 5;
-        float fracJourney = (distCovered / journeyLength) * 100;
+        float distCovered = (Time.time - startTime);
+        float fracJourney = (distCovered / journeyLength) * 150;
   
-        transform.position = Vector3.Lerp(_startPos, _target, fracJourney);
+       // transform.position = Vector3.Lerp(_startPos, _target, fracJourney);
+       
 
-        _poolingParticleManager.Emit("blood_prefab", _target, Color.green, 200);
+        // calculate current time within our lerping time range
+        float cTime = fracJourney;
+        float trajectoryHeight = 30f;
+        // calculate straight-line lerp position:
+        Vector3 currentPos = Vector3.Lerp(_startPos, _target, cTime);
+        // add a value to Y, using Sine to give a curved trajectory in the Y direction
+        currentPos.y += trajectoryHeight * Mathf.Sin(Mathf.Clamp01(cTime) * Mathf.PI);
+        // finally assign the computed position to our gameObject:
+        transform.position = currentPos;
+
+         _poolingParticleManager.Emit("blood_prefab", _target, Color.green, 200);
+
     }
 
     void OnCollisionEnter(Collision collision)
