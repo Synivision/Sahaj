@@ -57,28 +57,25 @@ namespace Assets.Code.Ui.CanvasControllers
 		
 		private void OnMoveClicked(){
 			
-			//ToDo Open Upgrade Canvas
 			Debug.Log ("On Move Clicked");
-//			var buildingNameStr = gameObject.transform.parent.name;
-//			_messager.Publish(new OpenBuildingInfoCanvas {
-//
-//				buildingName = buildingNameStr
-//
-//			});
+
+			_messager.Publish(new MoveBuildingmessage {
+
+			});
+			disableCanvas ();
 		}
 		
 		private void OnInfoClicked(){
-			
-			//ToDo Open Info Canvas
+
 			Debug.Log ("On Info Clicked");
-//            var buildingNameStr = gameObject.transform.parent.name;
-//			_messager.Publish(new OpenBuildingInfoCanvas {
-//                
-//                buildingName = buildingNameStr
-//
-//            });
-//
-//            gameObject.SetActive(false);
+
+			_messager.Publish(new OpenBuildingInfoCanvas {
+                
+				buildingName = _buildingModel.Name
+
+            });
+
+			disableCanvas ();
 		}
 
 		public void enableCanvas() {
