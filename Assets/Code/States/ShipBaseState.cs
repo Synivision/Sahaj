@@ -31,6 +31,8 @@ namespace Assets.Code.States
 		private MessagingToken _onOpenShopMessage;
 		private MessagingToken _onCreateBuildingMessage;
 		private MessagingToken _onOpenCreatePirateCanvasMessage;
+
+		private MessagingToken _onOpenBuildingMenuMessage;
         public static bool buildingsMoving = false;
 
         MapLayout _map;
@@ -48,6 +50,8 @@ namespace Assets.Code.States
         private UnityReferenceMaster _unityReferenceMaster;
         private CameraController _camera;
         private ShopCanvasController _shopCanvasController;
+		private InspectorCanvasController _buildingMenuCanvasController;
+
 		private CreatePirateCanvasController _createPirateCanvasController;
         Vector3 curPosition;
 		Vector3 selectedgameObjectPosition = new Vector3(0,0,0);
@@ -81,6 +85,8 @@ namespace Assets.Code.States
             _onOpenShopMessage = _messager.Subscribe<OpenShopMessage>(OnOpenShop);
             _onCreateBuildingMessage = _messager.Subscribe<CreateBuildingMessage>(onCreateBuilding);
 			_onOpenCreatePirateCanvasMessage = _messager.Subscribe<OpenCreatePirateCanvasMessage> (onOpenCreatePirateCanvas);
+
+			_onOpenBuildingMenuMessage = _messager.Subscribe<OpenBuildingMenuMessage> (OnOpenBuildingMenu);
 
             //generate tile and disable it
             var tileo = _poolingObjectManager.Instantiate("tile");
@@ -159,15 +165,31 @@ namespace Assets.Code.States
 		}
 		
 		public void OpenInventoryBuilding(OpenInventory message){
-			
-			_uiManager.RegisterUi (new InventoryCanvasController (_resolver, _canvasProvider.GetCanvas ("InventoryCanvas")));
-			
+
+			var controller  = new InventoryCanvasController (_resolver, _canvasProvider.GetCanvas ("InventoryCanvas"));
+			_uiManager.RegisterUi (controller);
 		}
 		
 		public void OnChangeStateToAttack(StartGameMessage message){
 			
 			SwitchState (new PlayState(_resolver,message.MapLayout));
 			
+		}
+
+		public void OnOpenBuildingMenu(OpenBuildingMenuMessage message){
+		
+			if (_buildingMenuCanvasController == null) {
+
+				_buildingMenuCanvasController = new InspectorCanvasController (_resolver, _canvasProvider.GetCanvas ("BuildingMenuCanvas"), message.Model, message.Position);
+				_uiManager.RegisterUi (_buildingMenuCanvasController);
+				_buildingMenuCanvasController.enableCanvas ();
+				Debug.Log ("Open Building canvas");
+
+			} else {
+				_buildingMenuCanvasController.enableCanvas ();
+				_buildingMenuCanvasController = new InspectorCanvasController (_resolver, _canvasProvider.GetCanvas ("BuildingMenuCanvas"), message.Model, message.Position);
+			}
+		
 		}
 
 		public void onOpenCreatePirateCanvas(OpenCreatePirateCanvasMessage message){
@@ -214,6 +236,14 @@ namespace Assets.Code.States
 					_mouseState = true;
 					//get position of object selected 
 					selectedgameObjectPosition = target.transform.position;
+
+					// show building inspector canvas canvas
+					_messager.Publish(new OpenBuildingMenuMessage{
+						BuildingName = target.name,
+						Model = target.GetComponent<BuildingController>().Model,
+						Position = target.transform.position
+					});
+
 					Debug.Log("Cube");
 				}
 				
@@ -230,6 +260,11 @@ namespace Assets.Code.States
 				}
 				
 				if(target != null && target.gameObject.tag != "Cube"){
+
+					if(_buildingMenuCanvasController!=null){
+						_buildingMenuCanvasController.disableCanvas ();
+
+					}
 					tile.SetActive(false);
 				}
 			}
@@ -238,10 +273,6 @@ namespace Assets.Code.States
 
 				//show inspector if selected and current tilename and objectname is same espectively.
 				if( _mouseState && shipLevelManager.GetTileAt(curPosition + new Vector3(125,0,125)) == target.gameObject.name){
-
-                    //shows building menu
-						inspectorCanvas = target.transform.GetChild(0).gameObject;
-						inspectorCanvas.SetActive(true);
 					
 				}
 				
@@ -329,7 +360,7 @@ namespace Assets.Code.States
 		public override void TearDown (){
 
             _messager.CancelSubscription(_onBuildingInfoOpen,_onInventoryOpen,
-                _onChangeStateToAttack, _onOpenShopMessage, _onCreateBuildingMessage);
+				_onChangeStateToAttack, _onOpenShopMessage, _onCreateBuildingMessage,_onOpenBuildingMenuMessage);
 			_uiManager.TearDown();
 			Object.Destroy (tile.gameObject);
 			shipLevelManager.TearDown();

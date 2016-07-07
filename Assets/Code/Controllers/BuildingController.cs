@@ -32,7 +32,7 @@ public class BuildingController : InitializeRequiredBehaviour {
     
 
     // data
-    private BuildingModel Model;
+	public BuildingModel Model;
 
     /* PROPERTIES */
     private  StatsBehaviour _currentTarget;
@@ -119,10 +119,6 @@ public class BuildingController : InitializeRequiredBehaviour {
        // var indicator = _poolingObjectManager.Instantiate("move_indicator");
         
         //movementIndicator.transform.SetParent(gameObject.transform);
-
-        var inspectorCanvasGameObject = transform.GetChild (0);
-        var inspectorCanvas = inspectorCanvasGameObject.GetComponent<Canvas> ();
-        inspectorCanvasGameObject.GetComponent<InspectorCanvasController>().Initialize(_resolver,inspectorCanvas,Model);
     }
 
 
