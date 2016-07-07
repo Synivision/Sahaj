@@ -214,6 +214,7 @@ namespace Assets.Code.States
 					_mouseState = true;
 					//get position of object selected 
 					selectedgameObjectPosition = target.transform.position;
+					Debug.Log("Cube");
 				}
 				
 				if (target != null && (target.gameObject.tag == "RowBoat")) {
@@ -225,6 +226,7 @@ namespace Assets.Code.States
 				}
 				if (target != null && (target.gameObject.tag == "water")) {
 					target = null;
+					Debug.Log("water");
 				}
 				
 				if(target != null && target.gameObject.tag != "Cube"){
