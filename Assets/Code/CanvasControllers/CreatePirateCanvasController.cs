@@ -22,6 +22,7 @@ namespace Assets.Code.Ui.CanvasControllers
 		private PrefabProvider _prefabProvider;
 		private readonly Messager _messager;
 		private PirateGenerator _pirateGenerator;
+        private GameDataProvider _gameDataProvider;
 		
 		//Scroll Views
 		private GameObject _parentPirateButtonPanel;
@@ -41,6 +42,7 @@ namespace Assets.Code.Ui.CanvasControllers
 		List<PirateModel> _pirateVarietyList;
 		List<string> _piratesBiengGenerated;
 		List<Button> _piratesBiengGeneratedButtons;
+        List<PirateModel> _listOfAllPiratesAvailable;
 
 		private MessagingToken _newPirateGeneratedMessage;
 
@@ -51,11 +53,14 @@ namespace Assets.Code.Ui.CanvasControllers
 			_canvas = canvasView;
 			_resolver.Resolve(out _prefabProvider);
 			_resolver.Resolve(out _messager);
-			_resolver.Resolve (out _pirateGenerator);
+			_resolver.Resolve(out _pirateGenerator);
+            _resolver.Resolve(out _gameDataProvider);
 
 		}
 
 		public void Initialize(){
+
+            _listOfAllPiratesAvailable = _gameDataProvider.GetAllData<PirateModel>();
 
 			_buildingName = BuildingModel.Name;
 
@@ -73,13 +78,16 @@ namespace Assets.Code.Ui.CanvasControllers
 			var mainPanel = GetElement("Main Panel") as GameObject;
 			_parentPirateButtonPanel = mainPanel.transform.GetChild (1).transform.GetChild (0).gameObject;
 			_parentPirateImagesScrollViewPanel = mainPanel.transform.GetChild (2).transform.GetChild (0).gameObject;
-			
-			//_leftNavigationButton.gameObject.SetActive (false);
-			//_rightNavigationButton.gameObject.SetActive (false);
-			
-			//Add Pirate buttons to ui
-			if(BuildingModel.piratesContained != null)
-			for (int i = 0; i < BuildingModel.piratesContained.Count; i++) {
+
+            //_leftNavigationButton.gameObject.SetActive (false);
+            //_rightNavigationButton.gameObject.SetActive (false);
+
+            //Add Pirate buttons to ui
+
+            Debug.Log("Building Level : " + BuildingModel.Level);
+            Debug.Log("_listOfPirates : " + _listOfAllPiratesAvailable.Count);
+			if(_listOfAllPiratesAvailable != null)
+			for (int i = 0; i < BuildingModel.Level; i++) {
 				
 				var fab = Object.Instantiate(_prefabProvider.GetPrefab("create_pirate_button")).gameObject.GetComponent<Button>();
 				
@@ -88,17 +96,17 @@ namespace Assets.Code.Ui.CanvasControllers
 				fab.name = "pirate choice " + i.ToString();
 				
 				var buttonLabel = fab.transform.GetChild(0).GetComponent<Text>();
-				buttonLabel.text = BuildingModel.piratesContained[i].Name;
+				buttonLabel.text = _listOfAllPiratesAvailable[i].Name;
 				
 				var buttonNumberLabel = fab.transform.GetChild(2).GetComponent<Text>();
 				
-				buttonNumberLabel.text = BuildingModel.piratesContained[i].TrainingCost.ToString();
+				buttonNumberLabel.text = _listOfAllPiratesAvailable[i].TrainingCost.ToString();
 				
 				fab.transform.SetParent(_parentPirateButtonPanel.transform);
 				
 				//fab.onClick.AddListener(() => OnPirateButtonClicked(i));
 				AddListenerToButton(ref fab,i);
-				_pirateVarietyList.Add(BuildingModel.piratesContained[i]);
+				_pirateVarietyList.Add(_listOfAllPiratesAvailable[i]);
 				_pirateButtons.Add(fab);
 			}
 			

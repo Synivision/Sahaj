@@ -359,7 +359,8 @@ namespace Assets.Code.UnityBehaviours
 					MaximumDamage = 1,
 					MaximumCourage = -1
 				},
-				Type = BuildingModel.BuildingType.Defence_Platoons
+				Type = BuildingModel.BuildingType.Defence_Platoons,
+                Level = 3
 			});
 			_gameDataProvider.AddData (new BuildingModel
 			                           {
