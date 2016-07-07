@@ -110,6 +110,8 @@ namespace Assets.Code.States
             }
             _camera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraController>();
 
+			saveMapLayoutToFile ();
+
         }
 
         public void onCreateBuilding(CreateBuildingMessage message) {

@@ -32,6 +32,7 @@
 		river.mat
 		rowboat_arrow.png
 		rowboat_arrow_mat.mat
+		water.mat
 	}
 	ParticleSystems
 	{
@@ -105,6 +106,7 @@
 		residence.png
 		row_boat.png
 		row_boat_mini.png
+		sand_texture.jpg
 		ship_bomb.png
 		ship_fire.png
 		ship_gas.png

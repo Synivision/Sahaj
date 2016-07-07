@@ -17,6 +17,7 @@ public class Serializer
                 {
                     
                     Stream stream = File.Open(Application.persistentDataPath + "/" + filename, FileMode.Open);
+					Debug.Log (Application.persistentDataPath);
                     BinaryFormatter formatter = new BinaryFormatter();
                     formatter.Binder = new VersionDeserializationBinder();
                     dataLoaded = formatter.Deserialize(stream) as T;
@@ -35,7 +36,8 @@ public class Serializer
     public static void Save<T>(string filename, T data) where T : class
     {
         var fullFileName = Application.persistentDataPath + "/" + filename;
-        Stream stream = File.Open(Application.persistentDataPath + "/" + filename, FileMode.Create);
+		Debug.Log (fullFileName);
+		Stream stream = File.Open(fullFileName, FileMode.Create);
         BinaryFormatter formatter = new BinaryFormatter();
         formatter.Binder = new VersionDeserializationBinder();
         formatter.Serialize(stream, data);
