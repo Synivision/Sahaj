@@ -351,13 +351,12 @@ namespace Assets.Code.States
             
             if (shipLevelManager.GetCoordinatePassability(curPosition + new Vector3(125, 0, 125)) == ShipLevelManager.PassabilityType.Passible)
             {
-                shipLevelManager.UpdateBlueprint(buildingOrignalPosition, curPosition + new Vector3(125, 0, 125));
+                shipLevelManager.UpdateBlueprint(buildingOrignalPosition + new Vector3(125, 0, 125), curPosition + new Vector3(125, 0, 125));
                 result = true;
             }
 
                 return result;
         }
-
 
         public void saveMapLayoutToFile() {
             MapLayout layout = shipLevelManager.bluePrintToMapLayout();
