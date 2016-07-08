@@ -7,6 +7,8 @@ using Assets.Code.Logic.Pooling;
 using Assets.Code.DataPipeline.Providers;
 using Assets.Code.Models.Pooling;
 using Assets.Code.Ui.CanvasControllers;
+using Assets.Code.Messaging.Messages;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(StatsBehaviour))]
 public class BuildingController : InitializeRequiredBehaviour {
@@ -20,7 +22,6 @@ public class BuildingController : InitializeRequiredBehaviour {
     private PoolingObjectManager _poolingObjectManager;
     private PoolingParticleManager _poolingParticleManager;
     private PlayerManager _playerManager;
-
     private LevelManager _levelManager;
     private ShipLevelManager _shipLevelManager;
     // other compenents
@@ -28,8 +29,8 @@ public class BuildingController : InitializeRequiredBehaviour {
     private GameObject _bulletOrigin;
     private GameObject _pirateSpawnPoint;
 
-   
-    
+	public bool canMoveBuilding = false;
+    public Text buildingNameText;
 
     // data
 	public BuildingModel Model;
@@ -74,8 +75,8 @@ public class BuildingController : InitializeRequiredBehaviour {
         Stats.OnCurrentHealthChangedEvent += OnCurrentHealthChanged;
 
         MarkAsInitialized();
-
-        //var indicator = _poolingObjectManager.Instantiate("move_indicator");
+        buildingNameText.text = model.Name;
+        canMoveBuilding = false;
     }
 
     public void Initialize (IoCResolver resolver,BuildingModel model,ShipLevelManager shiplevelmanager)
@@ -115,12 +116,13 @@ public class BuildingController : InitializeRequiredBehaviour {
         Stats.OnCurrentHealthChangedEvent += OnCurrentHealthChanged;
         
         MarkAsInitialized();
+        buildingNameText.text = model.Name;
+        canMoveBuilding = false;
 
        // var indicator = _poolingObjectManager.Instantiate("move_indicator");
         
         //movementIndicator.transform.SetParent(gameObject.transform);
     }
-
 
     private void OnCurrentHealthChanged(float oldHealth, float newHealth, float delta)
     {

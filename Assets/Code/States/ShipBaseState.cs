@@ -24,7 +24,8 @@ namespace Assets.Code.States
 		readonly GameDataProvider _gameDataProvider;
 		private readonly PrefabProvider _prefabProvider;
 		private SpriteProvider _spriteProvider;
-
+		private MessagingToken _onBuildingMove;
+		private MessagingToken _onBuildingStopMovement;
 		private MessagingToken _onChangeStateToAttack;
 		private MessagingToken _onInventoryOpen;
 		private MessagingToken _onBuildingInfoOpen;
@@ -85,7 +86,8 @@ namespace Assets.Code.States
             _onOpenShopMessage = _messager.Subscribe<OpenShopMessage>(OnOpenShop);
             _onCreateBuildingMessage = _messager.Subscribe<CreateBuildingMessage>(onCreateBuilding);
 			_onOpenCreatePirateCanvasMessage = _messager.Subscribe<OpenCreatePirateCanvasMessage> (onOpenCreatePirateCanvas);
-
+			_onBuildingMove = _messager.Subscribe<MoveBuildingmessage> (OnMoveBuilding);
+			_onBuildingStopMovement = _messager.Subscribe<StopMovingBuildingMessage> (OnStopMovingBuilding);
 			_onOpenBuildingMenuMessage = _messager.Subscribe<OpenBuildingMenuMessage> (OnOpenBuildingMenu);
 
             //generate tile and disable it
@@ -119,6 +121,19 @@ namespace Assets.Code.States
 			saveMapLayoutToFile ();
 
         }
+
+		void OnMoveBuilding(MoveBuildingmessage message){
+            if (message.BuildingName == target.name)
+            {
+                _mouseState = true;
+            }
+		}
+
+		void OnStopMovingBuilding(StopMovingBuildingMessage message){
+			_mouseState = false;
+
+		}
+
 
         public void onCreateBuilding(CreateBuildingMessage message) {
 			
@@ -228,30 +243,48 @@ namespace Assets.Code.States
 			//used to move cube around 
 			if (Input.GetMouseButtonDown (0)  && !isButton()) {
 				RaycastHit hitInfo;
-				target = GetClickedObject (out hitInfo);
-				
+
+                if (!_mouseState) {
+                    target = GetClickedObject(out hitInfo);
+                }
 				//turn off any inspector canvas visible on clicking any place other than that canvas button
 				if(inspectorCanvas != null){
 					inspectorCanvas.SetActive(false);
 				}
 				
 				if (target != null && (target.gameObject.tag == "Cube" )) {
-					_mouseState = true;
-					//get position of object selected 
-					selectedgameObjectPosition = target.transform.position;
 
-					// show building inspector canvas canvas
-					_messager.Publish(new OpenBuildingMenuMessage{
-						BuildingName = target.name,
-						Model = target.GetComponent<BuildingController>().Model,
-						Position = target.transform.position
-					});
+                    if (_mouseState) {
 
-					Debug.Log("Cube");
+                        if (SaveLocationOfBuildingInMap(selectedgameObjectPosition))
+                        {
+                            _mouseState = false;
+                            tile.SetActive(false);
+
+                            saveMapLayoutToFile();
+                        }
+                        else {
+
+                            target.transform.position = selectedgameObjectPosition;
+                            _mouseState = false;
+                            tile.SetActive(false);
+                        }
+                       
+                    }
+                    else {
+                        selectedgameObjectPosition = target.transform.position;
+
+                        _messager.Publish(new OpenBuildingMenuMessage {
+                            BuildingName = target.name,
+                            Model = target.GetComponent<BuildingController>().Model,
+                            Position = selectedgameObjectPosition
+                        });
+                    }
+                    Debug.Log("_mouseState" + _mouseState.ToString());
 				}
-				
-				if (target != null && (target.gameObject.tag == "RowBoat")) {
-                    //TODO Now show RowBoat Status Canvas to update rowboat or do something to rowboat 
+
+
+                if (target != null && (target.gameObject.tag == "RowBoat")) {
 
                     Debug.Log("Show RowBoat Status Canvas");
                     target = null;
@@ -273,40 +306,14 @@ namespace Assets.Code.States
 			}
 			
 			if (Input.GetMouseButtonUp (0) ) {
-
-				//show inspector if selected and current tilename and objectname is same espectively.
-				if( _mouseState && shipLevelManager.GetTileAt(curPosition + new Vector3(125,0,125)) == target.gameObject.name){
-					
-				}
-				
-				//update the grid tile of moved object if grid tile is empty
-				
-				if(_mouseState && shipLevelManager.GetCoordinatePassability(curPosition + new Vector3(125,0,125)) == ShipLevelManager.PassabilityType.Passible){
-					shipLevelManager.UpdateBlueprint(selectedgameObjectPosition + new Vector3(125,0,125),curPosition + new Vector3(125,0,125));
-					
-					if (newBuilding)
-					{
-						shipLevelManager.UpdateBlueprint(selectedgameObjectPosition + new Vector3(125, 0, 125), curPosition + new Vector3(125, 0, 125));
-                        newBuilding = null;
-                    }
-				}
-				else{
-                    //move back the building
-                    if (target != null && target.gameObject.tag != "Plane")
-                    {
-                        target.transform.position = selectedgameObjectPosition;
-                       
-                    }
-				}
-				_mouseState = false;
+                
                 _camera.canMove = true;
-                //save map data to file 
                 saveMapLayoutToFile();
-
             }
 			
-			if (_mouseState) {
-				screenSpace = Camera.main.WorldToScreenPoint (target.transform.position);
+			if (_mouseState && (target.gameObject.tag == "Cube")) {
+
+                screenSpace = Camera.main.WorldToScreenPoint (target.transform.position);
 				var curScreenSpace = new Vector3 (Input.mousePosition.x, Input.mousePosition.y, screenSpace.z);
 				curPosition = Camera.main.ScreenToWorldPoint (curScreenSpace) + offset;
 				curPosition.y = target.transform.position.y;
@@ -334,12 +341,25 @@ namespace Assets.Code.States
 					}
 				}
 			}
-			else if (tile.GetComponent<Renderer> ().material.color == Color.red) {
-				
-				tile.transform.position = new Vector3 (1000, -10, 0);
-               
-            }
 		}
+
+        bool SaveLocationOfBuildingInMap(Vector3 buildingOrignalPosition) {
+
+            bool result = false;
+            screenSpace = Camera.main.WorldToScreenPoint(target.transform.position);
+            var curScreenSpace = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenSpace.z);
+            curPosition = Camera.main.ScreenToWorldPoint(curScreenSpace) + offset;
+            curPosition.y = target.transform.position.y;
+
+            
+            if (shipLevelManager.GetCoordinatePassability(curPosition + new Vector3(125, 0, 125)) == ShipLevelManager.PassabilityType.Passible)
+            {
+                shipLevelManager.UpdateBlueprint(buildingOrignalPosition + new Vector3(125, 0, 125), curPosition + new Vector3(125, 0, 125));
+                result = true;
+            }
+
+                return result;
+        }
 
         public void saveMapLayoutToFile() {
             MapLayout layout = shipLevelManager.bluePrintToMapLayout();
@@ -363,7 +383,7 @@ namespace Assets.Code.States
 		public override void TearDown (){
 
             _messager.CancelSubscription(_onBuildingInfoOpen,_onInventoryOpen,
-				_onChangeStateToAttack, _onOpenShopMessage, _onCreateBuildingMessage,_onOpenBuildingMenuMessage);
+				_onChangeStateToAttack, _onOpenShopMessage, _onCreateBuildingMessage,_onOpenBuildingMenuMessage,_onBuildingMove,_onBuildingStopMovement);
 			_uiManager.TearDown();
 			Object.Destroy (tile.gameObject);
 			shipLevelManager.TearDown();
