@@ -3,8 +3,8 @@
 
 namespace Assets.Code.Messaging
 {
-	public class MoveBuildingmessage : IMessage
-	{
-
-	}
+    public class MoveBuildingmessage : IMessage
+    {
+        public String BuildingName;
+    }
 }
