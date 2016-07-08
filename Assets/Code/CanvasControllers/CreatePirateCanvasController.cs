@@ -192,8 +192,6 @@ namespace Assets.Code.Ui.CanvasControllers
 			int buttonPosition = 0;
 			foreach (var button in _piratesBiengGeneratedButtons) {
 			
-
-
 				if(button.name == message.PirateModel.Name){
 
 				}
@@ -264,10 +262,11 @@ namespace Assets.Code.Ui.CanvasControllers
 
 			_canvas.enabled = true;
 
-		}
+        }
 
 		public void disableCanvas() {
 			_canvas.enabled = false;
+            Debug.Log("Pirate Create Canvas Disabled");
 		}
 	}
 }

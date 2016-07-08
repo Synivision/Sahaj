@@ -195,12 +195,15 @@ namespace Assets.Code.States
 		public void onOpenCreatePirateCanvas(OpenCreatePirateCanvasMessage message){
 
 			if (_createPirateCanvasController == null) {
-			
-				_createPirateCanvasController = new CreatePirateCanvasController (_resolver, _canvasProvider.GetCanvas ("CreatePirateCanvas"));
-				_createPirateCanvasController.BuildingModel = message.BuildingModel;
-				_createPirateCanvasController.Initialize();
 
-				_uiManager.RegisterUi (_createPirateCanvasController);
+                var _newCreatepiratecanvascontroller = new NewCreatePirateCanvasController(_resolver, _canvasProvider.GetCanvas("CreatePirateCanvas"));
+                //_createpiratecanvascontroller = new CreatePirateCanvasController (_resolver, _canvasProvider.GetCanvas ("CreatePirateCanvas"));
+                //_createPirateCanvasController.BuildingModel = message.BuildingModel;
+                //_createPirateCanvasController.Initialize();
+                _newCreatepiratecanvascontroller.Initialize();
+                _newCreatepiratecanvascontroller.PlatoonBuildingLevel = message.BuildingModel.Level;
+
+                _uiManager.RegisterUi (_newCreatepiratecanvascontroller);
 			
 			} else {
 			
