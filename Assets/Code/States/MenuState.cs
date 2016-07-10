@@ -53,8 +53,6 @@ public class MenuState : BaseState{
 //        try getting map from saved file 
          MapLayout loadedMap = Serializer.Load<MapLayout>("MapLayout1");
         if (loadedMap != null) {
-            
-            Debug.Log("Loading Map");
             SwitchState(new ShipBaseState(_resolver, loadedMap));
 
         }

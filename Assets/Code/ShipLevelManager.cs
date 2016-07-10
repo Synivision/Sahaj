@@ -137,7 +137,7 @@ public class ShipLevelManager {
         if (model.piratesContained == null) {
             model.piratesContained = new List<PirateModel>();
         }
-        Debug.Log(model.Type + " : Level " + model.Level);
+
 		GameObject fab;
 		BuildingController buildingController;
 		fab = Object.Instantiate(_prefabProvider.GetPrefab("Building"));

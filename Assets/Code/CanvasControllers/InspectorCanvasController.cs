@@ -56,8 +56,6 @@ namespace Assets.Code.Ui.CanvasControllers
         }
         
         private void OnMoveClicked(){
-            
-            Debug.Log ("On Move Clicked");
 
             _messager.Publish(new MoveBuildingmessage {
                 BuildingName = _buildingModel.Name
@@ -66,8 +64,6 @@ namespace Assets.Code.Ui.CanvasControllers
         }
         
         private void OnInfoClicked(){
-
-            Debug.Log ("On Info Clicked");
 
             _messager.Publish(new OpenBuildingInfoCanvas {
                 

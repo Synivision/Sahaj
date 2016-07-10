@@ -104,6 +104,7 @@ namespace Assets.Code.UnityBehaviours
 			//initialize dummy player model
 			playerManager.Initialize(_resolver, InitializeDummyPlayerModel());
 			_resolver.RegisterItem(playerManager);
+			Debug.Log("Unlocked Pirate Count " + playerManager.Model.UnlockedPirates.Count.ToString());
 			
 			//Pirate Generator
 			var pirateGenerator = new PirateGenerator();

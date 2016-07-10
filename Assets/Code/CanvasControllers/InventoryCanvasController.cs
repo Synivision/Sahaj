@@ -167,7 +167,7 @@ namespace Assets.Code.Ui.CanvasControllers{
 
             fab.transform.SetParent(_pirateButtonScrollPanel.transform);
 
-            //fab.transform.localScale = Vector3.one;
+			fab.transform.localScale = new Vector3 (0.6f,0.6f,0.6f);
             
             return fab;
         }

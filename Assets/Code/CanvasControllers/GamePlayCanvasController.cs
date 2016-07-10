@@ -210,6 +210,7 @@ namespace Assets.Code.Ui.CanvasControllers
 
             fab.onClick.AddListener(() => OnRowBoatButtonClicked(fab, name));
             fab.transform.SetParent(_parentButtonObject.transform);
+			fab.transform.localScale = Vector3.one;
             fab.transform.SetAsFirstSibling();
 
             return fab;
@@ -329,7 +330,7 @@ namespace Assets.Code.Ui.CanvasControllers
 
             fab.transform.SetParent(_parentButtonObject.transform);
 
-            //fab.transform.localScale = Vector3.one;
+            fab.transform.localScale = Vector3.one;
             return fab;
         }
 
@@ -347,9 +348,8 @@ namespace Assets.Code.Ui.CanvasControllers
             var buttonNumberLabel = fab.transform.GetChild(1).GetComponent<Text>();
             buttonNumberLabel.text = "";
             fab.onClick.AddListener(() => OnShipAttackButtonClicked(fab, name));
-
             fab.transform.SetParent(_parentButtonObject.transform);
-
+			fab.transform.localScale = Vector3.one;
             return fab;
         }
 

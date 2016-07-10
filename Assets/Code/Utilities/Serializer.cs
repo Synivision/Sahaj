@@ -17,7 +17,6 @@ public class Serializer
                 {
                     
                     Stream stream = File.Open(Application.persistentDataPath + "/" + filename, FileMode.Open);
-					Debug.Log (Application.persistentDataPath);
                     BinaryFormatter formatter = new BinaryFormatter();
                     formatter.Binder = new VersionDeserializationBinder();
                     dataLoaded = formatter.Deserialize(stream) as T;

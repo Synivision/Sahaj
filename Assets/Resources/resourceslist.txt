@@ -10,19 +10,12 @@
 	}
 	Materials
 	{
-		arrow.png
 		Fairy Dust.mat
 		FlameA.mat
-		grass.mat
-		gridm.mat
-		indicator_tile_material.mat
 		NavyGrid.mat
 		NavySmooth.mat
 		PinkGrid.mat
 		PinkSmooth.mat
-		river.mat
-		rowboat_arrow.png
-		rowboat_arrow_mat.mat
 		SwatchMauveAlbedo.mat
 		SwatchNavyDarkAlbedo.mat
 		SwatchOrangeAlbedo.mat
@@ -31,8 +24,15 @@
 		SwatchTurquoiseAlbedo.mat
 		SwatchWhiteAlbedo.mat
 		SwatchYellowAlbedo.mat
-		water.mat
 		YellowGrid.mat
+		arrow.png
+		grass.mat
+		gridm.mat
+		indicator_tile_material.mat
+		river.mat
+		rowboat_arrow.png
+		rowboat_arrow_mat.mat
+		water.mat
 	}
 	ParticleSystems
 	{
@@ -66,41 +66,14 @@
 	}
 	Textures
 	{
-		add_sprite.png
 		Bomber.png
-		button_bg_1.png
-		button_bg_2.png
-		canvas_bg.jpg
 		Captain.png
-		captain_sword.png
-		cross.png
-		dot.png
-		dot_bullet.png
-		dot_selected.png
-		frame.png
-		frame_map_image.png
+		Carpenter.png
+		Chef.png
 		Garen_Render.png
-		gold_storage.png
-		grass.png
 		GridEmissive.png
 		Gunner.png
-		gunner_tower.png
-		info.png
-		level_select_map.jpg
-		map_img1.png
-		map_img2.png
-		map_img3.png
-		platoons.png
 		Quarter Master.png
-		residence.png
-		row_boat.png
-		row_boat_mini.png
-		sand_texture.jpg
-		shipp.png
-		ship_bomb.png
-		ship_fire.png
-		ship_gas.png
-		ship_gun.png
 		Surgeon.png
 		SwatchMauveAlbedo.png
 		SwatchNavyAlbedo.png
@@ -111,8 +84,37 @@
 		SwatchTurquoiseAlbedo.png
 		SwatchWhiteAlbedo.png
 		SwatchYellowAlbedo.png
-		water_cannon.png
 		Water_Cannon3.png
+		add_sprite.png
+		button_bg_1.png
+		button_bg_2.png
+		canvas_bg.jpg
+		captain_sword.png
+		cross.png
+		dot.png
+		dot_bullet.png
+		dot_selected.png
+		frame.png
+		frame_map_image.png
+		gold_storage.png
+		grass.png
+		gunner_tower.png
+		info.png
+		level_select_map.jpg
+		map_img1.png
+		map_img2.png
+		map_img3.png
+		platoons.png
+		residence.png
+		row_boat.png
+		row_boat_mini.png
+		sand_texture.jpg
+		ship_bomb.png
+		ship_fire.png
+		ship_gas.png
+		ship_gun.png
+		shipp.png
+		water_cannon.png
 		white.jpg
 		win.png
 	}
