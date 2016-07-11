@@ -8,10 +8,11 @@ using Assets.Code.Messaging.Messages;
 public class PirateGenerator : IResolvableItem {
 
 	private Dictionary <string,List<PirateGeneratorModel>> _piratesInProcess;
-	private  IoCResolver _resolver;
+	private IoCResolver _resolver;
 	private UnityReferenceMaster _unityReference;
 	private PlayerManager _playerManager;
 	private Messager _messager;
+
 	public void Initialize (IoCResolver resolver)
 	{
 		//Get Resolver
@@ -44,14 +45,15 @@ public class PirateGenerator : IResolvableItem {
 
 				listOfPirates.Add(model);
 				if(listOfPirates.Count == 1){
-					_unityReference.Delay (() => DoneGeneratingPirate(model,buildingName), pirate.TrainingTime);	
-
-				}
+					_unityReference.Delay (() => DoneGeneratingPirate(model,buildingName), pirate.TrainingTime);
+                    listOfPirates[0].PirateGenerationStatus = (int)PirateGeneratorModel.Status.IN_PROCESS;
+                }
 			}else{
 
 				listOfPirates = new List<PirateGeneratorModel>();
 				listOfPirates.Add (model);
-			}
+                listOfPirates[0].PirateGenerationStatus = (int)PirateGeneratorModel.Status.IN_PROCESS;
+            }
 
 			_piratesInProcess[buildingName] = listOfPirates;
 
@@ -67,9 +69,11 @@ public class PirateGenerator : IResolvableItem {
 			_piratesInProcess.Add (buildingName,listOfPirates);
 
 			//Create first pirate
-			_unityReference.Delay (() => DoneGeneratingPirate(model,buildingName), pirate.TrainingTime);	
+			_unityReference.Delay (() => DoneGeneratingPirate(model,buildingName), pirate.TrainingTime);
+            
+            listOfPirates[0].PirateGenerationStatus = (int)PirateGeneratorModel.Status.IN_PROCESS;
 
-		}
+        }
 	}
 
 	void DoneGeneratingPirate(PirateGeneratorModel model,string buildingName){
@@ -134,9 +138,9 @@ public class PirateGenerator : IResolvableItem {
 					//time remaining for processing pirate
 					//var time = (System.TimeSpan.FromSeconds((double)pirate.PirateModel.TrainingTime) - (System.TimeSpan.FromSeconds((double)Time.time)));
 					var time = (System.TimeSpan.FromSeconds((double)Time.time) - pirate.StartTime );
-					//add this time only if it is positive because at this instant it might be possible that status changed
-					timeLeft += (time < System.TimeSpan.FromSeconds((double)pirate.PirateModel.TrainingTime)) ? (System.TimeSpan.FromSeconds((double)pirate.PirateModel.TrainingTime) - time): System.TimeSpan.FromSeconds(0);
-				
+                    //add this time only if it is positive because at this instant it might be possible that status changed
+                    timeLeft += (time < System.TimeSpan.FromSeconds((double)pirate.PirateModel.TrainingTime)) ? (System.TimeSpan.FromSeconds((double)pirate.PirateModel.TrainingTime) - time): System.TimeSpan.FromSeconds(0);
+                    
 				}
 
 			}

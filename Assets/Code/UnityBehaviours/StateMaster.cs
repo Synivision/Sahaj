@@ -148,7 +148,7 @@ namespace Assets.Code.UnityBehaviours
 				PirateRange = (int)PirateModel.Range.Milee,
 				PirateColor = Color.blue,
 				TrainingCost = 2000,
-				TrainingTime = 60
+				TrainingTime = 20
 			});
 			
 			_gameDataProvider.AddData(new PirateModel
@@ -166,8 +166,8 @@ namespace Assets.Code.UnityBehaviours
 				PirateRange = (int)PirateModel.Range.Gunner3,
 				PirateColor = Color.green,
 				TrainingCost = 1000,
-				TrainingTime = 60
-			});
+                TrainingTime = 10
+            });
 			_gameDataProvider.AddData(new PirateModel
 			                          {
 				Name = "Gunner",

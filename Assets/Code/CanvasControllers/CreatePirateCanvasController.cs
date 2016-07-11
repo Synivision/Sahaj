@@ -233,9 +233,9 @@ namespace Assets.Code.Ui.CanvasControllers
 	
 		public void enableCanvas() {
 
-			//Recreate the buttons to show pirates bieng generated.
+            //Recreate the buttons to show pirates bieng generated.
 
-			_piratesBiengGenerated = _pirateGenerator.PiratesBiengGeneratedForBuilding (_buildingName);
+            _piratesBiengGenerated = _pirateGenerator.PiratesBiengGeneratedForBuilding (_buildingName);
 
 			foreach (var pirateName in _piratesBiengGenerated) {
 			

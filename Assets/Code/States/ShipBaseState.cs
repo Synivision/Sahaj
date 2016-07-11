@@ -53,7 +53,7 @@ namespace Assets.Code.States
         private ShopCanvasController _shopCanvasController;
 		private InspectorCanvasController _buildingMenuCanvasController;
 
-		private CreatePirateCanvasController _createPirateCanvasController;
+		private NewCreatePirateCanvasController _createPirateCanvasController;
         Vector3 curPosition;
 		Vector3 selectedgameObjectPosition = new Vector3(0,0,0);
 		
@@ -211,24 +211,27 @@ namespace Assets.Code.States
 
 			if (_createPirateCanvasController == null) {
 
-                var _newCreatepiratecanvascontroller = new NewCreatePirateCanvasController(_resolver, _canvasProvider.GetCanvas("CreatePirateCanvas"));
-                //_createpiratecanvascontroller = new CreatePirateCanvasController (_resolver, _canvasProvider.GetCanvas ("CreatePirateCanvas"));
+                _createPirateCanvasController = new NewCreatePirateCanvasController(_resolver, _canvasProvider.GetCanvas("CreatePirateCanvas"));
+                //_createPiratecanvascontroller = new CreatePirateCanvasController (_resolver, _canvasProvider.GetCanvas ("CreatePirateCanvas"));
                 //_createPirateCanvasController.BuildingModel = message.BuildingModel;
                 //_createPirateCanvasController.Initialize();
-                _newCreatepiratecanvascontroller.Initialize();
-                _newCreatepiratecanvascontroller.PlatoonBuildingLevel = message.BuildingModel.Level;
+                _createPirateCanvasController.BuildingName = message.BuildingModel.Name;
+                _createPirateCanvasController.PlatoonBuildingLevel = message.BuildingModel.Level;
+                _createPirateCanvasController.Initialize();
+                
 
-                _uiManager.RegisterUi (_newCreatepiratecanvascontroller);
+                _uiManager.RegisterUi (_createPirateCanvasController);
 			
 			} else {
-			
-				
-				//_createPirateCanvasController.BuildingModel = null;
-				_createPirateCanvasController.BuildingModel = message.BuildingModel;
-				_createPirateCanvasController.Initialize();
-				_createPirateCanvasController.enableCanvas();
-			
-			}
+
+
+                //_createPirateCanvasController.BuildingModel = null;
+                _createPirateCanvasController.BuildingName = message.BuildingModel.Name;
+                _createPirateCanvasController.PlatoonBuildingLevel = message.BuildingModel.Level;
+                _createPirateCanvasController.ReInitialize();
+                _createPirateCanvasController.enableCanvas();
+
+            }
 
 		}
 		
@@ -387,11 +390,11 @@ namespace Assets.Code.States
 			_uiManager.TearDown();
 			Object.Destroy (tile.gameObject);
 			shipLevelManager.TearDown();
+
 			if (_rowbBoatParent !=null) {
 				
 				Object.Destroy(_rowbBoatParent.gameObject);
 			}
-			
 			
 		}
 		

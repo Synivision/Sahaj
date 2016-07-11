@@ -68,10 +68,12 @@
 	{
 		add_sprite.png
 		Bomber.png
+		Bomber_Render.png
 		button_bg_1.png
 		button_bg_2.png
 		canvas_bg.jpg
 		Captain.png
+		Captain_Render.png
 		captain_sword.png
 		cross.png
 		dot.png
@@ -79,11 +81,11 @@
 		dot_selected.png
 		frame.png
 		frame_map_image.png
-		Garen_Render.png
 		gold_storage.png
 		grass.png
 		GridEmissive.png
 		Gunner.png
+		Gunner_Render.png
 		gunner_tower.png
 		info.png
 		level_select_map.jpg
@@ -92,6 +94,7 @@
 		map_img3.png
 		platoons.png
 		Quarter Master.png
+		Quarter Master_Render.png
 		residence.png
 		row_boat.png
 		row_boat_mini.png
@@ -102,6 +105,7 @@
 		ship_gas.png
 		ship_gun.png
 		Surgeon.png
+		Surgeon_Render.png
 		SwatchMauveAlbedo.png
 		SwatchNavyAlbedo.png
 		SwatchNavyDarkAlbedo.png
