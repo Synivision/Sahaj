@@ -1,4 +1,4 @@
-﻿using Assets.Code.DataPipeline;
+using Assets.Code.DataPipeline;
 using Assets.Code.Messaging;
 using Assets.Code.Ui;
 using UnityEngine;
@@ -32,7 +32,7 @@ namespace Assets.Code.States
 		private MessagingToken _onOpenShopMessage;
 		private MessagingToken _onCreateBuildingMessage;
 		private MessagingToken _onOpenCreatePirateCanvasMessage;
-
+        private MessagingToken _onOpenStockCanvasMessage;
 		private MessagingToken _onOpenBuildingMenuMessage;
         public static bool buildingsMoving = false;
 
@@ -54,6 +54,7 @@ namespace Assets.Code.States
 		private InspectorCanvasController _buildingMenuCanvasController;
 
 		private NewCreatePirateCanvasController _createPirateCanvasController;
+        private StockCanvasController _stockCanvasController;
         Vector3 curPosition;
 		Vector3 selectedgameObjectPosition = new Vector3(0,0,0);
 		
@@ -89,7 +90,7 @@ namespace Assets.Code.States
 			_onBuildingMove = _messager.Subscribe<MoveBuildingmessage> (OnMoveBuilding);
 			_onBuildingStopMovement = _messager.Subscribe<StopMovingBuildingMessage> (OnStopMovingBuilding);
 			_onOpenBuildingMenuMessage = _messager.Subscribe<OpenBuildingMenuMessage> (OnOpenBuildingMenu);
-
+            _onOpenStockCanvasMessage = _messager.Subscribe<OpenStockCanvasMessage>(OnOpenStockCanvas);
             //generate tile and disable it
             var tileo = _poolingObjectManager.Instantiate("tile");
             tile = tileo.gameObject;
@@ -134,6 +135,18 @@ namespace Assets.Code.States
 
 		}
 
+        void OnOpenStockCanvas(OpenStockCanvasMessage message) {
+            if (_stockCanvasController == null){
+
+                _stockCanvasController = new StockCanvasController(_resolver, _canvasProvider.GetCanvas("StockCanvas"));
+                _uiManager.RegisterUi(_stockCanvasController);
+                _stockCanvasController.enableCanvas();
+            }
+            else { 
+                _stockCanvasController.enableCanvas();
+
+            }
+        }
 
         public void onCreateBuilding(CreateBuildingMessage message) {
 			
@@ -198,7 +211,6 @@ namespace Assets.Code.States
 				_buildingMenuCanvasController = new InspectorCanvasController (_resolver, _canvasProvider.GetCanvas ("BuildingMenuCanvas"), message.Model, message.Position);
 				_uiManager.RegisterUi (_buildingMenuCanvasController);
 				_buildingMenuCanvasController.enableCanvas ();
-				Debug.Log ("Open Building canvas");
 
 			} else {
 				_buildingMenuCanvasController.enableCanvas ();
@@ -386,15 +398,15 @@ namespace Assets.Code.States
 		public override void TearDown (){
 
             _messager.CancelSubscription(_onBuildingInfoOpen,_onInventoryOpen,
-				_onChangeStateToAttack, _onOpenShopMessage, _onCreateBuildingMessage,_onOpenBuildingMenuMessage,_onBuildingMove,_onBuildingStopMovement);
+				_onChangeStateToAttack, _onOpenShopMessage, _onCreateBuildingMessage,_onOpenBuildingMenuMessage,_onBuildingMove,_onBuildingStopMovement, _onOpenStockCanvasMessage);
 			_uiManager.TearDown();
 			Object.Destroy (tile.gameObject);
 			shipLevelManager.TearDown();
-
 			if (_rowbBoatParent !=null) {
 				
 				Object.Destroy(_rowbBoatParent.gameObject);
 			}
+			
 			
 		}
 		

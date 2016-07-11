@@ -66,13 +66,43 @@ namespace Assets.Code.Ui.CanvasControllers
             AddPiratesAllowedToBeGeneratedByBuildingToButtonsPanel();
 
             _newPirateGeneratedMessage = _messager.Subscribe<NewPirateGeneratedMessage>(RemovePirate);
+
+            AddPiratesInQueueToPiratesBiengGeneratedPanel();
+        }
+
+        private void AddPiratesInQueueToPiratesBiengGeneratedPanel()
+        {
+            var piratesBiengGeneratedByPirateGenerator = _pirateGenerator.PiratesBiengGeneratedForBuilding(BuildingName);
+
+            foreach (var pirateName in piratesBiengGeneratedByPirateGenerator)
+            {
+                if (_listOfPiratesBiengGenerated.Contains(pirateName))
+                {
+                    var pirateBiengGeneratedButtonForCurrentPirate = _pirateDisplayImagePanel.transform.FindChild("Pirate " + pirateName);
+                    var numberOfPiratesOfCurrentTypeInQueueLabel = pirateBiengGeneratedButtonForCurrentPirate.GetChild(0).GetComponent<Text>();
+                    int numberOfPiratesOfThisType = System.Int32.Parse(numberOfPiratesOfCurrentTypeInQueueLabel.text);
+                    numberOfPiratesOfCurrentTypeInQueueLabel.text = (numberOfPiratesOfThisType + 1).ToString() + "";
+                }
+                else
+                {
+                    //Add pirate to second scroll panel
+                    var fab = Object.Instantiate(_prefabProvider.GetPrefab("pirate_bieng_generated")).gameObject.GetComponent<Button>();
+                    fab.transform.SetParent(_pirateDisplayImagePanel.transform);
+                    fab.gameObject.name = "Pirate " + pirateName;
+                    var pirateImage = _spriteProvider.GetSprite(pirateName + "_Render");
+                    fab.image.overrideSprite = pirateImage;
+                    _listOfPiratesBiengGenerated.Add(pirateName);
+                }
+            }
+
+
         }
 
         public override void Update()
         {
 
             base.Update();
-            _timeRemainingLabel.text = _pirateGenerator.GetTimeToCompletionOfPirate(BuildingName).ToString();
+            _timeRemainingLabel.text = _pirateGenerator.GetTimeToCompletionOfPirate(BuildingName).ToString().Substring(0,8);
         }
 
         private void InitializeUIElements()
@@ -113,6 +143,8 @@ namespace Assets.Code.Ui.CanvasControllers
                 buttonNumberLabel.text = _listOfAllPiratesAvailable[i].TrainingCost.ToString();
 
                 fab.transform.SetParent(_buttonPanel.transform);
+
+                fab.transform.localScale = new Vector3(0.7f,0.7f,0.7f);
 
                 AddListenerToButton(ref fab, _listOfAllPiratesAvailable[i].Name);
             }

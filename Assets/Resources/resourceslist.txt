@@ -75,6 +75,8 @@
 		Captain.png
 		Captain_Render.png
 		captain_sword.png
+		Carpenter.png
+		Chef.png
 		cross.png
 		dot.png
 		dot_bullet.png

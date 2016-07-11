@@ -104,6 +104,7 @@ namespace Assets.Code.UnityBehaviours
 			//initialize dummy player model
 			playerManager.Initialize(_resolver, InitializeDummyPlayerModel());
 			_resolver.RegisterItem(playerManager);
+			Debug.Log("Unlocked Pirate Count " + playerManager.Model.UnlockedPirates.Count.ToString());
 			
 			//Pirate Generator
 			var pirateGenerator = new PirateGenerator();
@@ -148,7 +149,7 @@ namespace Assets.Code.UnityBehaviours
 				PirateRange = (int)PirateModel.Range.Milee,
 				PirateColor = Color.blue,
 				TrainingCost = 2000,
-				TrainingTime = 20
+				TrainingTime = 60
 			});
 			
 			_gameDataProvider.AddData(new PirateModel
@@ -166,8 +167,8 @@ namespace Assets.Code.UnityBehaviours
 				PirateRange = (int)PirateModel.Range.Gunner3,
 				PirateColor = Color.green,
 				TrainingCost = 1000,
-                TrainingTime = 10
-            });
+				TrainingTime = 60
+			});
 			_gameDataProvider.AddData(new PirateModel
 			                          {
 				Name = "Gunner",
