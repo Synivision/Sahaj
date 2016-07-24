@@ -47,7 +47,7 @@ namespace Assets.Code.States
         private InputSessionData _inputSessionData;
         
         //ship lerp
-        public float speed = 1.0F;
+        public float speed = 0.5F;
         private float startTime;
         private float journeyLength;
         GameObject shipPrefab;
@@ -134,8 +134,8 @@ namespace Assets.Code.States
             if (_inputSession.CurrentlySelectedRowBoatName != null)
             {
                 _arrowGameObject.SetActive(true);
-                var pos1 = new Vector3(-200,20,0);
-                var pos2 = new Vector3(-150, 20, 0);
+                var pos1 = new Vector3(-150,20,106);
+                var pos2 = new Vector3(-150, 20, -121);
                 _arrowGameObject.transform.position = Vector3.Lerp(pos1, pos2, Mathf.PingPong(Time.time * speed, 1.0f));
 
             }
