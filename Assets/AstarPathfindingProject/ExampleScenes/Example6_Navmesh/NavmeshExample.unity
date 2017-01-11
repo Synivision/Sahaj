@@ -24,7 +24,7 @@ RenderSettings:
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
   m_HaloTexture: {fileID: 0}
-  m_SpotCookie: {fileID: 0}
+  m_SpotCookie: {fileID: 10001, guid: 0000000000000000e000000000000000, type: 0}
   m_ObjectHideFlags: 0
 --- !u!127 &3
 LevelGameManager:
@@ -34,12 +34,12 @@ LightmapSettings:
   m_ObjectHideFlags: 0
   m_LightProbes: {fileID: 0}
   m_Lightmaps: []
-  m_LightmapsMode: 0
+  m_LightmapsMode: 1
   m_BakedColorSpace: 0
   m_UseDualLightmapsInForward: 0
   m_LightmapEditorSettings:
-    m_Resolution: 20
-    m_LastUsedResolution: 20
+    m_Resolution: 1
+    m_LastUsedResolution: 0
     m_TextureWidth: 1024
     m_TextureHeight: 1024
     m_BounceBoost: 1
@@ -53,10 +53,10 @@ LightmapSettings:
     m_FinalGatherGradientThreshold: 0
     m_FinalGatherInterpolationPoints: 15
     m_AOAmount: 0
-    m_AOMaxDistance: .100000001
+    m_AOMaxDistance: 1
     m_AOContrast: 1
     m_LODSurfaceMappingDistance: 1
-    m_Padding: 0
+    m_Padding: 2
     m_TextureCompression: 0
     m_LockAtlas: 0
 --- !u!1 &5
@@ -377,12 +377,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   astarData:
-    hasBeenReverted: 0
-    data: 504b0304140000080800b0a0424607c2976a15010000b90100000b0024006772617068302e6a736f6e0a0020000000000001001800f42c61381b3fd001f42c61381b3fd001e02c61381b3fd00175514d4b033110fd2bcb9c63c922ae4b614f223d886bc1ea4544a6c96c0d6693251fb5dbd2ff6ed256ed41191832efcd1bde233b58452561ba8335ea483005594b5957925f0b7985b8e4175cd6bc1397654d5d55899ac39e81b7d109ba27ff9ea52df6596970dd27e48d36d80f9aaad30c0c16e390179e8c0ae3ad59294393ac65c519c28a67725e59d3f0c9a158711375888e1a433138d4ac98c7a556e28ec685fd20d398a8757663bbce53c84e3630e50cc643dfa69e4867038674f61fda0bd4c95bc90085880e03b5848e7c68ad4c78709118a86453a19e93411d8e723b90f9a6cd317f8beb9c6ae670c8a1a5c3cf99daf6d6ff9ee9eca37044e6e1a0ee50fb04f7189cdafcfc415a7f29193fd59fafd7fdfe0b504b0304140000080800b0a04246552ac6d97800000088000000090024006d6574612e6a736f6e0a0020000000000001001800703861381b3fd001703861381b3fd001663861381b3fd0011d8cb10e82301040ffe5666c8e104a65757092b81b86b377850eb684161263fc77a9db1bde7b1fd8654d3e06e8a151ad3aab0e2a98565ae6047d7de0e6f9a007b061369ab1b3dc123df1846cd0d9a636e2b4b60661ac20bf1719e825ffe24e79763eb00f931a68bf499aaf655cc410592e710bb998387e7f504b01022d00140000080800b0a0424607c2976a15010000b90100000b00240000000000000000000000000000006772617068302e6a736f6e0a0020000000000001001800f42c61381b3fd001f42c61381b3fd001e02c61381b3fd001504b01022d00140000080800b0a04246552ac6d978000000880000000900240000000000000000000000620100006d6574612e6a736f6e0a0020000000000001001800703861381b3fd001703861381b3fd001663861381b3fd001504b05060000000002000200b8000000250200000000
+    dataString: UEsDBBQAAAgIAAAIIez6cHWQAQEAAIMBAAALACQAZ3JhcGgwLmpzb24KACAAAAAAAAEAGAAAgD7V3rGdAQCAPtXesZ0BAIA+1d6xnQF1j09LAzEQxb/KMudYUsR1WehJpAdxLVi9yjSZ1GA2WfJn7bb0u5tsFb1IYCDvzW947wT7pCW0JxjRJIIWZCNlU0t+K+QN4o5fcdlwJa6XDam6Fg2HM4Pgkhf0SOG9oB32hbQ49ll5owP2g6H6+w8MttNQFl6sjtO93WtLi8Ky6o/CqlfyQTu74ov5seoumZg8rSyl6NGwapN2RosHmrbug+zKJmNKGqdUoFiSHKDlDKZ5HvPMpncRYz77jx0EmpxtyQCFSB4jdYSeQuyczHr0iRjoHFOj2ZBFEy+4G8j+2PbSv8OxtFp7HEpp6fFzrY+9C79nlHsWnsg+zbRCE+j8BVBLAwQUAAAICAAACCHsfeIlS3UAAACEAAAACQAkAG1ldGEuanNvbgoAIAAAAAAAAQAYAACAPtXesZ0BAIA+1d6xnQEAgD7V3rGdAR2MsQ6CMBBA/+VmJEeIpWF1cJK4G4azd6UdbAktJIbw71K3N7z3dthkST4G6KGtO6hgWmh2CfrmxNXzSS9gzawVY2f4SvTGC7JGa9pGi1XKaISxgvydZaCP/IsnZWd9YB+meqDtIcndy7iIIbLc4hpyMXE8flBLAQItABQAAAgIAAAIIez6cHWQAQEAAIMBAAALACQAAAAAAAAAAAAAAAAAAABncmFwaDAuanNvbgoAIAAAAAAAAQAYAACAPtXesZ0BAIA+1d6xnQEAgD7V3rGdAVBLAQItABQAAAgIAAAIIex94iVLdQAAAIQAAAAJACQAAAAAAAAAAAAAAE4BAABtZXRhLmpzb24KACAAAAAAAAEAGAAAgD7V3rGdAQCAPtXesZ0BAIA+1d6xnQFQSwUGAAAAAAIAAgC4AAAADgIAAAAA
+    upgradeData: 
     data_backup: 
     file_cachedStartup: {fileID: 0}
     data_cachedStartup: 
-    revertData: 
     cacheStartup: 0
   showNavGraphs: 1
   showUnwalkableNodes: 1
@@ -447,9 +446,6 @@ MonoBehaviour:
   minAreaSize: 10
   limitGraphUpdates: 1
   maxGraphUpdateFreq: .200000003
-  lastScanTime: .149303004
-  inGameDebugPath: 
-  isScanning: 0
   euclideanEmbedding:
     mode: 0
     seed: 0
@@ -470,6 +466,7 @@ NavMeshSettings:
     minRegionArea: 2
     widthInaccuracy: 16.666666
     heightInaccuracy: 10
+    tileSizeHint: 0
   m_NavMesh: {fileID: 0}
 --- !u!1 &578526423
 GameObject:
@@ -604,7 +601,7 @@ Light:
   serializedVersion: 3
   m_Type: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: .5
+  m_Intensity: .699999988
   m_Range: 10
   m_SpotAngle: 30
   m_CookieSize: 10
@@ -613,8 +610,8 @@ Light:
     m_Resolution: 3
     m_Strength: .913999975
     m_Bias: .0560000017
-    m_Softness: 1.64999998
-    m_SoftnessFade: .419999987
+    m_Softness: 4
+    m_SoftnessFade: 1
   m_Cookie: {fileID: 0}
   m_DrawHalo: 0
   m_ActuallyLightmapped: 0
@@ -624,7 +621,7 @@ Light:
     serializedVersion: 2
     m_Bits: 4294967295
   m_Lightmapping: 1
-  m_ShadowSamples: 5
+  m_ShadowSamples: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
   m_IndirectIntensity: 1
@@ -641,64 +638,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
---- !u!1 &1086680570
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 1086680571}
-  - 119: {fileID: 1086680573}
-  - 114: {fileID: 1086680572}
-  m_Layer: 1
-  m_Name: Shadow
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1086680571
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1086680570}
-  m_LocalRotation: {x: -.705589414, y: -.0463001654, z: .0463001728, w: -.705589294}
-  m_LocalPosition: {x: 0, y: .446803093, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 1797897903}
-  m_RootOrder: 2
---- !u!114 &1086680572
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1086680570}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9593f64d71aa84f3b8edc10cab754762, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!119 &1086680573
-Projector:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1086680570}
-  m_Enabled: 1
-  serializedVersion: 2
-  m_NearClipPlane: .387970567
-  m_FarClipPlane: 4.08242559
-  m_FieldOfView: 50
-  m_AspectRatio: 1
-  m_Orthographic: 0
-  m_OrthographicSize: 10
-  m_Material: {fileID: 2100000, guid: 9deee521acbe44d5487cbd7a54c06fa7, type: 2}
-  m_IgnoreLayers:
-    serializedVersion: 2
-    m_Bits: 0
 --- !u!1 &1552443639
 GameObject:
   m_ObjectHideFlags: 0
@@ -799,7 +738,6 @@ Transform:
   m_Children:
   - {fileID: 1552443640}
   - {fileID: 578526426}
-  - {fileID: 1086680571}
   m_Father: {fileID: 0}
   m_RootOrder: 6
 --- !u!114 &1797897905
@@ -870,7 +808,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   drawGizmos: 1
   detailedGizmos: 0
-  saveGetNearestHints: 1
   startEndModifier:
     priority: 3
     addPoints: 0
@@ -881,7 +818,8 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 4294967295
     useGraphRaycasting: 0
-  traversableTags:
+  traversableTags: -1
+  traversableTagsCompatibility:
     tagsChange: -1
     tagsSet: -1
   tagPenalties: 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
